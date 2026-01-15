@@ -1,16 +1,69 @@
 package main
 
+
 import (
+    // "context"
+    // "log"
 	"fmt"
 	"os"
+
+    "github.com/joho/godotenv"
+    "github.com/jolotech/jolo-mars/config"
+    "github.com/jolotech/jolo-mars/internal/app"
+    "github.com/jolotech/jolo-mars/internal/infrastructure/database"
+    // redisInfra "github.com/jolotech/Logistic-gateway/internal/infrastructure/redis"
+    // "github.com/jolotech/jolo-mars/internal/infrastructure/redis"
+
+    
+    // "github.com/jolotech/Logistic-gateway/internal/repository"
+    // "github.com/jolotech/Logistic-gateway/internal/queue"
+    // "github.com/jolotech/Logistic-gateway/internal/service"
+    // "github.com/jolotech/Logistic-gateway/internal/worker"
+    // "github.com/jolotech/jolo-mars/internal/app/dependencies"
+
+    // "github.com/robfig/cron/v3"
 )
 
-
-
 func main() {
+
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: go run cmd/main.go <Your Name>")
 		return
 	}
 	fmt.Printf("Hello, %s!\n", os.Args[1])
+
+
+    godotenv.Load()
+    config.LoadConfig()
+
+    database.ConnectDB()
+    // redisInfra.ConnectRedis()
+    // ctx := context.Background()
+
+    // redis.ConnectRedis()
+
+    // container := dependencies.Init()
+    // container.Worker.Start(ctx)
+
+    // ---- Cron Job ----
+	// c := cron.New()
+
+	// every 15 minutes auto debit check
+	// c.AddJob("*/2 * * * *", container.AutoDebit)
+	// c.Start()
+
+
+
+    // --- Initialize Webhook System ---
+    // webhookRepo := repositories.NewWebhookRepository(database.DB)
+    // webhookQueue := queue.NewWebhookQueue(redisInfra.RDB, "webhook_queue")
+    // webhookService := service.NewWebhookService(webhookRepo, webhookQueue)
+
+    // w := worker.NewWebhookWorker(webhookRepo, webhookQueue, webhookService)
+    // w.Start(ctx)
+
+    // log.Println("Webhook worker started...")
+
+    // Start the main API server
+    app.StartServer()
 }
