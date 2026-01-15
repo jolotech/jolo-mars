@@ -9,12 +9,12 @@ import (
 
 // Config holds all environment variables
 type Config struct {
-	DBUser               string
-	DBPassword           string
-	DBHost               string
-	DBPort               string
-	DBName               string
-	ServerPort           string
+	DBUser               string   // valid 
+	DBPassword           string   // valid
+	DBHost               string   // valid
+	DBPort               string   // valid
+	DBName               string   // valid
+	ServerPort           string   // valid
 	RedisAddr            string
 	RedisPort            string
 	AppSecrete           string
@@ -22,8 +22,9 @@ type Config struct {
 	PHPBaseURL           string
 	CloudinaryName       string
 	CloudinaryApiKey     string
-	CloudinaryApiSecrete string
-	AppEnv               string
+	CloudinaryApiSecrete string    
+	AppEnv               string    // valid values: "development", "staging", "production"
+	AppVersion           string    // valid
 }
 
 // LoadConfig loads .env variables or system env
@@ -49,6 +50,7 @@ func LoadConfig() *Config {
 		CloudinaryApiSecrete: os.Getenv("CLOUDINAR_API_SECRETE"),
 		AppSecrete: os.Getenv("APP_SIGNATURE_SECRET"),
 		AppEnv:    os.Getenv("ENV"),
+		AppVersion: os.Getenv("APP_VERSION"),
 	}
 
 	return cfg

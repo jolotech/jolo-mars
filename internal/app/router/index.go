@@ -11,6 +11,10 @@ import (
 	"github.com/jolotech/jolo-mars/internal/app/middlewares"
 	// "github.com/jolotech/jolo-mars/internal/helpers"
 	"github.com/jolotech/jolo-mars/internal/app/dependencies"
+    "github.com/jolotech/jolo-mars/internal/infrastructure/database"
+	"github.com/jolotech/jolo-mars/config"
+
+
 
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +24,8 @@ import (
 
 func InitRoutes(container *dependencies.Container) *gin.Engine {
 	// logger.InitLogger()
+	cfg := config.LoadConfig()
+
 
 	router := gin.New()
 
@@ -39,11 +45,31 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 	// 	helpers.SuccessResponse(c, nil, "✅ Jolo Delivery server is healthy", http.StatusOK)
 	// })
 
+	// router.GET("/health", func(c *gin.Context) {
+	// 	c.HTML(http.StatusOK, "health.html", gin.H{
+	// 		"time": time.Now().Format("02 Jan 2006, 15:04:05"),
+	// 	})
+	// })
+
 	router.GET("/health", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "health.html", gin.H{
-			"time": time.Now().Format("02 Jan 2006, 15:04:05"),
-		})
+	// DB health check
+	dbOK := true
+	sqlDB, err := database.DB.DB()
+	if err != nil || sqlDB.Ping() != nil {
+		dbOK = false
+	}
+
+	// uptime
+	uptime := time.Since(appStartTime).Round(time.Second)
+
+	c.HTML(http.StatusOK, "health.html", gin.H{
+		"time":    time.Now().Format("02 Jan 2006, 15:04:05"),
+		"uptime": uptime.String(),
+		"version": cfg.AppVersion,
+		"dbOK":    dbOK,
 	})
+})
+
 
 
 // 	router.GET("/health", func(c *gin.Context) {
