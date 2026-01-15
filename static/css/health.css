@@ -1,0 +1,128 @@
+/* Reset
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	background: #0f172a;
+	color: #e5e7eb;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	margin: 0;
+} */
+
+/* Card container */
+/* .card {
+	background: #020617;
+	padding: 40px;
+	border-radius: 12px;
+	text-align: center;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+	width: 500px;
+} */
+
+/* Status text */
+/* .status {
+	font-size: 22px;
+	font-weight: bold;
+	margin-top: 10px;
+}
+
+.status.ok {
+	color: #22c55e; 
+}
+
+.status.bad {
+	color: #ef4444; 
+} */
+
+/* Meta info */
+/* .meta {
+	margin-top: 12px;
+	font-size: 14px;
+	color: #94a3b8;
+} */
+
+
+
+/* Reset */
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	background: #0f172a;
+	color: #e5e7eb;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	margin: 0;
+}
+
+/* Card container */
+.card {
+	background: #020617;
+	padding: 40px;
+	border-radius: 12px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+	width: 520px;
+}
+
+/* Title */
+.card h1 {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+/* Server status */
+.status {
+	text-align: center;
+	font-size: 22px;
+	font-weight: bold;
+	margin-bottom: 25px;
+}
+
+.status.ok {
+	color: #22c55e;
+}
+
+.status.bad {
+	color: #ef4444;
+}
+
+/* Meta rows */
+.meta-row {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 14px;
+	font-size: 14px;
+}
+
+/* Left label */
+.meta-label {
+	color: #94a3b8;
+}
+
+/* Right value */
+.meta-value {
+	text-align: right;
+	font-weight: 600;
+}
+
+/* Dynamic colors */
+.meta-value.db-ok {
+	color: #22c55e; /* green */
+}
+
+.meta-value.db-bad {
+	color: #ef4444; /* red */
+}
+
+.meta-value.uptime {
+	color: #facc15; /* yellow */
+}
