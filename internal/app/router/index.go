@@ -9,7 +9,7 @@ import (
 	// "github.com/jolotech/jolo-mars/internal/app/middlewares"
 	"github.com/jolotech/jolo-mars/internal/app/middlewares"
 	"github.com/jolotech/jolo-mars/internal/helpers"
-
+	"github.com/jolotech/jolo-mars/internal/app/dependencies"
 
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +17,7 @@ import (
 
 
 
-func InitRoutes() *gin.Engine {
+func InitRoutes(container *dependencies.Container) *gin.Engine {
 	// logger.InitLogger()
 
 	router := gin.New()

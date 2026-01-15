@@ -10,7 +10,7 @@ import (
 )
 
 func StartServer() {
-	// container := dependencies.Init()
+	container := dependencies.Init()
 
 	r := router.InitRoutes(container)
 
