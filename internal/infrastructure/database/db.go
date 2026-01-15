@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"time"
-	"github.com/jolotech/jolo-mars/internal/infrastructure/database/migrations"
+	// "github.com/jolotech/jolo-mars/internal/infrastructure/database/migrations"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -52,17 +52,15 @@ func ConnectDB() {
 
 	DB = db
 	DB = db
-	tables := []string{"users", "admins"}
+	// tables := []string{"users", "admins"}
 
 
 		// 🚀 Automatically run migrations
-	if err := migrations.RunAll(DB, tables); err != nil {
-		log.Fatalf("❌ Migration failed: %v", err)
-	}
+	// if err := migrations.RunAll(DB, tables); err != nil {
+	// 	log.Fatalf("❌ Migration failed: %v", err)
+	// }
 
-	log.Println("✅ All migrations executed successfully.")
+	// log.Println("✅ All migrations executed successfully.")
 
-	// Migrations package not available; skipping automatic migrations.
-	log.Println("⚠️ Migrations skipped: migrations package not available")
 
 }

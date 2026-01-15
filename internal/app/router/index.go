@@ -1,7 +1,7 @@
 package router
 
 import (
-	"log"
+	// "log"
 	"net/http"
 
 	// "github.com/gin-gonic/gin"
@@ -34,22 +34,22 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 
 	// ✅ Health check
 	router.GET("/health", func(c *gin.Context) {
-		helpers.SuccessResponse(c, nil, "✅ Jolo Logistics API Gateway is healthy", http.StatusOK)
+		helpers.SuccessResponse(c, nil, "✅ Jolo Delivery server is healthy", http.StatusOK)
 	})
 
-	router.POST("/webhook/test", func(c *gin.Context) {
-    var payload map[string]interface{}
-    if err := c.BindJSON(&payload); err != nil {
-        c.JSON(400, gin.H{"error": "invalid json"})
-        return
-    }
+// 	router.POST("/webhook/test", func(c *gin.Context) {
+//     var payload map[string]interface{}
+//     if err := c.BindJSON(&payload); err != nil {
+//         c.JSON(400, gin.H{"error": "invalid json"})
+//         return
+//     }
 
-    log.Println("Received webhook:", payload)
+//     log.Println("Received webhook:", payload)
 
-    c.JSON(200, gin.H{
-        "message": "Webhook received successfully",
-    })
-})
+//     c.JSON(200, gin.H{
+//         "message": "Webhook received successfully",
+//     })
+// })
 
 
     // router.GET("/topup/verify", paymentHandler.VerifyTopUp)
