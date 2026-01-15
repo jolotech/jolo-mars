@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -37,6 +37,32 @@
 		<h1>🚀 Jolo Delivery API</h1>
 		<p class="status">✅ Server is Healthy</p>
 		<p class="time">Checked at: {{ .time }}</p>
+	</div>
+</body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Jolo Delivery – Health Status</title>
+	<link rel="stylesheet" href="/static/css/health.css">
+</head>
+<body>
+	<div class="card">
+		<h1>🚀 Jolo Delivery API</h1>
+
+		<p class="status {{ if .dbOK }}ok{{ else }}bad{{ end }}">
+			{{ if .dbOK }}✅ Server Healthy{{ else }}❌ Server Unhealthy{{ end }}
+		</p>
+
+		<p class="meta">🗄️ Database: {{ if .dbOK }}Connected{{ else }}Down{{ end }}</p>
+		<p class="meta">⏱️ Uptime: {{ .uptime }}</p>
+		<p class="meta">🏷️ Version: {{ .version }}</p>
+		<p class="meta">🕒 Checked at: {{ .time }}</p>
 	</div>
 </body>
 </html>
