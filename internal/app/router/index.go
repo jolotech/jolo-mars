@@ -44,6 +44,7 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 
 
      router.GET("/health", healthHandler.UI)
+	 router.GET("/health/json", healthHandler.JSON)
 
 	// 404 handler
 	NotFoundHandler(router)

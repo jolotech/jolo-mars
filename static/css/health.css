@@ -1,5 +1,6 @@
-/* Reset
-* {
+
+/* Reset */
+/* * {
 	box-sizing: border-box;
 }
 
@@ -19,32 +20,67 @@ body {
 	background: #020617;
 	padding: 40px;
 	border-radius: 12px;
-	text-align: center;
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-	width: 500px;
+	width: 520px;
 } */
 
-/* Status text */
+/* Title */
+/* .card h1 {
+	text-align: center;
+	margin-bottom: 20px;
+} */
+
+/* Server status */
 /* .status {
+	text-align: center;
 	font-size: 22px;
 	font-weight: bold;
-	margin-top: 10px;
+	margin-bottom: 25px;
 }
 
 .status.ok {
-	color: #22c55e; 
+	color: #22c55e;
 }
 
 .status.bad {
-	color: #ef4444; 
+	color: #ef4444;
 } */
 
-/* Meta info */
-/* .meta {
-	margin-top: 12px;
+/* Meta rows */
+/* .meta-row {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 14px;
 	font-size: 14px;
+} */
+
+/* Left label */
+/* .meta-label {
 	color: #94a3b8;
 } */
+
+/* Right value */
+/* .meta-value {
+	text-align: right;
+	font-weight: 600;
+} */
+
+/* Dynamic colors */
+/* .meta-value.db-ok {
+	color: #22c55e; 
+}
+
+.meta-value.db-bad {
+	color: #ef4444; 
+}
+
+.meta-value.uptime {
+	color: #facc15; 
+} */
+
+
+
+
 
 
 
@@ -64,35 +100,47 @@ body {
 	margin: 0;
 }
 
-/* Card container */
 .card {
 	background: #020617;
 	padding: 40px;
 	border-radius: 12px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 	width: 520px;
 }
 
-/* Title */
 .card h1 {
 	text-align: center;
 	margin-bottom: 20px;
 }
 
-/* Server status */
 .status {
 	text-align: center;
 	font-size: 22px;
 	font-weight: bold;
 	margin-bottom: 25px;
+	transition: color 0.5s ease;
 }
 
 .status.ok {
-	color: #22c55e;
+	color: #22c55e; /* green */
+	animation: pulse-green 2s infinite;
 }
 
 .status.bad {
-	color: #ef4444;
+	color: #ef4444; /* red */
+	animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-green {
+	0% { color: #22c55e; }
+	50% { color: #38b000; }
+	100% { color: #22c55e; }
+}
+
+@keyframes pulse-red {
+	0% { color: #ef4444; }
+	50% { color: #f87171; }
+	100% { color: #ef4444; }
 }
 
 /* Meta rows */
@@ -103,26 +151,17 @@ body {
 	font-size: 14px;
 }
 
-/* Left label */
 .meta-label {
 	color: #94a3b8;
 }
 
-/* Right value */
 .meta-value {
 	text-align: right;
 	font-weight: 600;
 }
 
-/* Dynamic colors */
-.meta-value.db-ok {
-	color: #22c55e; /* green */
-}
-
-.meta-value.db-bad {
-	color: #ef4444; /* red */
-}
-
-.meta-value.uptime {
-	color: #facc15; /* yellow */
-}
+.meta-value.db-ok { color: #22c55e; }
+.meta-value.db-bad { color: #ef4444; }
+.meta-value.uptime { color: #facc15; } /* yellow */
+.meta-value.mem { color: #60a5fa; }   /* blue */
+.meta-value.cpu { color: #f97316; }   /* orange */

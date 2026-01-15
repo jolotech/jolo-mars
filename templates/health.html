@@ -1,39 +1,11 @@
-
-
-<!-- 
-
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<title>Jolo Delivery – Health Status</title>
 	<link rel="stylesheet" href="/static/css/health.css">
-</head>
-<body>
-	<div class="card">
-		<h1>🚀 Jolo Delivery API</h1>
 
-		<p class="status {{ if .dbOK }}ok{{ else }}bad{{ end }}">
-			{{ if .dbOK }}✅ Server Healthy{{ else }}❌ Server Unhealthy{{ end }}
-		</p>
-
-		<p class="meta">🗄️ Database: {{ if .dbOK }}Connected{{ else }}Down{{ end }}</p>
-		<p class="meta">⏱️ Uptime: {{ .uptime }}</p>
-		<p class="meta">🏷️ Version: {{ .version }}</p>
-		<p class="meta">🕒 Checked at: {{ .time }}</p>
-	</div>
-</body>
-</html> -->
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Jolo Delivery – Health Status</title>
-	<link rel="stylesheet" href="/static/css/health.css">
+	<meta http-equiv="refresh" content="10">
 </head>
 <body>
 	<div class="card">
@@ -56,6 +28,11 @@
 		</div>
 
 		<div class="meta-row">
+			<span class="meta-label">💾 Memory</span>
+			<span class="meta-value mem">{{ .memUsageMB }} MB</span>
+		</div>
+
+		<div class="meta-row">
 			<span class="meta-label">🏷️ Version</span>
 			<span class="meta-value">{{ .version }}</span>
 		</div>
@@ -66,4 +43,89 @@
 		</div>
 	</div>
 </body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Jolo Delivery – Health Status</title>
+	<link rel="stylesheet" href="/static/css/health.css">
+</head>
+<body>
+	<div class="card">
+		<h1>🚀 Jolo Delivery API</h1>
+
+		<p id="server-status" class="status ok">Server is Healthy</p>
+
+		<div class="meta-row">
+			<span class="meta-label">🗄️ Database</span>
+			<span id="db-status" class="meta-value db-ok">Connected</span>
+		</div>
+
+		<div class="meta-row">
+			<span class="meta-label">⏱️ Uptime</span>
+			<span id="uptime" class="meta-value uptime">0s</span>
+		</div>
+
+		<div class="meta-row">
+			<span class="meta-label">💾 Memory</span>
+			<span id="mem" class="meta-value mem">0 MB</span>
+		</div>
+
+		<div class="meta-row">
+			<span class="meta-label">🏷️ Version</span>
+			<span id="version" class="meta-value">{{ .version }}</span>
+		</div>
+
+		<div class="meta-row">
+			<span class="meta-label">🕒 Checked</span>
+			<span id="checked-time" class="meta-value">{{ .time }}</span>
+		</div>
+	</div>
+
+	<script>
+		async function fetchHealth() {
+			try {
+				const res = await fetch("/health/json");
+				const data = await res.json();
+
+				// Server status
+				const serverStatus = document.getElementById("server-status");
+				serverStatus.className = "status " + (data.dbOK ? "ok" : "bad");
+				serverStatus.textContent = data.dbOK ? "Server is Healthy" : "Server is Unhealthy";
+
+				// DB
+				const db = document.getElementById("db-status");
+				db.className = "meta-value " + (data.dbOK ? "db-ok" : "db-bad");
+				db.textContent = data.dbOK ? "Connected" : "Down";
+
+				// Uptime
+				const uptime = document.getElementById("uptime");
+				uptime.textContent = data.uptime;
+
+				// Memory
+				const mem = document.getElementById("mem");
+				mem.textContent = data.memUsageMB + " MB";
+
+				// Version
+				const version = document.getElementById("version");
+				version.textContent = data.version;
+
+				// Checked time
+				const checked = document.getElementById("checked-time");
+				checked.textContent = data.time;
+			} catch (err) {
+				console.error("Error fetching health data:", err);
+			}
+		}
+
+		// Fetch immediately and every 5 seconds
+		fetchHealth();
+		setInterval(fetchHealth, 5000);
+	</script>
+</body>
 </html>
+
