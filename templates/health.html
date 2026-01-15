@@ -1,42 +1,26 @@
-<!-- <!DOCTYPE html>
+
+
+<!-- 
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<title>Jolo Delivery – Health Status</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			background: #0f172a;
-			color: #e5e7eb;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			height: 100vh;
-		}
-		.card {
-			background: #020617;
-			padding: 40px;
-			border-radius: 12px;
-			text-align: center;
-			box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-		}
-		.status {
-			font-size: 22px;
-			color: #22c55e;
-			margin-top: 10px;
-		}
-		.time {
-			margin-top: 15px;
-			font-size: 14px;
-			color: #94a3b8;
-		}
-	</style>
+	<link rel="stylesheet" href="/static/css/health.css">
 </head>
 <body>
 	<div class="card">
 		<h1>🚀 Jolo Delivery API</h1>
-		<p class="status">✅ Server is Healthy</p>
-		<p class="time">Checked at: {{ .time }}</p>
+
+		<p class="status {{ if .dbOK }}ok{{ else }}bad{{ end }}">
+			{{ if .dbOK }}✅ Server Healthy{{ else }}❌ Server Unhealthy{{ end }}
+		</p>
+
+		<p class="meta">🗄️ Database: {{ if .dbOK }}Connected{{ else }}Down{{ end }}</p>
+		<p class="meta">⏱️ Uptime: {{ .uptime }}</p>
+		<p class="meta">🏷️ Version: {{ .version }}</p>
+		<p class="meta">🕒 Checked at: {{ .time }}</p>
 	</div>
 </body>
 </html> -->
@@ -59,10 +43,27 @@
 			{{ if .dbOK }}✅ Server Healthy{{ else }}❌ Server Unhealthy{{ end }}
 		</p>
 
-		<p class="meta">🗄️ Database: {{ if .dbOK }}Connected{{ else }}Down{{ end }}</p>
-		<p class="meta">⏱️ Uptime: {{ .uptime }}</p>
-		<p class="meta">🏷️ Version: {{ .version }}</p>
-		<p class="meta">🕒 Checked at: {{ .time }}</p>
+		<div class="meta-row">
+			<span class="meta-label">🗄️ Database</span>
+			<span class="meta-value {{ if .dbOK }}db-ok{{ else }}db-bad{{ end }}">
+				{{ if .dbOK }}Connected{{ else }}Down{{ end }}
+			</span>
+		</div>
+
+		<div class="meta-row">
+			<span class="meta-label">⏱️ Uptime</span>
+			<span class="meta-value uptime">{{ .uptime }}</span>
+		</div>
+
+		<div class="meta-row">
+			<span class="meta-label">🏷️ Version</span>
+			<span class="meta-value">{{ .version }}</span>
+		</div>
+
+		<div class="meta-row">
+			<span class="meta-label">🕒 Checked</span>
+			<span class="meta-value">{{ .time }}</span>
+		</div>
 	</div>
 </body>
 </html>
