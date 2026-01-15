@@ -7,7 +7,7 @@ import (
 	"time"
 
 	// "jolo-mars/internal/infrasructure/database/migrations"
-	"github.com/jolotech/jolo-mars/internal/infrasructure/database/migrations"
+	"github.com/jolotech/jolo-mars/internal/infrastructure/database/migrations"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
