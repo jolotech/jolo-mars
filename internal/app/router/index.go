@@ -3,12 +3,13 @@ package router
 import (
 	// "log"
 	"net/http"
+	"time"
 
 	// "github.com/gin-gonic/gin"
 	// "github.com/gin-contrib/cors"
 	// "github.com/jolotech/jolo-mars/internal/app/middlewares"
 	"github.com/jolotech/jolo-mars/internal/app/middlewares"
-	"github.com/jolotech/jolo-mars/internal/helpers"
+	// "github.com/jolotech/jolo-mars/internal/helpers"
 	"github.com/jolotech/jolo-mars/internal/app/dependencies"
 
 
@@ -33,9 +34,58 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 
 
 	// ✅ Health check
+	// router.GET("/health", func(c *gin.Context) {
+	// 	helpers.SuccessResponse(c, nil, "✅ Jolo Delivery server is healthy", http.StatusOK)
+	// })
+
 	router.GET("/health", func(c *gin.Context) {
-		helpers.SuccessResponse(c, nil, "✅ Jolo Delivery server is healthy", http.StatusOK)
-	})
+	c.Header("Content-Type", "text/html")
+	c.String(http.StatusOK, `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Jolo Delivery – Health Status</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background: #0f172a;
+			color: #e5e7eb;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+		}
+		.card {
+			background: #020617;
+			padding: 40px;
+			border-radius: 12px;
+			text-align: center;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+		}
+		.status {
+			font-size: 22px;
+			color: #22c55e;
+			margin-top: 10px;
+		}
+		.time {
+			margin-top: 15px;
+			font-size: 14px;
+			color: #94a3b8;
+		}
+	</style>
+</head>
+<body>
+	<div class="card">
+		<h1>🚀 Jolo Delivery API</h1>
+		<p class="status">✅ Server is Healthy</p>
+		<p class="time">Checked at: `+time.Now().Format("02 Jan 2006, 15:04:05")+`</p>
+	</div>
+</body>
+</html>
+`)
+})
+
 
 // 	router.POST("/webhook/test", func(c *gin.Context) {
 //     var payload map[string]interface{}
