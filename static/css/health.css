@@ -123,12 +123,12 @@ body {
 
 .status.ok {
 	color: #22c55e; /* green */
-	animation: pulse-green 2s infinite;
+	animation: pulse-green 5s infinite;
 }
 
 .status.bad {
 	color: #ef4444; /* red */
-	animation: pulse-red 2s infinite;
+	animation: pulse-red 5s infinite;
 }
 
 @keyframes pulse-green {
