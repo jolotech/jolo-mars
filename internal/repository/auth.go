@@ -1,4 +1,4 @@
-package reposiory
+package repository
 
 
 import (
