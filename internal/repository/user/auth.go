@@ -15,6 +15,9 @@ type UserAuthRepository struct {
 	db *gorm.DB
 }	
 
+func NewUserAuthRepository(db *gorm.DB) *UserAuthRepository {
+	return &UserAuthRepository{db: db}
+}
 
 func FindUserByRefCode(db *gorm.DB, code string) (*models.User, error) {
 	var user models.User
