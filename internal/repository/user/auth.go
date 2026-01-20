@@ -11,6 +11,10 @@ import (
 )
 
 
+type UserAuthRepository struct {
+	db *gorm.DB
+}	
+
 
 func FindUserByRefCode(db *gorm.DB, code string) (*models.User, error) {
 	var user models.User

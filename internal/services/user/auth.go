@@ -9,12 +9,12 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/jolotech/jolo-mars/internal/models"
-	"github.com/jolotech/jolo-mars/internal/repository"
+	"github.com/jolotech/jolo-mars/internal/repository/user"
 	// "github.com/jolotech/jolo-mars/internal/utils"
 )
 
-type AuthService struct {
-	repo *repository.AuthRepository
+type UserAuthService struct {
+	repo *repository.UserAuthRepository
 	DB   *gorm.DB
 }
 
@@ -27,14 +27,14 @@ type RegisterRequest struct {
 }
 
 
-func NewAuthService(repo *repository.AuthRepository, db *gorm.DB) *AuthService {
-	return &AuthService{
+func NewAuthService(repo *repository.UserAuthRepository, db *gorm.DB) *UserAuthService {
+	return &UserAuthService{
 		repo: repo,
 		DB: db,
 	}
 }
 
-func (s *AuthService) Register(c *gin.Context, req RegisterRequest) (gin.H, int) {
+func (s *UserAuthService) Register(c *gin.Context, req RegisterRequest) (gin.H, int) {
 
 	// ================= VALIDATION =================
 	if err := utils.ValidateRegister(req, s.DB); err != nil {
