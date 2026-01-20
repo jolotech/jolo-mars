@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jolotech/jolo-mars/internal/domain"
+	"github.com/jolotech/jolo-mars/internal/models"
 	"gorm.io/gorm"
 )
 
@@ -14,7 +14,7 @@ func RunAll(db *gorm.DB, tables []string) error {
     log.Println("🚀 Starting all migrations...")
 
     // Ensure migration_histories table exists
-    if err := db.AutoMigrate(&domain.MigrationHistory{}); err != nil {
+    if err := db.AutoMigrate(&models.MigrationHistory{}); err != nil {
         return fmt.Errorf("failed migration_histories migration: %v", err)
     }
     log.Println("✅ migration_histories table synced.")
@@ -24,12 +24,12 @@ func RunAll(db *gorm.DB, tables []string) error {
 
         switch table {
         case "users":
-            if err := db.AutoMigrate(&domain.User{}); err != nil {
+            if err := db.AutoMigrate(&models.User{}); err != nil {
                 return fmt.Errorf("failed users migration: %v", err)
             }
             log.Println("✅ users table synced.")
         case "admins", "admin":
-            if err := db.AutoMigrate(&domain.Admin{}); err != nil {
+            if err := db.AutoMigrate(&models.Admin{}); err != nil {
                 return fmt.Errorf("failed admins migration: %v", err)
             }
             log.Println("✅ admins table synced.")
