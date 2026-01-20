@@ -26,6 +26,14 @@ type RegisterRequest struct {
 	RefCode  string `json:"ref_code"`
 }
 
+
+func NewAuthService(repo *repository.AuthRepository, db *gorm.DB) *AuthService {
+	return &AuthService{
+		repo: repo,
+		DB: db,
+	}
+}
+
 func (s *AuthService) Register(c *gin.Context, req RegisterRequest) (gin.H, int) {
 
 	// ================= VALIDATION =================
