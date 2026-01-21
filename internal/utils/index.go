@@ -4,11 +4,15 @@ import (
 	"errors"
 	"regexp"
 	"strings"
-
+	"github.com/jolotech/jolo-mars/types"
+	
 	"gorm.io/gorm"
 )
 
-func ValidateRegister(req RegisterRequest, db *gorm.DB) error {
+
+
+
+func ValidateRegister(req types.RegisterRequest, db *gorm.DB) error {
 	// Trim spaces
 	req.Name = strings.TrimSpace(req.Name)
 	req.Email = strings.TrimSpace(req.Email)
@@ -38,7 +42,7 @@ func ValidateRegister(req RegisterRequest, db *gorm.DB) error {
 	// Check if email already exists
 	if req.Email != "" {
 		var count int64
-		if err := db.Model(&User{}).
+		if err := db.Table("users").
 			Where("email = ?", req.Email).
 			Count(&count).Error; err != nil {
 			return err
@@ -51,7 +55,7 @@ func ValidateRegister(req RegisterRequest, db *gorm.DB) error {
 
 	// Check if phone already exists
 	var phoneCount int64
-	if err := db.Model(&User{}).
+	if err := db.Table("users").
 		Where("phone = ?", req.Phone).
 		Count(&phoneCount).Error; err != nil {
 		return err
