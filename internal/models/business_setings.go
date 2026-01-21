@@ -3,7 +3,7 @@ package models
 import "time"
 
 type BusinessSetting struct {
-	ID uint `gorm:"primaryKey"`
+	ID                      uint       `json:"id" gorm:"primaryKey"`
 
 	// Referral
 	RefEarningStatus        bool        `json:"ref_earning_status" gorm:"default:true"`
