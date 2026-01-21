@@ -12,6 +12,7 @@ import (
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/internal/repository/user"
 	"github.com/jolotech/jolo-mars/internal/utils"
+	"github.com/jolotech/jolo-mars/types"
 )
 
 type UserAuthService struct {
@@ -20,13 +21,13 @@ type UserAuthService struct {
 	DB   *gorm.DB
 }
 
-type RegisterRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone" binding:"required"`
-	Password string `json:"password" binding:"required,min=8"`
-	RefCode  string `json:"ref_code"`
-}
+// type RegisterRequest struct {
+// 	Name     string `json:"name" binding:"required"`
+// 	Email    string `json:"email"`
+// 	Phone    string `json:"phone" binding:"required"`
+// 	Password string `json:"password" binding:"required,min=8"`
+// 	RefCode  string `json:"ref_code"`
+// }
 
 
 func NewAuthService(authRepo *repository.UserAuthRepository, mainRepo *repository.UserMainRepository, db *gorm.DB) *UserAuthService {
@@ -37,7 +38,7 @@ func NewAuthService(authRepo *repository.UserAuthRepository, mainRepo *repositor
 	}
 }
 
-func (s *UserAuthService) Register(c *gin.Context, req RegisterRequest) (string, error) {
+func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (string, error) {
 
 	// ================= VALIDATION =================
 	if err := utils.ValidateRegister(req, s.DB); err != nil {
