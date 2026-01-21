@@ -57,9 +57,10 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	var refBy *uint
 
 	if req.RefCode != "" {
-		refStatus := repository.GetBusinessSetting(s.DB, "ref_earning_status")
-		if !refStatus {
-			return utils.ErrorResponse("ref_code", utils.Translate("messages.referer_disable")), 403
+		refStatus := models.GetBusinessSetting(s.DB, "ref_earning_status").(bool)
+		// refStatus := setting.(bool)
+		if  !refStatus {
+			return "referer not available", nil, http.StatusForbidden, errors.New("referer not available")
 		}
 
 		referer, err := repository.FindUserByRefCode(s.DB, req.RefCode)
