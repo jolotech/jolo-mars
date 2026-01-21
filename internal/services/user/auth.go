@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -10,11 +11,12 @@ import (
 
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/internal/repository/user"
-	// "github.com/jolotech/jolo-mars/internal/utils"
+	"github.com/jolotech/jolo-mars/internal/utils"
 )
 
 type UserAuthService struct {
-	repo *repository.UserAuthRepository
+	authRepo *repository.UserAuthRepository
+	mainRepo *repository.UserMainRepository
 	DB   *gorm.DB
 }
 
@@ -27,14 +29,15 @@ type RegisterRequest struct {
 }
 
 
-func NewAuthService(repo *repository.UserAuthRepository, db *gorm.DB) *UserAuthService {
+func NewAuthService(authRepo *repository.UserAuthRepository, mainRepo *repository.UserMainRepository, db *gorm.DB) *UserAuthService {
 	return &UserAuthService{
-		repo: repo,
+		authRepo: authRepo,
+		mainRepo: mainRepo,
 		DB: db,
 	}
 }
 
-func (s *UserAuthService) Register(c *gin.Context, req RegisterRequest) (gin.H, int) {
+func (s *UserAuthService) Register(c *gin.Context, req RegisterRequest) (string, error) {
 
 	// ================= VALIDATION =================
 	if err := utils.ValidateRegister(req, s.DB); err != nil {
@@ -98,12 +101,15 @@ func (s *UserAuthService) Register(c *gin.Context, req RegisterRequest) (gin.H, 
 		Status:   true,
 	}
 
-	if err := s.DB.Create(&user).Error; err != nil {
-		return gin.H{"error": err.Error()}, 500
+	newUSer, err := s.authRepo.CreateUser(&user); 
+	if err != nil {
+		return "", err
 	}
 
-	user.RefCode = utils.GenerateRefererCode(user)
-	s.DB.Save(&user)
+	newUSer.RefCode = utils.GenerateRefererCode(user)
+	if err := s.mainRepo.UpdateUser(newUSer); err != nil {
+		return "", err
+	}
 
 	// ================= TOKEN =================
 	token := utils.GenerateAuthToken(user.ID)

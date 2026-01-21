@@ -19,6 +19,16 @@ func NewUserAuthRepository(db *gorm.DB) *UserAuthRepository {
 	return &UserAuthRepository{db: db}
 }
 
+
+func (r *UserAuthRepository) CreateUser(user *models.User) (*models.User, error) {
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
+	if err := r.db.Create(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func FindUserByRefCode(db *gorm.DB, code string) (*models.User, error) {
 	var user models.User
 	err := db.Where("ref_code = ?", code).First(&user).Error
@@ -34,3 +44,4 @@ func CreateUserNotification(db *gorm.DB, userID uint, data map[string]interface{
 		"updated_at": time.Now(),
 	})
 }
+ 
