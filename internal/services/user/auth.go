@@ -13,6 +13,7 @@ import (
 	"github.com/jolotech/jolo-mars/internal/repository/user"
 	"github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/utils"
+	"github.com/jolotech/jolo-mars/internal/helpers"
 	"github.com/jolotech/jolo-mars/types"
 )
 
@@ -89,7 +90,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 			referer.CMFirebaseToken != nil {
 
 			helpers.SendPushNotifToDevice(*referer.CMFirebaseToken, notification)
-			repository.CreateUserNotification(s.DB, referer.ID, notification)
+			s.authRepo.CreateUserNotification(referer.ID, notification)
 		}
 
 		refBy = &referer.ID
@@ -112,7 +113,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	}
 
 	newUSer.RefCode = utils.GenerateRefererCode(user)
-	if err := s.mainRepo.UpdateUser(newUSer); err != nil {
+	if err := s.usermainRepo.UpdateUser(newUSer); err != nil {
 		return "error generating referer code", nil, http.StatusInternalServerError, err
 	}
 

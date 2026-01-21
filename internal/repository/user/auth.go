@@ -35,13 +35,23 @@ func (r *Auth) FindUserByRefCode(code string) (*models.User, error) {
 	return &user, err
 }
 
-func CreateUserNotification(db *gorm.DB, userID uint, data map[string]interface{}) {
+func (r *Auth) CreateUserNotification(userID uint, data map[string]interface{}) error {
+
 	payload, _ := json.Marshal(data)
-	db.Table("user_notifications").Create(map[string]interface{}{
-		"user_id":    userID,
-		"data":       payload,
-		"created_at": time.Now(),
-		"updated_at": time.Now(),
-	})
+
+	return r.db.Create(&models.UserNotification{
+		UserID: userID,
+		Data:   string(payload),
+	}).Error
 }
+// func CreateUserNotification(db *gorm.DB, userID uint, data map[string]interface{}) {
+// 	payload, _ := json.Marshal(data)
+// 	db.Table("user_notifications").Create(map[string]interface{}{
+// 		"user_id":    userID,
+// 		"data":       payload,
+// 		"created_at": time.Now(),
+// 		"updated_at": time.Now(),
+// 	})
+// }
+
  
