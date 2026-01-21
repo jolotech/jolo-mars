@@ -58,7 +58,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 
 	if req.RefCode != "" {
 		refStatus := repository.GetBusinessSetting(s.DB, "ref_earning_status")
-		if refStatus != "1" {
+		if !refStatus {
 			return utils.ErrorResponse("ref_code", utils.Translate("messages.referer_disable")), 403
 		}
 
