@@ -5,11 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jolotech/jolo-mars/internal/services/user"
-	"github.com/joloetech/jolo-mars/types"
+	"github.com/jolotech/jolo-mars/internal/helpers"
+	"github.com/jolotech/jolo-mars/types"
 )
 
 type AuthHandler struct {
-	AuthService services.UserAuthService
+	UserAuthService services.UserAuthService
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
@@ -22,6 +23,10 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	resp, statusCode := h.UserAuthService.Register(c, req)
-	c.JSON(statusCode, resp)
+	msg, data, statusCode, err := h.UserAuthService.Register(c, req)
+	if err != nil {
+		helpers.ErrorResponse(c, err, msg, statusCode)
+		return
+	}
+	helpers.SuccessResponse(c, data, msg, statusCode)
 }

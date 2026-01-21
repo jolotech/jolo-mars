@@ -38,11 +38,11 @@ func NewAuthService(authRepo *repository.UserAuthRepository, mainRepo *repositor
 	}
 }
 
-func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (string, uint64, error) {
+func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (string, interface{}, int, error) {
 
 	// ================= VALIDATION =================
 	if msg := utils.ValidateUserRegister(req, s.DB); msg != "" {
-		return msg , http.StatusForbidden, errors.New(msg)
+		return msg, nil, http.StatusForbidden, errors.New(msg)
 	}
 
 	// ================= NAME SPLIT =================
@@ -102,12 +102,12 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 
 	newUSer, err := s.authRepo.CreateUser(&user); 
 	if err != nil {
-		return "", err
+		return "error creating user", nil, http.StatusInternalServerError, err
 	}
 
 	newUSer.RefCode = utils.GenerateRefererCode(user)
 	if err := s.mainRepo.UpdateUser(newUSer); err != nil {
-		return "", err
+		return "error generating referer code", nil, http.StatusInternalServerError, err
 	}
 
 	// ================= TOKEN =================
@@ -158,7 +158,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	// ================= REGISTRATION MAIL =================
 	utils.SendRegistrationMailIfEnabled(req.Email, req.Name)
 
-	return gin.H{
+	data :=  map[string]interface{}{
 		"token":               token,
 		"is_phone_verified":   isPhoneVerified,
 		"is_email_verified":   isEmailVerified,
@@ -166,5 +166,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		"is_exist_user":       nil,
 		"login_type":          "manual",
 		"email":               user.Email,
-	}, 200
+	}
+
+	return "", data, http.StatusOK, nil
 }
