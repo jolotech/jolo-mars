@@ -31,6 +31,11 @@ func UserAuthMiddleware() gin.HandlerFunc {
 
 		tokenString := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
 		log.Println("Extracted Token:", tokenString)
+		if tokenString == "" {
+			helpers.ErrorResponse(c, nil, "Token not provided in Authorization header", http.StatusUnauthorized)
+			c.Abort()
+			return
+		}
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			return secret, nil
@@ -50,15 +55,15 @@ func UserAuthMiddleware() gin.HandlerFunc {
 		}
 
 		email, ok := claims["email"].(string)
-		userId, ok := claims["user_id"]
-
+		userIdFloat, ok := claims["user_id"].(float64)
 		if !ok || email == "" {
 			helpers.ErrorResponse(c, nil, "Invalid token payload", http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
+		userId := uint(userIdFloat)
 
-		// pass email forward
+		// pass email/userId forward
 		c.Set("userEmail", email)
 		c.Set("userId", userId)
 

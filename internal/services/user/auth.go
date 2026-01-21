@@ -127,17 +127,17 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	token, _ := utils.GenerateAuthToken(user.Email, user.ID)
 
 	// ================= SETTINGS =================
-	loginSettings := repository.GetLoginSettings(s.DB)
-	firebaseOTP := repository.GetBusinessSetting(s.DB, "firebase_otp_verification")
+	loginSettings := s.adminmainRepo.GetLoginSettings()
+	firebaseOTP := s.adminmainRepo.GetBusinessSetting("firebase_otp_verification").(bool)
 
-	isPhoneVerified := 1
-	isEmailVerified := 1
+	isPhoneVerified := true
+	isEmailVerified := true
 
 	// ================= PHONE OTP =================
-	if loginSettings["phone_verification_status"] == "1" {
-		isPhoneVerified = 0
+	if loginSettings.PhoneVerification {
+		isPhoneVerified = false
 
-		if firebaseOTP != "1" {
+		if !firebaseOTP {
 			lastOTP := repository.GetPhoneVerification(s.DB, req.Phone)
 			if lastOTP != nil && time.Since(lastOTP.UpdatedAt).Seconds() < 60 {
 				wait := 60 - int(time.Since(lastOTP.UpdatedAt).Seconds())
@@ -148,7 +148,8 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 			repository.UpsertPhoneOTP(s.DB, req.Phone, otp)
 
 			if !utils.SendSMS(req.Phone, otp) {
-				return utils.ErrorResponse("otp", utils.Translate("messages.failed_to_send_sms")), 405
+				return "failed to send sms", nil, http.StatusMethodNotAllowed, errors.New("failed to send sms")
+
 			}
 
 			token = ""
@@ -156,8 +157,8 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	}
 
 	// ================= EMAIL OTP =================
-	if loginSettings["email_verification_status"] == "1" {
-		isEmailVerified = 0
+	if loginSettings.EmailVerification {
+		isEmailVerified = false
 		otp := utils.GenerateOTP()
 		repository.UpsertEmailOTP(s.DB, req.Email, otp)
 
