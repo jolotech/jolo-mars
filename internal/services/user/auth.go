@@ -8,12 +8,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"os"
 
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/internal/repository/user"
 	"github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/utils"
 	"github.com/jolotech/jolo-mars/internal/helpers/notifications"
+	"github.com/jolotech/jolo-mars/internal/helpers/verifications"
 	"github.com/jolotech/jolo-mars/types"
 )
 
@@ -128,33 +130,60 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 
 	// ================= SETTINGS =================
 	loginSettings := s.adminmainRepo.GetLoginSettings()
-	firebaseOTP := s.adminmainRepo.GetBusinessSetting("firebase_otp_verification").(bool)
+	// firebaseOTP := s.adminmainRepo.GetBusinessSetting("firebase_otp_verification").(bool)
 
 	isPhoneVerified := true
 	isEmailVerified := true
 
 	// ================= PHONE OTP =================
 	if loginSettings.PhoneVerification {
-		isPhoneVerified = false
+	isPhoneVerified = false
 
-		if !firebaseOTP {
-			lastOTP := repository.GetPhoneVerification(s.DB, req.Phone)
-			if lastOTP != nil && time.Since(lastOTP.UpdatedAt).Seconds() < 60 {
-				wait := 60 - int(time.Since(lastOTP.UpdatedAt).Seconds())
-				return utils.OTPWaitError(wait), 405
-			}
+	    // if !firebaseOTP {
 
-			otp := utils.GenerateOTP()
-			repository.UpsertPhoneOTP(s.DB, req.Phone, otp)
+			lastOTP, _ := user_repository.GetPhoneVerification(s.DB, req.Phone)
+		    if lastOTP != nil {
+			    elapsed := time.Since(lastOTP.UpdatedAt).Seconds()
+			    if elapsed < 60 {
+				    wait := 60 - int(elapsed)
+				    return utils.OTPWaitError(wait), nil, http.StatusMethodNotAllowed, errors.New("otp wait error")
+			    }
+		    }
 
-			if !utils.SendSMS(req.Phone, otp) {
-				return "failed to send sms", nil, http.StatusMethodNotAllowed, errors.New("failed to send sms")
+		    otp := utils.GenerateOTP()
+		    if err := user_repository.UpsertPhoneOTP(s.DB, req.Phone, otp); err != nil {
+			    return "failed to generate otp", nil, http.StatusInternalServerError, err
+		    }
 
-			}
+		    if !otp_helpers.SendSMS(req.Phone, otp) && os.Getenv("APP_MODE") != "test" {
+			    return "failed to send sms", nil, http.StatusMethodNotAllowed, errors.New("failed to send sms")
+		    }
 
-			token = ""
-		}
-	}
+		    token = ""
+	    // }
+    }
+
+	// if loginSettings.PhoneVerification {
+	// 	isPhoneVerified = false
+
+	// 	if !firebaseOTP {
+	// 		lastOTP := repository.GetPhoneVerification(s.DB, req.Phone)
+	// 		if lastOTP != nil && time.Since(lastOTP.UpdatedAt).Seconds() < 60 {
+	// 			wait := 60 - int(time.Since(lastOTP.UpdatedAt).Seconds())
+	// 			return utils.OTPWaitError(wait), 405
+	// 		}
+
+	// 		otp := utils.GenerateOTP()
+	// 		repository.UpsertPhoneOTP(s.DB, req.Phone, otp)
+
+	// 		if !utils.SendSMS(req.Phone, otp) {
+	// 			return "failed to send sms", nil, http.StatusMethodNotAllowed, errors.New("failed to send sms")
+
+	// 		}
+
+	// 		token = ""
+	// 	}
+	// }
 
 	// ================= EMAIL OTP =================
 	if loginSettings.EmailVerification {
@@ -163,7 +192,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		repository.UpsertEmailOTP(s.DB, req.Email, otp)
 
 		if !utils.SendEmailOTP(req.Email, otp, req.Name) {
-			return utils.ErrorResponse("otp", utils.Translate("messages.failed_to_send_mail")), 405
+			return "failed_to_send_mail", nil, http.StatusMethodNotAllowed, errors.New("failed to send email")
 		}
 
 		token = ""
