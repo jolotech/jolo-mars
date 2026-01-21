@@ -112,7 +112,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		return "error creating user", nil, http.StatusInternalServerError, err
 	}
 
-	newUSer.RefCode = utils.GenerateRefererCode(user)
+	newUSer.RefCode = utils.GenerateRefererCode(s.DB)
 	if err := s.usermainRepo.UpdateUser(newUSer); err != nil {
 		return "error generating referer code", nil, http.StatusInternalServerError, err
 	}
