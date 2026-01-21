@@ -12,7 +12,7 @@ import (
 
 
 
-func ValidateRegister(req types.RegisterRequest, db *gorm.DB) error {
+func ValidateRegisters(req types.RegisterRequest, db *gorm.DB) error {
 	// Trim spaces
 	req.Name = strings.TrimSpace(req.Name)
 	req.Email = strings.TrimSpace(req.Email)
