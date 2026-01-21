@@ -71,9 +71,6 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 			return "invalid referer code", nil, http.StatusNotFound, errors.New("invalid referer code")
 		}
 
-		// if repository.IsWalletReferenceUsed(s.DB, req.Phone) {
-		// 	return utils.ErrorResponse("phone", utils.Translate("Referrer code already used")), 203
-		// }
 
 		if s.usermainRepo.IsWalletReferenceUsed(req.Phone) {
 			return "Referrer code already used", nil, http.StatusForbidden, errors.New("Referrer code already used")
@@ -88,10 +85,10 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 			"type":        "referral_code",
 		}
 
-		if utils.GetNotificationStatusData("customer", "customer_new_referral_join", "push_notification_status") &&
+		if helpers.GetNotificationStatusData("customer", "customer_new_referral_join", "push_notification_status") &&
 			referer.CMFirebaseToken != nil {
 
-			utils.SendPushNotifToDevice(*referer.CMFirebaseToken, notification)
+			helpers.SendPushNotifToDevice(*referer.CMFirebaseToken, notification)
 			repository.CreateUserNotification(s.DB, referer.ID, notification)
 		}
 
