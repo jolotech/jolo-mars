@@ -38,13 +38,11 @@ func NewAuthService(authRepo *repository.UserAuthRepository, mainRepo *repositor
 	}
 }
 
-func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (string, error) {
+func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (string, uint64, error) {
 
 	// ================= VALIDATION =================
-	if err := utils.ValidateRegister(req, s.DB); err != nil {
-		return gin.H{
-			"errors": utils.ErrorProcessor(err),
-		}, http.StatusForbidden
+	if msg := utils.ValidateRegister(req, s.DB); msg != "" {
+		return msg, http.StatusForbidden, errors.New(msg)
 	}
 
 	// ================= NAME SPLIT =================

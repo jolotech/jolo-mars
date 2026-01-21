@@ -12,7 +12,7 @@ import (
 
 
 
-func ValidateRegister(req types.RegisterRequest, db *gorm.DB) error {
+func ValidateRegister(req types.RegisterRequest, db *gorm.DB) string {
 	// Trim spaces
 	req.Name = strings.TrimSpace(req.Name)
 	req.Email = strings.TrimSpace(req.Email)
@@ -20,22 +20,22 @@ func ValidateRegister(req types.RegisterRequest, db *gorm.DB) error {
 
 	// Basic required checks (extra safety)
 	if req.Name == "" {
-		return errors.New("name is required")
+		return "name is required"
 	}
 
 	if req.Phone == "" {
-		return errors.New("phone number is required")
+		return "phone number is required"
 	}
 
 	if len(req.Password) < 8 {
-		return errors.New("password must be at least 8 characters")
+		return "password must be at least 8 characters"
 	}
 
 	// Email validation (if provided)
 	if req.Email != "" {
 		emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
 		if !emailRegex.MatchString(req.Email) {
-			return errors.New("invalid email address")
+			return "invalid email address"
 		}
 	}
 
@@ -45,11 +45,11 @@ func ValidateRegister(req types.RegisterRequest, db *gorm.DB) error {
 		if err := db.Table("users").
 			Where("email = ?", req.Email).
 			Count(&count).Error; err != nil {
-			return err
+			return "internal error"
 		}
 
 		if count > 0 {
-			return errors.New("email already registered")
+			return "email already registered"
 		}
 	}
 
@@ -58,12 +58,12 @@ func ValidateRegister(req types.RegisterRequest, db *gorm.DB) error {
 	if err := db.Table("users").
 		Where("phone = ?", req.Phone).
 		Count(&phoneCount).Error; err != nil {
-		return err
+		return "internal error"
 	}
 
 	if phoneCount > 0 {
-		return errors.New("phone number already registered")
+		return "phone number already registered"
 	}
 
-	return nil
+	return ""
 }

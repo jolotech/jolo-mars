@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jolotech/jolo-mars/internal/services/user"
+	"github.com/joloetech/jolo-mars/types"
 )
 
 type AuthHandler struct {
@@ -12,7 +13,7 @@ type AuthHandler struct {
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
-	var req services.RegisterRequest
+	var req types.RegisterRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -21,6 +22,6 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	resp, statusCode := h.AuthService.Register(c, req)
+	resp, statusCode := h.UserAuthService.Register(c, req)
 	c.JSON(statusCode, resp)
 }
