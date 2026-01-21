@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jolotech/jolo-mars/internal/services"
+	"github.com/jolotech/jolo-mars/internal/services/user"
 )
 
 type AuthHandler struct {
-	AuthService services.AuthService
+	AuthService services.UserAuthService
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
