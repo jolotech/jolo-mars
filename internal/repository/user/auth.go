@@ -1,4 +1,4 @@
-package repository
+package user_repository
 
 
 import (
@@ -11,16 +11,16 @@ import (
 )
 
 
-type UserAuthRepository struct {
+type Auth struct {
 	db *gorm.DB
 }	
 
-func NewUserAuthRepository(db *gorm.DB) *UserAuthRepository {
-	return &UserAuthRepository{db: db}
+func NewUserAuthRepository(db *gorm.DB) *Auth {
+	return &Auth{db: db}
 }
 
 
-func (r *UserAuthRepository) CreateUser(user *models.User) (*models.User, error) {
+func (r *Auth) CreateUser(user *models.User) (*models.User, error) {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 	if err := r.db.Create(user).Error; err != nil {
@@ -29,9 +29,9 @@ func (r *UserAuthRepository) CreateUser(user *models.User) (*models.User, error)
 	return user, nil
 }
 
-func FindUserByRefCode(code string) (*models.User, error) {
+func (r *Auth) FindUserByRefCode(code string) (*models.User, error) {
 	var user models.User
-	err := db.Where("ref_code = ?", code).First(&user).Error
+	err := r.db.Where("ref_code = ?", code).First(&user).Error
 	return &user, err
 }
 

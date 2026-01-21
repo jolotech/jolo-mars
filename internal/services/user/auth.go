@@ -11,13 +11,15 @@ import (
 
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/internal/repository/user"
+	"github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/utils"
 	"github.com/jolotech/jolo-mars/types"
 )
 
 type UserAuthService struct {
-	authRepo *repository.UserAuthRepository
-	mainRepo *repository.UserMainRepository
+	authRepo *user_repository.Auth
+	usermainRepo *user_repository.Main
+	adminmainRepo *admin_repository.Main
 	DB   *gorm.DB
 }
 
@@ -30,10 +32,11 @@ type UserAuthService struct {
 // }
 
 
-func NewAuthService(authRepo *repository.UserAuthRepository, mainRepo *repository.UserMainRepository, db *gorm.DB) *UserAuthService {
+func NewAuthService(authRepo *user_repository.Auth, usermainRepo *user_repository.Main, adminmainRepo *admin_repository.Main, db *gorm.DB) *UserAuthService {
 	return &UserAuthService{
 		authRepo: authRepo,
-		mainRepo: mainRepo,
+		usermainRepo: usermainRepo,
+		adminmainRepo: adminmainRepo,
 		DB: db,
 	}
 }
@@ -57,13 +60,13 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	var refBy *uint
 
 	if req.RefCode != "" {
-		refStatus := models.GetBusinessSetting("ref_earning_status").(bool)
+		refStatus := s.adminmainRepo.GetBusinessSetting("ref_earning_status").(bool)
 		// refStatus := setting.(bool)
 		if  !refStatus {
 			return "referer not available", nil, http.StatusForbidden, errors.New("referer not available")
 		}
 
-		referer, err := repository.FindUserByRefCode(req.RefCode)
+		referer, err := s.authRepo.FindUserByRefCode(req.RefCode)
 		if err != nil || !referer.Status {
 			return "invalid referer code", nil, http.StatusNotFound, errors.New("invalid referer code")
 		}

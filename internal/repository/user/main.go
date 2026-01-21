@@ -1,4 +1,4 @@
-package repository
+package user_repository
 
 import (
 	// "encoding/json"
@@ -8,17 +8,17 @@ import (
 	"github.com/jolotech/jolo-mars/internal/models"
 )
 
-type UserMainRepository struct {
+type Main struct {
 	db *gorm.DB
 }	
 
 
-func NewUserMainRepository(db *gorm.DB) *UserMainRepository {
-	return &UserMainRepository{db: db}
+func NewUserMainRepository(db *gorm.DB) *Main {
+	return &Main{db: db}
 }
 
 
-func (r *UserMainRepository) UpdateUser(user *models.User) error {
+func (r *Main) UpdateUser(user *models.User) error {
 	// Save updated user to database
     user.UpdatedAt = time.Now()
 	if err := r.db.Save(user).Error; err != nil {

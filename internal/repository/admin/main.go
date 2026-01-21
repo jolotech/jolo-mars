@@ -1,21 +1,21 @@
-package repository
+package admin_repository
 
 import (
 	"gorm.io/gorm"
 	"github.com/jolotech/jolo-mars/internal/models"
 )
 
-type AdminMainRepository struct {
+type Main struct {
 	db *gorm.DB
 }	
 
 
-func NewAdminMainRepository(db *gorm.DB) *AdminMainRepository {
-	return &AdminMainRepository{db: db}
+func NewAdminMainRepository(db *gorm.DB) *Main {
+	return &Main{db: db}
 }
 
 
-func (r *AdminMainRepository) GetBusinessSetting(key string) interface{} {
+func (r *Main) GetBusinessSetting(key string) interface{} {
 	var setting models.BusinessSetting
 	result := r.db.First(&setting)
 	if result.Error != nil {
