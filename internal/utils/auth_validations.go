@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"regexp"
 	"strings"
 	"github.com/jolotech/jolo-mars/types"
@@ -12,7 +11,7 @@ import (
 
 
 
-func ValidateRegister(req types.RegisterRequest, db *gorm.DB) string {
+func ValidateUserRegister(req types.RegisterRequest, db *gorm.DB) string {
 	// Trim spaces
 	req.Name = strings.TrimSpace(req.Name)
 	req.Email = strings.TrimSpace(req.Email)

@@ -41,8 +41,8 @@ func NewAuthService(authRepo *repository.UserAuthRepository, mainRepo *repositor
 func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (string, uint64, error) {
 
 	// ================= VALIDATION =================
-	if msg := utils.ValidateRegister(req, s.DB); msg != "" {
-		return msg, http.StatusForbidden, errors.New(msg)
+	if msg := utils.ValidateUserRegister(req, s.DB); msg != "" {
+		return msg , http.StatusForbidden, errors.New(msg)
 	}
 
 	// ================= NAME SPLIT =================
