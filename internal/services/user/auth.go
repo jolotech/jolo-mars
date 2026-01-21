@@ -96,6 +96,12 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		refBy = &referer.ID
 	}
 
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+	    return "", nil, http.StatusInternalServerError, err
+	}
+
+
 	// ================= CREATE USER =================
 	user := models.User{
 		FName:    firstName,
@@ -103,7 +109,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		Email:    req.Email,
 		Phone:    req.Phone,
 		RefBy:    refBy,
-		Password: utils.HashPassword(req.Password),
+		Password: hashedPassword,
 		Status:   true,
 	}
 
