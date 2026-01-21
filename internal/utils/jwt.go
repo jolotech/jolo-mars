@@ -1,3 +1,4 @@
+
 package utils
 
 import (
@@ -7,24 +8,28 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type AuthClaims struct {
-	UserID uint `json:"user_id"`
+type UserClaims struct {
+	Email  string `json:"email"`
+	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
-func GenerateAuthToken(userID uint) (string, error) {
+func GenerateAuthToken(email, userID string) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 
-	expiry, _ := time.ParseDuration(os.Getenv("JWT_EXPIRES_IN"))
+	expiry, err := time.ParseDuration(os.Getenv("JWT_EXPIRES_IN"))
+	if err != nil {
+		expiry = 24 * time.Hour
+	}
 
-	claims := AuthClaims{
-		UserID: userID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiry)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
+	claims := jwt.MapClaims{
+		"email": email,
+		"user_id": userID,
+		"exp":   time.Now().Add(expiry).Unix(),
+		"iat":   time.Now().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
 	return token.SignedString([]byte(secret))
 }
