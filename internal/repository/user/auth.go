@@ -29,7 +29,7 @@ func (r *UserAuthRepository) CreateUser(user *models.User) (*models.User, error)
 	return user, nil
 }
 
-func FindUserByRefCode(db *gorm.DB, code string) (*models.User, error) {
+func FindUserByRefCode(code string) (*models.User, error) {
 	var user models.User
 	err := db.Where("ref_code = ?", code).First(&user).Error
 	return &user, err

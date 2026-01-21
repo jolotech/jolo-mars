@@ -18,23 +18,3 @@ type BusinessSetting struct {
 	CreatedAt               time.Time   `json:"created_at"`
 	UpdatedAt               time.Time   `json:"updated_at"`
 }
-
-func GetBusinessSetting(db *gorm.DB, key string) interface{} {
-	var setting BusinessSetting
-	result := db.First(&setting)
-	if result.Error != nil {
-		return nil
-	}
-	switch key {
-	case "ref_earning_status":
-		return setting.RefEarningStatus
-	case "registration_bonus_status":
-		return setting.RegistrationBonusStatus
-	case "registration_bonus_amount":
-		return setting.RegistrationBonusAmount
-	case "service_charge_percent":
-		return setting.ServiceChargePercent
-	default:
-		return nil
-	}
-}

@@ -57,20 +57,25 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	var refBy *uint
 
 	if req.RefCode != "" {
-		refStatus := models.GetBusinessSetting(s.DB, "ref_earning_status").(bool)
+		refStatus := models.GetBusinessSetting("ref_earning_status").(bool)
 		// refStatus := setting.(bool)
 		if  !refStatus {
 			return "referer not available", nil, http.StatusForbidden, errors.New("referer not available")
 		}
 
-		referer, err := repository.FindUserByRefCode(s.DB, req.RefCode)
+		referer, err := repository.FindUserByRefCode(req.RefCode)
 		if err != nil || !referer.Status {
-			return utils.ErrorResponse("ref_code", utils.Translate("messages.referer_code_not_found")), 405
+			return "invalid referer code", nil, http.StatusNotFound, errors.New("invalid referer code")
 		}
 
-		if repository.IsWalletReferenceUsed(s.DB, req.Phone) {
-			return utils.ErrorResponse("phone", utils.Translate("Referrer code already used")), 203
+		// if repository.IsWalletReferenceUsed(s.DB, req.Phone) {
+		// 	return utils.ErrorResponse("phone", utils.Translate("Referrer code already used")), 203
+		// }
+
+		if repository.IsWalletReferenceUsed(req.Phone) {
+			return "Referrer code already used", nil, http.StatusForbidden, errors.New("Referrer code already used")
 		}
+
 
 		notification := map[string]interface{}{
 			"title":       utils.Translate("messages.Your_referral_code_is_used_by") + " " + firstName + " " + lastName,
