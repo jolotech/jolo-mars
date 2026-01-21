@@ -75,14 +75,14 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		// 	return utils.ErrorResponse("phone", utils.Translate("Referrer code already used")), 203
 		// }
 
-		if repository.IsWalletReferenceUsed(req.Phone) {
+		if s.usermainRepo.IsWalletReferenceUsed(req.Phone) {
 			return "Referrer code already used", nil, http.StatusForbidden, errors.New("Referrer code already used")
 		}
 
 
 		notification := map[string]interface{}{
-			"title":       utils.Translate("messages.Your_referral_code_is_used_by") + " " + firstName + " " + lastName,
-			"description": utils.Translate("Be prepare to receive when they complete there first purchase"),
+			"title":       "Your referral code is used by" + " " + firstName + " " + lastName,
+			"description": "Be prepare to receive a coupon when they complete there first purchase",
 			"order_id":    1,
 			"image":       "",
 			"type":        "referral_code",

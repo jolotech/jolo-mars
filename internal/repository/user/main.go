@@ -26,3 +26,9 @@ func (r *Main) UpdateUser(user *models.User) error {
 	}
 	return nil
 }
+
+func (r *Main) IsWalletReferenceUsed(reference string) bool {
+	var tx models.WalletTransaction
+	err := r.db.Where("reference = ?", reference).First(&tx).Error
+	return err == nil
+}
