@@ -13,7 +13,7 @@ import (
 	"github.com/jolotech/jolo-mars/internal/repository/user"
 	"github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/utils"
-	"github.com/jolotech/jolo-mars/internal/helpers"
+	"github.com/jolotech/jolo-mars/internal/helpers/notifications"
 	"github.com/jolotech/jolo-mars/types"
 )
 
@@ -86,7 +86,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 			"type":        "referral_code",
 		}
 
-		if helpers.GetNotificationStatusData("customer", "customer_new_referral_join", "push_notification_status") &&
+		if helpers.GetNotificationStatusData("customer", "customer_new_referral_join", "push_notification_status", nil) &&
 			referer.CMFirebaseToken != nil {
 
 			helpers.SendPushNotifToDevice(*referer.CMFirebaseToken, notification)

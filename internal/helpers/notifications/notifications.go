@@ -8,14 +8,15 @@ import (
 	"net/http"
 	"gorm.io/gorm"
 	"github.com/jolotech/jolo-mars/internal/models"
-	"github.com/jolotech/jolo-mars/types"
+	// "github.com/jolotech/jolo-mars/types"
 )
 
 
 
 
-func GetNotificationStatusData(db *gorm.DB, userType string, key string, notificationType string, storeID *uint,) bool {
+func GetNotificationStatusData(userType string, key string, notificationType string, storeID *uint,) bool {
 
+	var db *gorm.DB
 	var setting models.NotificationSetting
 
 	query := db.Where("type = ?", userType).Where("key = ?", key)
@@ -47,7 +48,12 @@ func GetNotificationStatusData(db *gorm.DB, userType string, key string, notific
 
 
 
-func SendPushNotifToDevice(sa types.FirebaseServiceAccount, fcmToken string, data map[string]interface{}, webPushLink ...string,) error {
+func SendPushNotifToDevice(fcmToken string, data map[string]interface{}, webPushLink ...string,) error {
+
+	sa, err := LoadFirebaseServiceAccountFromEnv()
+	if err != nil {
+		return err
+	}
 
 	clickAction := ""
 	if len(webPushLink) > 0 {

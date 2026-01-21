@@ -8,7 +8,7 @@ import (
 	// "strings"
 )
 
-func getAccessToken(sa types.FirebaseServiceAccount) (string, error) {
+func getAccessToken(sa *types.FirebaseServiceAccount) (string, error) {
 	jwtToken, err := createJWT(sa)
 	if err != nil {
 		return "", err

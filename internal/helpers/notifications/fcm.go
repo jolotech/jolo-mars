@@ -1,6 +1,12 @@
 package helpers
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"strings"
+	"errors"
+	"github.com/jolotech/jolo-mars/types"
+)
 
 
 func buildFCMPayload(fcmToken string, data map[string]interface{}, clickAction string,) map[string]interface{} {
@@ -66,4 +72,25 @@ func toString(v interface{}) string {
 		return ""
 	}
 	return fmt.Sprintf("%v", v)
+}
+
+
+
+func LoadFirebaseServiceAccountFromEnv() (*types.FirebaseServiceAccount, error) {
+	projectID := os.Getenv("FIREBASE_PROJECT_ID")
+	clientEmail := os.Getenv("FIREBASE_CLIENT_EMAIL")
+	privateKey := os.Getenv("FIREBASE_PRIVATE_KEY")
+
+	if projectID == "" || clientEmail == "" || privateKey == "" {
+		return nil, errors.New("firebase env variables not set")
+	}
+
+	// Convert \n to actual newlines (CRITICAL)
+	privateKey = strings.ReplaceAll(privateKey, `\n`, "\n")
+
+	return &types.FirebaseServiceAccount{
+		ProjectID:   projectID,
+		ClientEmail: clientEmail,
+		PrivateKey:  privateKey,
+	}, nil
 }

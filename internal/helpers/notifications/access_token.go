@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func createJWT(sa types.FirebaseServiceAccount) (string, error) {
+func createJWT(sa *types.FirebaseServiceAccount) (string, error) {
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(sa.PrivateKey))
 	if err != nil {
 		return "", err
