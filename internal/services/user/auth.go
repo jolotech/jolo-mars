@@ -124,7 +124,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	}
 
 	// ================= TOKEN =================
-	token := utils.GenerateAuthToken(user.ID)
+	token, _ := utils.GenerateAuthToken(user.Email, user.ID)
 
 	// ================= SETTINGS =================
 	loginSettings := repository.GetLoginSettings(s.DB)

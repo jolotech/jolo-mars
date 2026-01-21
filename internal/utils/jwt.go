@@ -14,7 +14,7 @@ type UserClaims struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateAuthToken(email, userID string) (string, error) {
+func GenerateAuthToken(email string, userID uint) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 
 	expiry, err := time.ParseDuration(os.Getenv("JWT_EXPIRES_IN"))
