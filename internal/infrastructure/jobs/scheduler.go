@@ -11,11 +11,12 @@ func StartJobScheduler(db *gorm.DB) {
 	c := cron.New()
 
 	// Run every 5 minutes
-	c.AddFunc("@every 1m", func() {
+	c.AddFunc("@every 5m", func() {
 		if err := CleanupExpiredOTPs(db); err != nil {
 			log.Println("OTP cleanup failed:", err)
 		}
+		log.Println("OTP cleanup completed successfully")
 	})
-
+	log.Println("Job scheduler started...")
 	c.Start()
 }
