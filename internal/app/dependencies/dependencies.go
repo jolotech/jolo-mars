@@ -3,14 +3,15 @@ package dependencies
 import (
 	// "github.com/jolotech/Logistic-gateway/internal/app/handlers/admin"
 	"github.com/jolotech/jolo-mars/internal/app/handlers/auth"
-	"github.com/jolotech/Logistic-gateway/internal/infrastructure/database"
-	"github.com/jolotech/Logistic-gateway/internal/repository/user"
-	"github.com/jolotech/Logistic-gateway/internal/services/user"
+	"github.com/jolotech/jolo-mars/internal/infrastructure/database"
+	"github.com/jolotech/jolo-mars/internal/repository/admin"
+	"github.com/jolotech/jolo-mars/internal/repository/user"
+	"github.com/jolotech/jolo-mars/internal/services/user"
 	// "github.com/jolotech/Logistic-gateway/internal/queue"
 	// "github.com/jolotech/Logistic-gateway/internal/worker"
 	// "github.com/jolotech/Logistic-gateway/internal/jobs"
-	// "github.com/jolotech/Logistic-gateway/internal/infrastructure/redis"	
-	"github.com/jolotech/jolo-mars/config"
+	// "github.com/jolotech/Logistic-gateway/internal/infrastructure/redis"
+	// "github.com/jolotech/jolo-mars/config"
 )
 
 type Container struct {
@@ -31,22 +32,24 @@ type Container struct {
 
 // Init initializes all repositories, services, and handlers
 func Init() *Container {
-	cfg := config.LoadConfig()
+	// cfg := config.LoadConfig()
 
 
 
 	// Repositories
-	userAuthRepo := user_repositories.NewUserAuthRepository(database.DB)
+	userAuthRepo := user_repository.NewUserAuthRepository(database.DB)
+	userMainRepo := user_repository.NewUserMainRepository(database.DB)
+	adminMainRepo := admin_repository.NewAdminMainRepository(database.DB)
 	// orderRepo := repositories.NewOrderRepository(database.DB)
 	// adminRepo := repositories.NewAdminRepository(database.DB)
 	// webhookRepo := repositories.NewWebhookRepository(database.DB)
-	// auditRepo := repositories.NewAuditRepository(database.DB)
+	// auditRepo := repositories.NewAuditRepository(database.DB)d
 	// storeRepo := repositories.NewStoreRepository(database.DB, cfg.PHPBaseURL)
 
     // queue := queue.NewWebhookQueue(redis.RDB, "Webhook")
 
 	// Services
-	userAuthService := services.NewAuthService(userAuthRepo)
+	userAuthService := services.NewAuthService(userAuthRepo, userMainRepo, adminMainRepo, database.DB)
 	// webhookService := service.NewWebhookService(webhookRepo, queue, partnerRepo)
 	// webhookManager := service.NewWebhookManager(webhookService)
 	// orderService := service.NewOrderService(orderRepo, webhookManager)

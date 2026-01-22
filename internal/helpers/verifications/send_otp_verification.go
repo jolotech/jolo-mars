@@ -53,7 +53,9 @@ func SendOTPViaFirebase(phone, otp string) bool {
 
 
 func SendEmailOTP(email, otp, name string) bool {
-	if os.Getenv("APP_MODE") == "test" {
+	cfg := config.LoadConfig() // load from DB or env
+
+	if cfg.AppEnv == "development" {
 		return true
 	}
 
