@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -128,6 +129,10 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	// ================= SETTINGS =================
 	loginSettings := s.adminmainRepo.GetLoginSettings()
 	firebaseOTP := s.adminmainRepo.GetBusinessSetting("firebase_otp_verification").(bool)
+
+	log.Println("Firebase OTP Setting:", firebaseOTP)
+	log.Println("Phone Verification Setting:", loginSettings.PhoneVerification)
+	log.Println("Email Verification Setting:", loginSettings.EmailVerification)
 
 	isPhoneVerified := false
 	isEmailVerified := false
