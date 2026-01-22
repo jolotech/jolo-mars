@@ -28,42 +28,40 @@ func RunAll(db *gorm.DB, tables []string) error {
                 return fmt.Errorf("failed users migration: %v", err)
             }
             log.Println("✅ users table synced.")
-        case "admins", "admin":
+        case "admins":
             if err := db.AutoMigrate(&models.Admin{}); err != nil {
                 return fmt.Errorf("failed admins migration: %v", err)
             }
             log.Println("✅ admins table synced.")
 
-        // case "orders":
-        //     if err := db.AutoMigrate(&domain.Order{}); err != nil {
-        //         return fmt.Errorf("failed orders migration: %v", err)
-        //     }
-        //     log.Println("✅ orders table synced.")
+        case "business_settings":
+            if err := db.AutoMigrate(&models.BusinessSetting{}); err != nil {
+                return fmt.Errorf("failed business settings migration: %v", err)
+            }
+            log.Println("✅ business settings table synced.")
 
-        // case "webhook_events":
-        //     if err := db.AutoMigrate(&domain.WebhookEvent{}); err != nil {
-        //         return fmt.Errorf("failed webhook_events migration: %v", err)
-        //     }
-        //     log.Println("✅ webhook_events table synced.")
+        case "notification_settings":
+            if err := db.AutoMigrate(&models.NotificationSetting{}); err != nil {
+                return fmt.Errorf("failed notification settings migration: %v", err)
+            }
+            log.Println("✅ notification settings table synced.")
 
-        // case "webhook_retry_logs":
-        //     if err := db.AutoMigrate(&domain.WebhookRetryLog{}); err != nil {
-        //         return fmt.Errorf("failed webhook_retry_logs migration: %v", err)
-        //     }
-        //     log.Println("✅ webhook_retry_logs table synced.")
+        case "otp_verifications":
+            if err := db.AutoMigrate(&models.OtpVerification{}); err != nil {
+                return fmt.Errorf("failed otp verifications migration: %v", err)
+            }
+            log.Println("✅ otp verifications table synced.")
 
-        // case "audit_trails":
-        //     if err := db.AutoMigrate(&domain.AuditTrail{}); err != nil {
-        //         return fmt.Errorf("failed audit_trails migration: %v", err)
-        //     }
-        //     log.Println("✅ audit_trails table synced.")
-
-        // case "stores":
-        //     if err := db.AutoMigrate(&domain.Store{}); err != nil {
-        //         return fmt.Errorf("failed stores migration: %v", err)
-        //     }
-        //     log.Println("✅ stores table synced.")
-
+        case "user_notifications":
+            if err := db.AutoMigrate(&models.UserNotification{}); err != nil {
+                return fmt.Errorf("failed user notifications migration: %v", err)
+            }
+            log.Println("✅ user notifications table synced.")
+        case "wallet_transactions":
+            if err := db.AutoMigrate(&models.WalletTransaction{}); err != nil {
+                return fmt.Errorf("failed wallet transactions migration: %v", err)
+            }
+            log.Println("✅ wallet transactions table synced.")
         default:
             log.Printf("⚠️ No migration defined for: %s", table)
         }

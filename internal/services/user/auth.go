@@ -46,7 +46,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 
 	// ================= VALIDATION =================
 	if msg := utils.ValidateUserRegister(req, s.DB); msg != "" {
-		return msg, nil, http.StatusForbidden, errors.New(msg)
+		return msg, nil, http.StatusForbidden, errors.New("Validation error")
 	}
 
 	// ================= NAME SPLIT =================
@@ -106,6 +106,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		LName:    lastName,
 		Email:    req.Email,
 		Phone:    req.Phone,
+		PasswordHash: hashedPassword,
 		RefBy:    refBy,
 		Password: hashedPassword,
 		Status:   true,
