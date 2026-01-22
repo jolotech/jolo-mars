@@ -49,30 +49,3 @@ func IncrementOtpHit(db *gorm.DB, value string) error {
 func  IsOtpLocked(pv *models.OtpVerification) bool {
 	return pv.OtpHitCount >= utils.OTPMaxHitCount
 }
-
-
-func GetEmailVerification(db *gorm.DB, email string) (*models.EmailVerification, error) {
-	var ev models.EmailVerification
-	err := db.Where("email = ?", email).First(&ev).Error
-	if err != nil {
-		return nil, err
-	}
-	return &ev, nil
-}
-
-func UpsertEmailOTP(db *gorm.DB, email, otp string) error {
-	return db.Transaction(func(tx *gorm.DB) error {
-		var ev models.EmailVerification
-		if err := tx.Where("email = ?", email).First(&ev).Error; err != nil {
-			return tx.Create(&models.EmailVerification{
-				Email: email,
-				Token: otp,
-			}).Error
-		}
-		ev.Token = otp
-		return tx.Save(&ev).Error
-	})
-}
-func DeleteEmailVerification(db *gorm.DB, email string) error {
-	return db.Where("email = ?", email).Delete(&models.EmailVerification{}).Error
-}
