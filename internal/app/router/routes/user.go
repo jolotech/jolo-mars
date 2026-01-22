@@ -9,9 +9,9 @@ import (
 	// "github.com/jolotech/jolo-mars/internal/services"
 )
 
-func PartnerRoutes(
+func UserRoutes(
 	r *gin.Engine,
-	authHandler *auth.AuthHandler,
+	authHandler *auth.UserAuthHandler,
 	// orderHandler *partners.OrderHandler,
 	// partnerRepo *repositories.PartnerRepository,
 	// distanceHandler *partners.DistanceHandler,

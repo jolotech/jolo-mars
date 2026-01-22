@@ -2,19 +2,19 @@ package dependencies
 
 import (
 	// "github.com/jolotech/Logistic-gateway/internal/app/handlers/admin"
-	// "github.com/jolotech/Logistic-gateway/internal/app/handlers/partners"
-	// "github.com/jolotech/Logistic-gateway/internal/infrastructure/database"
-	// "github.com/jolotech/Logistic-gateway/internal/repository"
-	// "github.com/jolotech/Logistic-gateway/internal/service"
+	"github.com/jolotech/jolo-mars/internal/app/handlers/auth"
+	"github.com/jolotech/Logistic-gateway/internal/infrastructure/database"
+	"github.com/jolotech/Logistic-gateway/internal/repository/user"
+	"github.com/jolotech/Logistic-gateway/internal/services/user"
 	// "github.com/jolotech/Logistic-gateway/internal/queue"
 	// "github.com/jolotech/Logistic-gateway/internal/worker"
 	// "github.com/jolotech/Logistic-gateway/internal/jobs"
 	// "github.com/jolotech/Logistic-gateway/internal/infrastructure/redis"	
-	// "github.com/jolotech/jolo-mars/config"
+	"github.com/jolotech/jolo-mars/config"
 )
 
 type Container struct {
-	// PartnerHandler *partners.PartnerHandler
+	UserAuthHandler *auth.UserAuthHandler
 	// OrderHandler *partners.OrderHandler
 	// AdminHandler   *admin.AdminHandler
 	// PartnerRepository *repositories.PartnerRepository
@@ -31,12 +31,12 @@ type Container struct {
 
 // Init initializes all repositories, services, and handlers
 func Init() *Container {
-	// cfg := config.LoadConfig()
+	cfg := config.LoadConfig()
 
 
 
 	// Repositories
-	// partnerRepo := repositories.NewPartnerRepository(database.DB)
+	userAuthRepo := user_repositories.NewUserAuthRepository(database.DB)
 	// orderRepo := repositories.NewOrderRepository(database.DB)
 	// adminRepo := repositories.NewAdminRepository(database.DB)
 	// webhookRepo := repositories.NewWebhookRepository(database.DB)
@@ -46,7 +46,7 @@ func Init() *Container {
     // queue := queue.NewWebhookQueue(redis.RDB, "Webhook")
 
 	// Services
-	// partnerService := service.NewPartnerService(partnerRepo)
+	userAuthService := services.NewAuthService(userAuthRepo)
 	// webhookService := service.NewWebhookService(webhookRepo, queue, partnerRepo)
 	// webhookManager := service.NewWebhookManager(webhookService)
 	// orderService := service.NewOrderService(orderRepo, webhookManager)
@@ -62,7 +62,7 @@ func Init() *Container {
 
 
 	// Handlers
-	// partnerHandler := partners.NewPartnerHandler(partnerService, webhookService, partnerRepo, auditService, paymentService)
+	userAuthHandler := auth.NewUserAuhHandler(userAuthService)
 	// orderHandler := partners.NewOrderHandler(orderService, distanceService, storeRepo)
 	// adminHandler := admin.NewAdminHandler(adminService, adminRepo, auditService)
 	// distanceHandler := partners.NewDistanceHandler(distanceService)
@@ -77,7 +77,8 @@ func Init() *Container {
 
 
 	return &Container{
-		// PartnerHandler: partnerHandler,
+		UserAuthHandler: userAuthHandler,
+
 		// OrderHandler:   orderHandler,
 		// AdminHandler:   adminHandler,
 		// PartnerRepository: partnerRepo,

@@ -8,13 +8,14 @@ import (
 	// "github.com/gin-gonic/gin"
 	// "github.com/gin-contrib/cors"
 	// "github.com/jolotech/jolo-mars/internal/app/middlewares"
-	"github.com/jolotech/jolo-mars/internal/app/middlewares"
 	"github.com/jolotech/jolo-mars/internal/app/handlers"
+	"github.com/jolotech/jolo-mars/internal/app/middlewares"
+	"github.com/jolotech/jolo-mars/internal/app/router/routes"
+
 	// "github.com/jolotech/jolo-mars/internal/helpers"
 	"github.com/jolotech/jolo-mars/internal/app/dependencies"
 	// "github.com/jolotech/jolo-mars/internal/infrastructure/database"
 	"github.com/jolotech/jolo-mars/config"
-
 
 	"github.com/gin-gonic/gin"
 )
@@ -45,6 +46,9 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 
      router.GET("/health", healthHandler.UI)
 	 router.GET("/health/json", healthHandler.JSON)
+
+	// Initialize user routes
+	routes.UserRoutes(router, container.UserAuthHandler)
 
 	// 404 handler
 	NotFoundHandler(router)
