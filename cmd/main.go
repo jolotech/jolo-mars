@@ -1,27 +1,24 @@
 package main
 
-
 import (
-    // "context"
-    // "log"
+	// "context"
+	// "log"
 	"fmt"
 	"os"
 
-    "github.com/joho/godotenv"
-    "github.com/jolotech/jolo-mars/config"
-    "github.com/jolotech/jolo-mars/internal/app"
-    "github.com/jolotech/jolo-mars/internal/infrastructure/database"
-    // redisInfra "github.com/jolotech/Logistic-gateway/internal/infrastructure/redis"
-    // "github.com/jolotech/jolo-mars/internal/infrastructure/redis"
-
-    
-    // "github.com/jolotech/Logistic-gateway/internal/repository"
-    // "github.com/jolotech/Logistic-gateway/internal/queue"
-    // "github.com/jolotech/Logistic-gateway/internal/service"
-    // "github.com/jolotech/Logistic-gateway/internal/worker"
-    // "github.com/jolotech/jolo-mars/internal/app/dependencies"
-
-    // "github.com/robfig/cron/v3"
+	"github.com/joho/godotenv"
+	"github.com/jolotech/jolo-mars/config"
+	"github.com/jolotech/jolo-mars/internal/app"
+	"github.com/jolotech/jolo-mars/internal/infrastructure/database"
+	"github.com/jolotech/jolo-mars/internal/infrastructure/jobs"
+	// redisInfra "github.com/jolotech/Logistic-gateway/internal/infrastructure/redis"
+	// "github.com/jolotech/jolo-mars/internal/infrastructure/redis"
+	// "github.com/jolotech/Logistic-gateway/internal/repository"
+	// "github.com/jolotech/Logistic-gateway/internal/queue"
+	// "github.com/jolotech/Logistic-gateway/internal/service"
+	// "github.com/jolotech/Logistic-gateway/internal/worker"
+	// "github.com/jolotech/jolo-mars/internal/app/dependencies"
+	// "github.com/robfig/cron/v3"
 )
 
 func main() {
@@ -63,6 +60,9 @@ func main() {
     // w.Start(ctx)
 
     // log.Println("Webhook worker started...")
+
+    // Start background job scheduler
+    jobs.StartJobScheduler(database.DB)
 
     // Start the main API server
     app.StartServer()
