@@ -9,7 +9,7 @@ import (
 )
 
 func GenerateOTP() string {
-	if os.Getenv("APP_MODE") == "test" {
+	if os.Getenv("ENV") == "development" || os.Getenv("APP_MODE") == "test" {
 		return "123456"
 	}
 
