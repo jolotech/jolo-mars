@@ -21,3 +21,17 @@ func GenerateOTP() string {
 func OTPWaitError(wait int) string {
 	return "Please try again after " + strconv.Itoa(wait) + " seconds"
 }
+
+
+func IsOTPExpired(updatedAt time.Time) bool {
+	return time.Since(updatedAt).Minutes() > OTPExpiryMinutes
+}
+
+
+func CanResendOTP(updatedAt time.Time) (bool, int) {
+	elapsed := time.Since(updatedAt).Seconds()
+	if elapsed < OTPIntervalSeconds {
+		return false, OTPIntervalSeconds - int(elapsed)
+	}
+	return true, 0
+}

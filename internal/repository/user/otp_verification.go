@@ -3,12 +3,13 @@ package user_repository
 import (
 	"gorm.io/gorm"
 	"github.com/jolotech/jolo-mars/internal/models"
+	"github.com/jolotech/jolo-mars/internal/utils"
 )
 
-func GetPhoneVerification(db *gorm.DB, phone string) (*models.PhoneVerification, error) {
-	var pv models.PhoneVerification
+func GetVerification(db *gorm.DB, value string) (*models.OtpVerification, error) {
+	var pv models.OtpVerification
 
-	err := db.Where("phone = ?", phone).First(&pv).Error
+	err := db.Where("verification_method = ?", value).First(&pv).Error
 	if err != nil {
 		return nil, err
 	}
@@ -17,15 +18,15 @@ func GetPhoneVerification(db *gorm.DB, phone string) (*models.PhoneVerification,
 }
 
 
-func UpsertPhoneOTP(db *gorm.DB, phone, otp string) error {
+func UpsertOTP(db *gorm.DB, value, otp string) error {
 	return db.Transaction(func(tx *gorm.DB) error {
-		var pv models.PhoneVerification
+		var pv models.OtpVerification
 
-		err := tx.Where("phone = ?", phone).First(&pv).Error
+		err := tx.Where("verification_method = ?", value).First(&pv).Error
 		if err != nil {
 			// insert
-			return tx.Create(&models.PhoneVerification{
-				Phone:       phone,
+			return tx.Create(&models.OtpVerification{
+				VerificationMethod: value,
 				Token:       otp,
 				OtpHitCount: 0,
 			}).Error
@@ -37,6 +38,41 @@ func UpsertPhoneOTP(db *gorm.DB, phone, otp string) error {
 		return tx.Save(&pv).Error
 	})
 }
-func DeletePhoneVerification(db *gorm.DB, phone string) error {
-	return db.Where("phone = ?", phone).Delete(&models.PhoneVerification{}).Error
+
+
+func IncrementOtpHit(db *gorm.DB, value string) error {
+	return db.Model(&models.OtpVerification{}).
+		Where("verification_method = ?", value).
+		UpdateColumn("otp_hit_count", gorm.Expr("otp_hit_count + 1")).Error
+}
+
+func  IsOtpLocked(pv *models.OtpVerification) bool {
+	return pv.OtpHitCount >= utils.OTPMaxHitCount
+}
+
+
+func GetEmailVerification(db *gorm.DB, email string) (*models.EmailVerification, error) {
+	var ev models.EmailVerification
+	err := db.Where("email = ?", email).First(&ev).Error
+	if err != nil {
+		return nil, err
+	}
+	return &ev, nil
+}
+
+func UpsertEmailOTP(db *gorm.DB, email, otp string) error {
+	return db.Transaction(func(tx *gorm.DB) error {
+		var ev models.EmailVerification
+		if err := tx.Where("email = ?", email).First(&ev).Error; err != nil {
+			return tx.Create(&models.EmailVerification{
+				Email: email,
+				Token: otp,
+			}).Error
+		}
+		ev.Token = otp
+		return tx.Save(&ev).Error
+	})
+}
+func DeleteEmailVerification(db *gorm.DB, email string) error {
+	return db.Where("email = ?", email).Delete(&models.EmailVerification{}).Error
 }
