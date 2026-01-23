@@ -14,11 +14,6 @@ import (
 func SendSMS(phone, otp string) bool {
 	cfg := config.LoadConfig() // load from DB or env
 
-	// match: if (isset($config) && $config['status'] == 1)
-	// if cfg == nil || !cfg.Status {
-	// 	return false
-	// }
-
 	// replace #OTP#
 	message := strings.ReplaceAll(cfg.OTPTemplate, "#OTP#", otp)
 
