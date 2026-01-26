@@ -1,6 +1,18 @@
 package email
 
+import (
+	// "github.com/jolotech/jolo-mars/internal/models"
+	// "github.com/jolotech/jolo-mars/types"
+)
 
+type Sender struct {
+	User *struct {
+		Name  string
+		Email string
+	}
+	OTP   string
+	Token string
+}
 
 func (s *Sender) Verification() error {
 	body, err := renderTemplate("verification.html", map[string]any{

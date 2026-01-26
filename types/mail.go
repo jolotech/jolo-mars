@@ -8,3 +8,12 @@ type EmailSender struct {
 	Token string
 	User  models.User
 }
+
+type Sender struct {
+	User *struct {
+		Name  string
+		Email string
+	}
+	OTP   string
+	Token string
+}
