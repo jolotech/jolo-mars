@@ -2,26 +2,30 @@ package email
 
 import (
 	"net/smtp"
+	"github.com/jolotech/jolo-mars/config"
 )
 
-const (
-	SMTPHost = "smtp.zoho.com"
-	SMTPPort = "587"
+// const (
+// 	SMTPHost = "smtp.zoho.com"
+// 	SMTPPort = "587"
 
-	SMTPUser = "no-reply@yourdomain.com"
-	SMTPPass = "YOUR_ZOHO_APP_PASSWORD"
-)
+// 	SMTPUser = "no-reply@yourdomain.com"
+// 	SMTPPass = "YOUR_ZOHO_APP_PASSWORD"
+// )
 
-func sendMail(to, subject, body string) error {
+func Mail(to, subject, body string) error {
+
+	cfg := config.LoadConfig()
+
 	auth := smtp.PlainAuth(
 		"",
-		SMTPUser,
-		SMTPPass,
-		SMTPHost,
+		cfg.SMTPUser,
+		cfg.SMTPPass,
+		cfg.SMTPHost,
 	)
 
 	msg := []byte(
-		"From: " + SMTPUser + "\r\n" +
+		"From: " + cfg.SMTPUser + "\r\n" +
 			"To: " + to + "\r\n" +
 			"Subject: " + subject + "\r\n" +
 			"MIME-version: 1.0;\r\n" +
@@ -30,9 +34,9 @@ func sendMail(to, subject, body string) error {
 	)
 
 	return smtp.SendMail(
-		SMTPHost+":"+SMTPPort,
+		cfg.SMTPHost+":"+cfg.SMTPPort,
 		auth,
-		SMTPUser,
+		cfg.SMTPUser,
 		[]string{to},
 		msg,
 	)

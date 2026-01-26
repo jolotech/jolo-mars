@@ -28,11 +28,17 @@ type Config struct {
 
 
 	// Twilio configuration
-	SID                  string
-	Token                string
-	MessagingServiceSID  string
-	OTPTemplate          string
-	FROM                 string
+	SID                  string  // valid
+	Token                string  // valid
+	MessagingServiceSID  string  // valid
+	OTPTemplate          string  // valid
+	FROM                 string  // valid
+
+	// Zoho SMTP configuration
+	SMTPUser             string  // valid
+	SMTPPass             string  // valid
+	SMTPHost             string  // valid
+	SMTPPort             string  // valid
 }
 
 // LoadConfig loads .env variables or system env
@@ -69,6 +75,12 @@ func LoadConfig() *Config {
 		MessagingServiceSID:   os.Getenv("TWILIO_MESSAGING_SERVICE_SID"),
 		OTPTemplate:           os.Getenv("TWILIO_OTP_TEMPLATE"),
 		FROM:                  os.Getenv("TWILIO_FROM"),
+
+		// Zoho SMTP configuration 
+		SMTPUser: 	  os.Getenv("SMTPUser"),
+		SMTPPass: 	  os.Getenv("SMTPPass"),
+		SMTPHost:    os.Getenv("SMTPHost"),
+		SMTPPort:    os.Getenv("SMTPPort"),
 	}
 
 	return cfg
