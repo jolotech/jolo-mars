@@ -22,6 +22,10 @@ func ValidateUserRegister(req types.RegisterRequest, db *gorm.DB) string {
 		return "name is required"
 	}
 
+	if req.OtpOption != "email" && req.OtpOption != "phone" {
+		return "otp option is not available"
+	}
+
 	if req.Phone == "" {
 		return "phone number is required"
 	}
