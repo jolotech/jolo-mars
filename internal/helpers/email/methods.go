@@ -15,7 +15,7 @@ func (s *EmailSender) Verification() error {
 		return err
 	}
 
-	return sendMail(s.User.FName, "Email Verification", body)
+	return sendMail(s.User.Email, "Email Verification", body)
 }
 
 func (s *EmailSender) Welcome() error {
@@ -26,7 +26,7 @@ func (s *EmailSender) Welcome() error {
 		return err
 	}
 
-	return sendMail(s.User.FName, "Welcome 🎉", body)
+	return sendMail(s.User.Email, "Welcome 🎉", body)
 }
 
 func (s *EmailSender) ForgetPassword() error {
@@ -38,7 +38,7 @@ func (s *EmailSender) ForgetPassword() error {
 		return err
 	}
 
-	return sendMail(s.User.FName, "Reset Your Password", body)
+	return sendMail(s.User.Email, "Reset Your Password", body)
 }
 
 func (s *EmailSender) ResetPassword() error {
@@ -49,5 +49,5 @@ func (s *EmailSender) ResetPassword() error {
 		return err
 	}
 
-	return sendMail(s.User.FName, "Password Reset Successful", body)
+	return sendMail(s.User.Email, "Password Reset Successful", body)
 }

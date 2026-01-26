@@ -6,14 +6,6 @@ import (
 	"github.com/jolotech/jolo-mars/config"
 )
 
-// const (
-// 	SMTPHost = "smtp.zoho.com"
-// 	SMTPPort = "587"
-
-// 	SMTPUser = "no-reply@yourdomain.com"
-// 	SMTPPass = "YOUR_ZOHO_APP_PASSWORD"
-// )
-
 func sendMail(to, subject, body string) error {
 
 	cfg := config.LoadConfig()
@@ -25,6 +17,9 @@ func sendMail(to, subject, body string) error {
 		cfg.SMTPHost,
 	)
 
+	fmt.Println("Sending email to:", to, "SMTP")
+
+
 	msg := []byte(
 		"From: " + cfg.SMTPUser + "\r\n" +
 			"To: " + to + "\r\n" +
@@ -34,13 +29,7 @@ func sendMail(to, subject, body string) error {
 			body,
 	)
 
-	// return smtp.SendMail(
-	// 	cfg.SMTPHost+":"+cfg.SMTPPort,
-	// 	auth,
-	// 	cfg.SMTPUser,
-	// 	[]string{to},
-	// 	msg,
-	// )
+
 	if err := smtp.SendMail(
 		cfg.SMTPHost+":"+cfg.SMTPPort,
 		auth,
