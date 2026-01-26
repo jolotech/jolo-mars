@@ -5,57 +5,49 @@ import (
 	// "github.com/jolotech/jolo-mars/types"
 )
 
-type Sender struct {
-	User *struct {
-		Name  string
-		Email string
-	}
-	OTP   string
-	Token string
-}
 
-func (s *Sender) Verification() error {
+func (s *EmailSender) Verification() error {
 	body, err := renderTemplate("verification.html", map[string]any{
-		"Name": s.User.Name,
+		"Name": s.User.FName,
 		"OTP":  s.OTP,
 	})
 	if err != nil {
 		return err
 	}
 
-	return sendMail(s.User.Email, "Email Verification", body)
+	return sendMail(s.User.FName, "Email Verification", body)
 }
 
-func (s *Sender) Welcome() error {
+func (s *EmailSender) Welcome() error {
 	body, err := renderTemplate("welcome.html", map[string]any{
-		"Name": s.User.Name,
+		"Name": s.User.FName,
 	})
 	if err != nil {
 		return err
 	}
 
-	return sendMail(s.User.Email, "Welcome 🎉", body)
+	return sendMail(s.User.FName, "Welcome 🎉", body)
 }
 
-func (s *Sender) ForgetPassword() error {
+func (s *EmailSender) ForgetPassword() error {
 	body, err := renderTemplate("forget_password.html", map[string]any{
-		"Name":     s.User.Name,
+		"Name":     s.User.FName,
 		"ResetURL": "https://shop.jolojolo.com/reset-password?token=" + s.Token,
 	})
 	if err != nil {
 		return err
 	}
 
-	return sendMail(s.User.Email, "Reset Your Password", body)
+	return sendMail(s.User.FName, "Reset Your Password", body)
 }
 
-func (s *Sender) ResetPassword() error {
+func (s *EmailSender) ResetPassword() error {
 	body, err := renderTemplate("reset_password.html", map[string]any{
-		"Name": s.User.Name,
+		"Name": s.User.FName,
 	})
 	if err != nil {
 		return err
 	}
 
-	return sendMail(s.User.Email, "Password Reset Successful", body)
+	return sendMail(s.User.FName, "Password Reset Successful", body)
 }

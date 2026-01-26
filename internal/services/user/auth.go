@@ -15,6 +15,7 @@ import (
 	"github.com/jolotech/jolo-mars/internal/utils"
 	"github.com/jolotech/jolo-mars/internal/helpers/notifications"
 	"github.com/jolotech/jolo-mars/internal/helpers/verifications"
+	"github.com/jolotech/jolo-mars/internal/helpers/email"
 	"github.com/jolotech/jolo-mars/types"
 )
 
@@ -113,33 +114,34 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		Status:   true,
 	}
 
-	newUSer, err := s.authRepo.CreateUser(&user); 
-	if err != nil {
-		return "error creating user", nil, http.StatusInternalServerError, err
-	}
-
-	newUSer.RefCode = utils.GenerateRefererCode(s.DB)
-	if err := s.usermainRepo.UpdateUser(newUSer); err != nil {
-		return "error generating referer code", nil, http.StatusInternalServerError, err
-	}
-
 	// ================= TOKEN =================
-	token, _ := utils.GenerateAuthToken(user.Email, user.ID)
+	// token, _ := utils.GenerateAuthToken(user.Email, user.ID)
 
-	// ================= SETTINGS =================
+
+
+	// ================= OTP SETTINGS =================
 	loginSettings := s.adminmainRepo.GetLoginSettings()
 	firebaseOTP := s.adminmainRepo.GetBusinessSetting("firebase_otp_verification").(bool)
+	phoneOption := loginSettings.PhoneVerification
+	emailOption := loginSettings.EmailVerification
+
+
+	// ================= OTP OPTION CHECK =================
+	if req.OtpOption == "phone" && !phoneOption {
+		return "phone otp not enabled", nil, http.StatusForbidden, errors.New("phone otp not enabled")
+	}
+	if req.OtpOption == "email" && !emailOption {
+		return "email otp not enabled", nil, http.StatusForbidden, errors.New("email otp not enabled")
+	}
 
 	log.Println("Firebase OTP Setting:", firebaseOTP)
 	log.Println("Phone Verification Setting:", loginSettings.PhoneVerification)
 	log.Println("Email Verification Setting:", loginSettings.EmailVerification)
 
-	isPhoneVerified := false
-	isEmailVerified := false
 
 
 	// ================= PHONE OTP =================
-	if loginSettings.PhoneVerification {
+	if phoneOption && req.OtpOption == "phone" {
 
 	    if !firebaseOTP {
 
@@ -161,14 +163,12 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 			    return "failed to send sms", nil, 405, errors.New("sms failed")
 		    }
 		    user_repository.IncrementOtpHit(s.DB, req.Phone)
-
-		    token = ""
 	    }
     }
 
+	// ================= EMAIL OTP =================
 
-    if loginSettings.EmailVerification {
-	    isEmailVerified = false
+    if emailOption && req.OtpOption == "email" {
 
 	    lastOTP, _ := user_repository.GetVerification(s.DB, req.Email)
 	    if lastOTP != nil {
@@ -182,28 +182,36 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		}
 
 		otp := utils.GenerateOTP()
-	    user_repository.UpsertOTP(s.DB, req.Email, otp)
+		user_repository.UpsertOTP(s.DB, req.Email, otp)
 
-	    if !otp_helpers.SendEmailOTP(req.Email, otp, req.Name) {
-		    return "failed_to_send_mail", nil, 405, errors.New("mail failed")
-	    }
-	    user_repository.IncrementOtpHit(s.DB, req.Email)
+		// if !otp_helpers.SendEmailOTP(req.Email, otp, req.Name){
+		// 	return "failed_to_send_mail", nil, 405, errors.New("mail failed")
+		// }
+		err := email.SendEmail(otp, &user).Verification()
+		if err != nil {
+			return "failed to send email", nil, http.StatusInternalServerError, err
+		}
+		user_repository.IncrementOtpHit(s.DB, req.Email)
+	}
 
-	    token = ""
+	// ================= SAVE USER =================
+	newUSer, err := s.authRepo.CreateUser(&user); 
+	if err != nil {
+		return "error creating user", nil, http.StatusInternalServerError, err
+	}
+	newUSer.RefCode = utils.GenerateRefererCode(s.DB)
+	if err := s.usermainRepo.UpdateUser(newUSer); err != nil {
+		return "error generating referer code", nil, http.StatusInternalServerError, err
 	}
 
 
-		// ================= REGISTRATION MAIL =================
-	// utils.SendRegistrationMailIfEnabled(req.Email, req.Name)
-
-	data :=  map[string]interface{}{
-		"token":               token,
-		"is_phone_verified":   isPhoneVerified,
-		"is_email_verified":   isEmailVerified,
-		"is_personal_info":    1,
-		"is_exist_user":       nil,
-		"email":               user.Email,
+	// ================= RESPONSE =================
+	if emailOption && req.OtpOption == "email" {
+		return "verification email sent", nil, http.StatusOK, nil
+	}
+	if phoneOption && req.OtpOption == "phone" {
+		return "verification sms sent", nil, http.StatusOK, nil
 	}
 
-	return "", data, http.StatusOK, nil
+	return "registration successful", nil, http.StatusOK, nil
 }

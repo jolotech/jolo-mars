@@ -5,7 +5,7 @@ import (
 	// "net/smtp"
 
 	"github.com/jolotech/jolo-mars/internal/models"
-	"github.com/jolotech/jolo-mars/types"
+	// "github.com/jolotech/jolo-mars/types"
 )
 
 // type EmailSender struct {
@@ -31,17 +31,42 @@ import (
 // }
 
 
-func SendEmail(value interface{}, user *models.User) *types.EmailSender {
+// type Sender struct {
+// 	OTP   string
+// 	Token string
+// 	User  models.User
+// }
 
-	sender := &types.EmailSender{}
-	if user != nil {
-		sender.User = *user
-	}
+// func SendEmail(value interface{}, user *models.User) *Sender {
+
+// 	sender := &Sender{}
+// 	if user != nil {
+// 		sender.User = *user
+// 	}
+
+// 	if v, ok := value.(string); ok {
+// 		sender.OTP = v
+// 		sender.Token = v
+// 	}
+
+// 	return sender
+// }
+
+
+
+type EmailSender struct {
+	OTP   string
+	Token string
+	User  *models.User
+}
+
+func SendEmail(value interface{}, user *models.User) *EmailSender {
+	s := &EmailSender{User: user}
 
 	if v, ok := value.(string); ok {
-		sender.OTP = v
-		sender.Token = v
+		s.OTP = v
+		s.Token = v
 	}
 
-	return sender
+	return s
 }
