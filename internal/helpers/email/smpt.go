@@ -1,6 +1,7 @@
 package email
 
 import (
+	"fmt"
 	"net/smtp"
 	"github.com/jolotech/jolo-mars/config"
 )
@@ -33,11 +34,22 @@ func sendMail(to, subject, body string) error {
 			body,
 	)
 
-	return smtp.SendMail(
+	// return smtp.SendMail(
+	// 	cfg.SMTPHost+":"+cfg.SMTPPort,
+	// 	auth,
+	// 	cfg.SMTPUser,
+	// 	[]string{to},
+	// 	msg,
+	// )
+	if err := smtp.SendMail(
 		cfg.SMTPHost+":"+cfg.SMTPPort,
 		auth,
 		cfg.SMTPUser,
 		[]string{to},
 		msg,
-	)
+	); err != nil {
+		return fmt.Errorf("smtp send failed: %w", err)
+	}
+
+	return nil
 }
