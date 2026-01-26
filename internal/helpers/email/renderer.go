@@ -8,7 +8,9 @@ import (
 )
 
 func renderTemplate(templateName string, data any) (string, error) {
-	path := filepath.Join("internal", "email", "templates", templateName)
+	path := filepath.Join("templates", templateName)
+
+	
 
 	tpl, err := template.ParseFiles(path)
 	if err != nil {
