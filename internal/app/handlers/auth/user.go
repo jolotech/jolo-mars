@@ -24,17 +24,12 @@ func NewUserAuhHandler(userAuthService *services.UserAuthService) *UserAuthHandl
 
 func (h *UserAuthHandler) Register(c *gin.Context) {
 	var req types.RegisterRequest
-	// if err := c.ShouldBindJSON(&req); err != nil {
-	// 	helpers.ErrorResponse(c, err, "Validation failed", http.StatusBadRequest)
-	// 	return
-	// }
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 	    msg := validations.HandleValidationError(err)
 		helpers.ErrorResponse(c, err, msg, http.StatusBadRequest)
 		return
 	}
-
 
 	msg, data, statusCode, err := h.UserAuthService.Register(c, req)
 	if err != nil {
