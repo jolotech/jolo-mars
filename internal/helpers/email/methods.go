@@ -1,6 +1,6 @@
 package email
 
-func (s *Sender) Verification() error {
+func (s *ender) Verification() error {
 	body := verificationTemplate(s.User.Name, s.OTP)
 	return sendMail(s.User.Email, "Email Verification", body)
 }
