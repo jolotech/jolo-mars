@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
-	"log"
+	// "log"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -25,14 +25,6 @@ type UserAuthService struct {
 	adminmainRepo *admin_repository.Main
 	DB   *gorm.DB
 }
-
-// type RegisterRequest struct {
-// 	Name     string `json:"name" binding:"required"`
-// 	Email    string `json:"email"`
-// 	Phone    string `json:"phone" binding:"required"`
-// 	Password string `json:"password" binding:"required,min=8"`
-// 	RefCode  string `json:"ref_code"`
-// }
 
 
 func NewAuthService(authRepo *user_repository.Auth, usermainRepo *user_repository.Main, adminmainRepo *admin_repository.Main, db *gorm.DB) *UserAuthService {
@@ -134,11 +126,6 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		return "email otp not enabled", nil, http.StatusForbidden, errors.New("email otp not enabled")
 	}
 
-	log.Println("Firebase OTP Setting:", firebaseOTP)
-	log.Println("Phone Verification Setting:", loginSettings.PhoneVerification)
-	log.Println("Email Verification Setting:", loginSettings.EmailVerification)
-
-
 
 	// ================= PHONE OTP =================
 	if phoneOption && req.OtpOption == "phone" {
@@ -184,9 +171,6 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		otp := utils.GenerateOTP()
 		user_repository.UpsertOTP(s.DB, req.Email, otp)
 
-		// if !otp_helpers.SendEmailOTP(req.Email, otp, req.Name){
-		// 	return "failed_to_send_mail", nil, 405, errors.New("mail failed")
-		// }
 		err := email.SendEmail(otp, &user).Verification()
 		if err != nil {
 			return "failed to send email", nil, http.StatusInternalServerError, err

@@ -15,7 +15,7 @@ type User struct {
 	PasswordHash     string   `json:"-" gorm:"column:password_hash"`
 	RefBy            *uint     `json:"ref_by" gorm:"column:ref_by"`
 	// RefCode          string    `json:"ref_code" gorm:"column:ref_code"`
-	RefCode string `json:"ref_code" gorm:"type:varchar(100);uniqueIndex"`
+	RefCode          string `json:"ref_code" gorm:"type:varchar(100);uniqueIndex"`
 	Status           bool      `json:"status" gorm:"default:true"`
 	CMFirebaseToken  *string   `json:"cm_firebase_token" gorm:"column:cm_firebase_token"`
 	CreatedAt        time.Time `json:"created_at"`
