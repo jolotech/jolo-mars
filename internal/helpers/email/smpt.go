@@ -13,7 +13,7 @@ import (
 // 	SMTPPass = "YOUR_ZOHO_APP_PASSWORD"
 // )
 
-func Mail(to, subject, body string) error {
+func sendMail(to, subject, body string) error {
 
 	cfg := config.LoadConfig()
 

@@ -1,21 +1,49 @@
 package email
 
-func (s *ender) Verification() error {
-	body := verificationTemplate(s.User.Name, s.OTP)
+
+
+func (s *Sender) Verification() error {
+	body, err := renderTemplate("verification.html", map[string]any{
+		"Name": s.User.Name,
+		"OTP":  s.OTP,
+	})
+	if err != nil {
+		return err
+	}
+
 	return sendMail(s.User.Email, "Email Verification", body)
 }
 
 func (s *Sender) Welcome() error {
-	body := welcomeTemplate(s.User.Name)
+	body, err := renderTemplate("welcome.html", map[string]any{
+		"Name": s.User.Name,
+	})
+	if err != nil {
+		return err
+	}
+
 	return sendMail(s.User.Email, "Welcome 🎉", body)
 }
 
 func (s *Sender) ForgetPassword() error {
-	body := forgetPasswordTemplate(s.User.Name, s.Token)
-	return sendMail(s.User.Email, "Forgot Password", body)
+	body, err := renderTemplate("forget_password.html", map[string]any{
+		"Name":     s.User.Name,
+		"ResetURL": "https://shop.jolojolo.com/reset-password?token=" + s.Token,
+	})
+	if err != nil {
+		return err
+	}
+
+	return sendMail(s.User.Email, "Reset Your Password", body)
 }
 
 func (s *Sender) ResetPassword() error {
-	body := resetPasswordTemplate(s.User.Name)
+	body, err := renderTemplate("reset_password.html", map[string]any{
+		"Name": s.User.Name,
+	})
+	if err != nil {
+		return err
+	}
+
 	return sendMail(s.User.Email, "Password Reset Successful", body)
 }
