@@ -31,7 +31,7 @@ func generateUniqueReferralCode() (string, error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("RPC-%s-%s-%s",
+	return fmt.Sprintf("RPCJ%sO%sL%sO",
 		randomPart[0:4],
 		randomPart[4:8],
 		randomPart[8:10],
