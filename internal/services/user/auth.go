@@ -223,7 +223,13 @@ func (s *UserAuthService) VerifyOTP(c *gin.Context, req types.VerifyOTPRequest,)
 	}
 
 	//====================== CHECK OTP MATCH =====================
-	verification, err := user_repository.GetVerification(s.DB, req.Phone)
+	var verification *models.OtpVerification
+	if isPhone {
+		verification, err = user_repository.GetVerification(s.DB, req.Phone)
+	} else {
+		verification, err = user_repository.GetVerification(s.DB, req.Email)
+	}
+	// verification, err := user_repository.GetVerification(s.DB, req.Phone)
 	if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
 		return "OTP expired", nil, http.StatusBadRequest, nil
 	}
