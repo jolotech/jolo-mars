@@ -1,11 +1,13 @@
 package user_repository
 
 import (
-	"time"
 	"errors"
-	"gorm.io/gorm"
+	"log"
+	"time"
+
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/internal/utils"
+	"gorm.io/gorm"
 )
 
 // func GetVerification(db *gorm.DB, value string) (*models.OtpVerification, error) {
@@ -44,11 +46,14 @@ func UpsertOTP(db *gorm.DB, value, otp string) error {
 		err := tx.Where("verification_method = ?", value).First(&pv).Error
 		if err != nil {
 			// insert
-			return tx.Create(&models.OtpVerification{
+			new := tx.Create(&models.OtpVerification{
 				VerificationMethod: value,
 				Token:       otp,
 				OtpHitCount: 0,
 			}).Error
+
+			log.Println("Created OTP", new)
+			return new
 		}
 
 		// update

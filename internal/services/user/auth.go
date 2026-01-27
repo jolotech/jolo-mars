@@ -2,21 +2,23 @@ package services
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strings"
+
 	// "log"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"github.com/jolotech/jolo-mars/internal/models"
-	"github.com/jolotech/jolo-mars/internal/repository/user"
-	"github.com/jolotech/jolo-mars/internal/repository/admin"
-	"github.com/jolotech/jolo-mars/internal/utils"
+	"github.com/jolotech/jolo-mars/internal/helpers/email"
 	"github.com/jolotech/jolo-mars/internal/helpers/notifications"
 	"github.com/jolotech/jolo-mars/internal/helpers/verifications"
-	"github.com/jolotech/jolo-mars/internal/helpers/email"
+	"github.com/jolotech/jolo-mars/internal/models"
+	"github.com/jolotech/jolo-mars/internal/repository/admin"
+	"github.com/jolotech/jolo-mars/internal/repository/user"
+	"github.com/jolotech/jolo-mars/internal/utils"
 	"github.com/jolotech/jolo-mars/types"
 )
 
@@ -237,17 +239,22 @@ func (s *UserAuthService) VerifyOTP(c *gin.Context, req types.VerifyOTPRequest,)
 		}
         return user_repository.GetVerification(s.DB, req.Email)
 	}()
+	if err != nil || verification == nil {
+		return "Invalid verification", nil, http.StatusUnavailableForLegalReasons, errors.New("Invalid verification")
+	}
+
+	log.Println("VERIFICATION..............")
 
 	// verification, err := user_repository.GetVerification(s.DB, req.Phone)
 	if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
 		return "OTP expired", nil, http.StatusBadRequest, err
 	}
 
+		log.Println("VERIFICATION..............PASED")
+
+
 
 	// ====================== GET OTP VERIFICATION =====================
-	if err != nil || verification == nil {
-		return "Invalid verification", nil, http.StatusUnavailableForLegalReasons, err
-	}
 	if verification.Token != req.OTP {
 		return "OTP does not match", nil, http.StatusBadRequest, nil
 	}
