@@ -129,13 +129,14 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	if req.OtpOption == "email" && !emailOption {
 		return "email otp not enabled", nil, http.StatusForbidden, errors.New("email otp not enabled")
 	}
-
+	
 
 	// ================= PHONE OTP =================
 	if phoneOption && req.OtpOption == "phone" {
 
 	    if !firebaseOTP {
-
+			// ================= SAVE USER AND SEND OTP=================
+			s.authRepo.SaveSignUpUSer(user)
 			return HandleOTP(s.DB, req.Phone, func(otp string) error {
 				if !otp_helpers.SendSMS(req.Phone, otp) {
 				    return errors.New("sms failed")
@@ -168,8 +169,8 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	// ================= EMAIL OTP =================
 
     if emailOption && req.OtpOption == "email" {
-
-
+		// ================= SAVE USER AND SEND OTP=================
+		s.authRepo.SaveSignUpUSer(user)
 		return HandleOTP(s.DB, req.Email, func(otp string) error {
 			return email.SendEmail(otp, &user).Verification()
 		},)
@@ -193,16 +194,6 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		// 	return "failed to send email", nil, http.StatusInternalServerError, err
 		// }
 		// user_repository.IncrementOtpHit(s.DB, req.Email)
-	}
-
-	// ================= SAVE USER =================
-	newUSer, err := s.authRepo.CreateUser(&user); 
-	if err != nil {
-		return "error creating user", nil, http.StatusInternalServerError, err
-	}
-	newUSer.RefCode = utils.GenerateRefererCode(s.DB)
-	if err := s.usermainRepo.UpdateUser(newUSer); err != nil {
-		return "error generating referer code", nil, http.StatusInternalServerError, err
 	}
 
 

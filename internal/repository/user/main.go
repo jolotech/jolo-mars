@@ -3,6 +3,7 @@ package user_repository
 import (
 	// "encoding/json"
 	"time"
+	"errors"
 
 	"gorm.io/gorm"
 	"github.com/jolotech/jolo-mars/internal/models"
@@ -30,7 +31,13 @@ func (r *Main) UpdateUser(user *models.User) error {
 func (r *Main) GetByEmailOrPhone(identifier string) (*models.User, error) {
 	var user models.User
 	err := r.db.Where("email = ? OR phone = ?", identifier, identifier).First(&user).Error
-	return &user, err
+	if err != nil {
+	    if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil 
+		}
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (r *Main) IsWalletReferenceUsed(reference string) bool {
