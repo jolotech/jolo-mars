@@ -2,7 +2,7 @@ package services
 
 import (
 	"errors"
-	"log"
+	// "log"
 	"net/http"
 	"strings"
 
@@ -239,25 +239,31 @@ func (s *UserAuthService) VerifyOTP(c *gin.Context, req types.VerifyOTPRequest,)
 		}
         return user_repository.GetVerification(s.DB, req.Email)
 	}()
+	
 	if err != nil || verification == nil {
 		return "Invalid verification", nil, http.StatusUnavailableForLegalReasons, errors.New("Invalid verification")
 	}
 
-	log.Println("VERIFICATION..............")
-
-	// verification, err := user_repository.GetVerification(s.DB, req.Phone)
-	if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
-		return "OTP expired", nil, http.StatusBadRequest, err
+	if !verification.IsActive {
+		return "OTP deactivated", nil, http.StatusBadRequest, errors.New("Invalid OTP")
 	}
 
-		log.Println("VERIFICATION..............PASED")
 
+	// =================== Check FOR EXPIRED OTP ========================
+
+	if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
+		return "OTP expired", nil, http.StatusBadRequest, errors.New("OTP expired")
+	}
 
 
 	// ====================== GET OTP VERIFICATION =====================
 	if verification.Token != req.OTP {
-		return "OTP does not match", nil, http.StatusBadRequest, nil
+		return "OTP does not match", nil, http.StatusBadRequest, errors.New("OTP does not match")
 	}
+
+	// ===================== DEACTIVATE OTP ========================
+	verification.IsActive = false
+	user_repository.UpdateVerification(s.DB, *verification)
 
 	// ===================== UPDATE USER VERIFICATION STATUS =================
 	if isPhone {

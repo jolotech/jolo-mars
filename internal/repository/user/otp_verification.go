@@ -2,7 +2,7 @@ package user_repository
 
 import (
 	"errors"
-	"log"
+	// "log"
 	"time"
 
 	"github.com/jolotech/jolo-mars/internal/models"
@@ -33,8 +33,15 @@ func GetVerification(db *gorm.DB, value string) (*models.OtpVerification, error)
 		}
 		return nil, err
 	}
-
 	return &pv, nil
+}
+
+func UpdateVerification(db *gorm.DB, verification models.OtpVerification) error {
+	verification.UpdatedAt = time.Now()
+	if err := db.Save(verification).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 
@@ -46,19 +53,16 @@ func UpsertOTP(db *gorm.DB, value, otp string) error {
 		err := tx.Where("verification_method = ?", value).First(&pv).Error
 		if err != nil {
 			// insert
-			new := tx.Create(&models.OtpVerification{
+			return tx.Create(&models.OtpVerification{
 				VerificationMethod: value,
 				Token:       otp,
 				OtpHitCount: 0,
 			}).Error
-
-			log.Println("Created OTP", new)
-			return new
 		}
 
 		// update
 		pv.Token = otp
-		pv.OtpHitCount = 0
+		pv.OtpHitCount += 1
 		return tx.Save(&pv).Error
 	})
 }
