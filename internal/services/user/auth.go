@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	// "log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -198,4 +199,70 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	}
 
 	return "registration successful", nil, http.StatusOK, nil
+}
+
+
+
+// ================= VERIFY OTP =================
+
+func (s *UserAuthService) VerifyOTP(c *gin.Context, req types.VerifyOTPRequest,) (string, any, int, error) {
+	var user *models.User
+	var err error
+
+	var isPhone = req.VerificationType == "phone"
+
+	// =====================GET USER =====================
+	if isPhone {
+		user, err = s.usermainRepo.GetByEmailOrPhone(req.Phone)
+	} else {
+		user, err = s.usermainRepo.GetByEmailOrPhone(req.Email)
+	}
+
+	if err != nil || user == nil {
+		return "User not found", nil, http.StatusNotFound, err
+	}
+
+	// ====================== GET OTP VERIFICATION =====================
+	verification, err := user_repository.GetVerification(s.DB, req.Phone)
+	if err != nil || verification == nil {
+		return "OTP does not match", nil, http.StatusNotFound, err
+	}
+
+	//====================== CHECK OTP MATCH =====================
+	if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
+		return "OTP expired", nil, http.StatusBadRequest, nil
+	}
+
+	// =====
+	if isPhone {
+		user.IsPhoneVerified = true
+	} else {
+		user.IsEmailVerified = true
+	}
+
+	if err := s.usermainRepo.UpdateUser(user); err != nil {
+		return "Failed to verify user", nil, http.StatusInternalServerError, err
+	}
+
+	// 6. Login user (JWT)
+	// token, err := helpers.GenerateJWT(user)
+
+	// ================= TOKEN =================
+	token, _ := utils.GenerateAuthToken(user.Email, user.ID)
+
+	// 7. Guest cart merge (optional)
+	if req.GuestID != nil {
+		helpers.MergeGuestCart(user.ID, *req.GuestID)
+	}
+
+	// 8. Response
+	data := gin.H{
+		"token":             token,
+		"is_phone_verified": user.IsPhoneVerified,
+		"is_email_verified": user.IsEmailVerified,
+		"is_personal_info":  user.FirstName != "",
+		"email":             user.Email,
+	}
+
+	return "Verification successful", data, http.StatusOK, nil
 }

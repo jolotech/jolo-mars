@@ -1,6 +1,7 @@
 package user_repository
 
 import (
+	"time"
 	"gorm.io/gorm"
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/internal/utils"
@@ -49,3 +50,8 @@ func IncrementOtpHit(db *gorm.DB, value string) error {
 func  IsOtpLocked(pv *models.OtpVerification) bool {
 	return pv.OtpHitCount >= utils.OTPMaxHitCount
 }
+
+func IsOTPExpired(UpdatedAt time.Time, duration time.Duration) bool {
+	return time.Since(UpdatedAt) > duration
+}
+

@@ -27,6 +27,12 @@ func (r *Main) UpdateUser(user *models.User) error {
 	return nil
 }
 
+func (r *Main) GetByEmailOrPhone(identifier string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("email = ? OR phone = ?", identifier, identifier).First(&user).Error
+	return &user, err
+}
+
 func (r *Main) IsWalletReferenceUsed(reference string) bool {
 	var tx models.WalletTransaction
 	err := r.db.Where("reference = ?", reference).First(&tx).Error

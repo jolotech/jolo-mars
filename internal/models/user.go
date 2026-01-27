@@ -17,6 +17,8 @@ type User struct {
 	// RefCode          string    `json:"ref_code" gorm:"column:ref_code"`
 	RefCode          string `json:"ref_code" gorm:"type:varchar(100);uniqueIndex"`
 	Status           bool      `json:"status" gorm:"default:true"`
+	IsPhoneVerified  bool      `json:"is_phone_verified" gorm:"column:is_phone_verified;default:false"`
+	IsEmailVerified  bool      `json:"is_email_verified" gorm:"column:is_email_verified;default:false"`
 	CMFirebaseToken  *string   `json:"cm_firebase_token" gorm:"column:cm_firebase_token"`
 	CreatedAt        time.Time `json:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at"`
