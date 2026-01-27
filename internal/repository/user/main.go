@@ -38,3 +38,41 @@ func (r *Main) IsWalletReferenceUsed(reference string) bool {
 	err := r.db.Where("reference = ?", reference).First(&tx).Error
 	return err == nil
 }
+
+
+func (r *Main) GetByID(userID uint) (*models.User, error) {
+	var user models.User
+	err := r.db.First(&user, userID).Error
+	return &user, err
+}
+
+
+
+func MergeGuestCart(db *gorm.DB, userID uint, guestID string) bool {
+	if guestID == "" || userID == 0 {
+		return true
+	}
+
+	var guestCartExists bool
+	db.Model(&models.Cart{}).
+		Where("user_id = ? AND is_guest = ?", guestID, true).
+		Select("count(1) > 0").
+		Scan(&guestCartExists)
+
+	if guestCartExists {
+		db.Where("user_id = ? AND is_guest = ?", userID, false).
+			Delete(&models.Cart{})
+	}
+
+	db.Model(&models.Cart{}).
+		Where("user_id = ?", guestID).
+		Updates(map[string]interface{}{
+			"user_id":  userID,
+			"is_guest": false,
+		})
+
+	return true
+}
+
+
+ 

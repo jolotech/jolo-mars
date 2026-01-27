@@ -45,4 +45,3 @@ func (r *Auth) CreateUserNotification(userID uint, data map[string]interface{}) 
 	}).Error
 }
 
- 
