@@ -239,7 +239,7 @@ func (s *UserAuthService) VerifyOTP(c *gin.Context, req types.VerifyOTPRequest,)
 		}
         return user_repository.GetVerification(s.DB, req.Email)
 	}()
-	
+
 	if err != nil || verification == nil {
 		return "Invalid verification", nil, http.StatusUnavailableForLegalReasons, errors.New("Invalid verification")
 	}
@@ -268,6 +268,7 @@ func (s *UserAuthService) VerifyOTP(c *gin.Context, req types.VerifyOTPRequest,)
 	// ===================== UPDATE USER VERIFICATION STATUS =================
 	if isPhone {
 		user.IsPhoneVerified = true
+		user.Status = true
 	} else {
 		user.IsEmailVerified = true
 	}
