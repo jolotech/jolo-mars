@@ -40,7 +40,7 @@ func HandleValidationError(err error) string {
 		return "Validation failed"
 	}
 
-	e := errs[0] // 👈 FIRST validation error only
+	e := errs[0] 
 	field := strings.ToLower(e.Field())
 
 	switch e.Tag() {
