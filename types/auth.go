@@ -28,3 +28,10 @@ type VerifyOTPRequest struct {
 	Email            string `json:"email,omitempty"`
 	GuestID          *string `json:"guest_id,omitempty"`
 }
+
+type ResendOTPRequest struct {
+	OTP              string `json:"otp" binding:"required"`
+	VerificationType string `json:"verification_type" binding:"required,oneof=phone email"`
+	Phone            string `json:"phone,omitempty"`
+	Email            string `json:"email,omitempty"`
+}

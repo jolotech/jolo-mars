@@ -48,12 +48,30 @@ func (h *UserAuthHandler) VerifyOTP(c *gin.Context) {
 		return
 	}
 
-	msg, data, statusCode, err := h.UserAuthService.VerifyOTP(c, req)
+	msg, data, statusCode, err := h.UserAuthService.VerifyOTP(req)
 	if err != nil {
 		helpers.ErrorResponse(c, err, msg, statusCode)
 		return
 	}
 
+	helpers.SuccessResponse(c, data, msg, statusCode)
+}
+
+//============== RESEND OTP HANDLER =====================
+
+func (h *UserAuthHandler) ResendOTP(c *gin.Context){
+	var req types.ResendOTPRequest
+	
+	if err := c.ShouldBind(&req); err != nil {
+		msg := validations.HandleValidationError(err)
+		helpers.ErrorResponse(c, err, msg, http.StatusBadGateway)
+	}
+
+	msg, data, statusCode, err := h.UserAuthService.ResendOTP(req)
+	if err != nil {
+		helpers.ErrorResponse(c, err, msg, statusCode)
+		return
+	}
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
 

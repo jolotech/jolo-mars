@@ -135,16 +135,16 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 
 	    if !firebaseOTP {
 
-		    lastOTP, _ := user_repository.GetVerification(s.DB, req.Phone)
-		    if lastOTP != nil {
-			    if user_repository.IsOtpLocked(lastOTP) {
-				    return "too many attempts", nil, 403, errors.New("otp locked")
-			    }
-			    ok, wait := utils.CanResendOTP(lastOTP.UpdatedAt)
-			    if !ok {
-				    return utils.OTPWaitError(wait), nil, 405, errors.New("otp wait error")
-			    }
-		    }
+		    // lastOTP, _ := user_repository.GetVerification(s.DB, req.Phone)
+		    // if lastOTP != nil {
+			//     if user_repository.IsOtpLocked(lastOTP) {
+			// 	    return "too many attempts", nil, 403, errors.New("otp locked")
+			//     }
+			//     ok, wait := utils.CanResendOTP(lastOTP.UpdatedAt)
+			//     if !ok {
+			// 	    return utils.OTPWaitError(wait), nil, 405, errors.New("otp wait error")
+			//     }
+		    // }
 
 		    otp := utils.GenerateOTP()
 		    user_repository.UpsertOTP(s.DB, req.Phone, otp)
@@ -160,16 +160,16 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 
     if emailOption && req.OtpOption == "email" {
 
-	    lastOTP, _ := user_repository.GetVerification(s.DB, req.Email)
-	    if lastOTP != nil {
-		    if user_repository.IsOtpLocked(lastOTP) {
-				return "too many attempts", nil, 403, errors.New("otp locked")
-			}
-		    ok, wait := utils.CanResendOTP(lastOTP.UpdatedAt)
-		    if !ok {
-			    return utils.OTPWaitError(wait), nil, 405, errors.New("otp wait error")
-		    }
-		}
+	    // lastOTP, _ := user_repository.GetVerification(s.DB, req.Email)
+	    // if lastOTP != nil {
+		//     if user_repository.IsOtpLocked(lastOTP) {
+		// 		return "too many attempts", nil, 403, errors.New("otp locked")
+		// 	}
+		//     ok, wait := utils.CanResendOTP(lastOTP.UpdatedAt)
+		//     if !ok {
+		// 	    return utils.OTPWaitError(wait), nil, 405, errors.New("otp wait error")
+		//     }
+		// }
 
 		otp := utils.GenerateOTP()
 		user_repository.UpsertOTP(s.DB, req.Email, otp)
@@ -207,7 +207,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 
 // ================= VERIFY OTP =================
 
-func (s *UserAuthService) VerifyOTP(c *gin.Context, req types.VerifyOTPRequest,) (string, any, int, error) {
+func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, int, error) {
 	var user *models.User
 	var err error
 
@@ -292,4 +292,106 @@ func (s *UserAuthService) VerifyOTP(c *gin.Context, req types.VerifyOTPRequest,)
 	}
 
 	return "Verification successful", data, http.StatusOK, nil
+}
+
+
+func (s *UserAuthService) ResendOTP(req types.ResendOTPRequest) (string, any, int, error){
+
+	var user *models.User
+	var err error
+
+	isPhone := req.VerificationType == "phone"
+	isEmail := req.VerificationType == "email"
+
+	// =====================GET USER =====================
+	if isPhone {
+		user, err = s.usermainRepo.GetByEmailOrPhone(req.Phone)
+	} else {
+		user, err = s.usermainRepo.GetByEmailOrPhone(req.Email)
+	}
+
+	if err != nil || user == nil {
+		return "User not found", nil, http.StatusNotFound, err
+	}
+
+	//==================== GET VERIFICATION ======================
+
+	// verification, err := func() (*models.OtpVerification, error) {
+	// 	if isPhone {
+    //         return user_repository.GetVerification(s.DB, req.Phone)
+	// 	}
+    //     return user_repository.GetVerification(s.DB, req.Email)
+	// }()
+
+	// if err != nil || verification == nil {
+		
+	// ================= OTP SETTINGS =================
+	loginSettings := s.adminmainRepo.GetLoginSettings()
+	firebaseOTP := s.adminmainRepo.GetBusinessSetting("firebase_otp_verification").(bool)
+	phoneOption := loginSettings.PhoneVerification
+	emailOption := loginSettings.EmailVerification
+
+
+	// ================= OTP OPTION CHECK =================
+	if isPhone && !phoneOption {
+		return "phone otp not enabled", nil, http.StatusForbidden, errors.New("phone otp not enabled")
+	}
+	if isEmail && !emailOption {
+		return "email otp not enabled", nil, http.StatusForbidden, errors.New("email otp not enabled")
+	}
+
+
+	// ================= PHONE OTP =================
+	if phoneOption && isPhone {
+
+	    if !firebaseOTP {
+
+		    lastOTP, _ := user_repository.GetVerification(s.DB, req.Phone)
+		    if lastOTP != nil {
+			    if user_repository.IsOtpLocked(lastOTP) {
+				    return "too many attempts", nil, 403, errors.New("otp locked")
+			    }
+			    ok, wait := utils.CanResendOTP(lastOTP.UpdatedAt)
+			    if !ok {
+				    return utils.OTPWaitError(wait), nil, 405, errors.New("otp wait error")
+			    }
+		    }
+
+		    otp := utils.GenerateOTP()
+		    user_repository.UpsertOTP(s.DB, req.Phone, otp)
+
+		    if !otp_helpers.SendSMS(req.Phone, otp) {
+			    return "failed to send sms", nil, 405, errors.New("sms failed")
+		    }
+		    user_repository.IncrementOtpHit(s.DB, req.Phone)
+	    }
+    }
+
+	// ================= EMAIL OTP =================
+
+    if emailOption && isEmail {
+
+	    lastOTP, _ := user_repository.GetVerification(s.DB, req.Email)
+	    if lastOTP != nil {
+		    if user_repository.IsOtpLocked(lastOTP) {
+				return "too many attempts", nil, 403, errors.New("otp locked")
+			}
+		    ok, wait := utils.CanResendOTP(lastOTP.UpdatedAt)
+		    if !ok {
+			    return utils.OTPWaitError(wait), nil, 405, errors.New("otp wait error")
+		    }
+		}
+
+		otp := utils.GenerateOTP()
+		user_repository.UpsertOTP(s.DB, req.Email, otp)
+
+		err := email.SendEmail(otp, user).Verification()
+		if err != nil {
+			return "failed to send email", nil, http.StatusInternalServerError, err
+		}
+		user_repository.IncrementOtpHit(s.DB, req.Email)
+	}
+
+	// }
+	return "OTP Sent Successfully", nil, http.StatusOK, nil
 }
