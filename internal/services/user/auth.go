@@ -423,6 +423,8 @@ func HandleOTP(db *gorm.DB, identifier string, sendOTP OTPSendFunc,) (string, in
 	if lastOTP != nil {
 
 		if user_repository.IsOtpLocked(lastOTP) {
+			lastOTP.IsActive = false
+			user_repository.UpdateVerification(db, *lastOTP)
 			return "too many attempts", nil, http.StatusForbidden, errors.New("otp locked")
 		}
 
