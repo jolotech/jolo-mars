@@ -29,6 +29,7 @@ func UserRoutes(
 		{
 			// auth.POST("/login", authHandler.Login)
 			auth.POST("/register", authHandler.Register)
+			auth.POST("/verify-otp", authHandler.VerifyOTP)
 
 		}
 
