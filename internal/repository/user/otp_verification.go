@@ -2,21 +2,39 @@ package user_repository
 
 import (
 	"time"
+	"errors"
 	"gorm.io/gorm"
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/internal/utils"
 )
+
+// func GetVerification(db *gorm.DB, value string) (*models.OtpVerification, error) {
+// 	var pv models.OtpVerification
+
+// 	err := db.Where("verification_method = ?", value).First(&pv).Error
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &pv, nil
+// }
+
+
 
 func GetVerification(db *gorm.DB, value string) (*models.OtpVerification, error) {
 	var pv models.OtpVerification
 
 	err := db.Where("verification_method = ?", value).First(&pv).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil 
+		}
 		return nil, err
 	}
 
 	return &pv, nil
 }
+
 
 
 func UpsertOTP(db *gorm.DB, value, otp string) error {
