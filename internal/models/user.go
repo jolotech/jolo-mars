@@ -13,10 +13,11 @@ type User struct {
 	// Password         string    `json:"-" gorm:"not null"`
 	Password         string   `json:"-" gorm:"column:password"`
 	PasswordHash     string   `json:"-" gorm:"column:password_hash"`
-	RefBy            *uint     `json:"ref_by" gorm:"column:ref_by"`
+	RefBy            *uint    `json:"ref_by" gorm:"column:ref_by"`
 	// RefCode          string    `json:"ref_code" gorm:"column:ref_code"`
-	RefCode          string `json:"ref_code" gorm:"type:varchar(100);uniqueIndex"`
+	RefCode          string    `json:"ref_code" gorm:"type:varchar(100);uniqueIndex"`
 	Status           bool      `json:"status" gorm:"default:false"`
+	IsNew            bool      `json:"is_new" gorm:"defaul:true"`
 	IsPhoneVerified  bool      `json:"is_phone_verified" gorm:"column:is_phone_verified;default:false"`
 	IsEmailVerified  bool      `json:"is_email_verified" gorm:"column:is_email_verified;default:false"`
 	CMFirebaseToken  *string   `json:"cm_firebase_token" gorm:"column:cm_firebase_token"`
