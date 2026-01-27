@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"time"
-	// "github.com/jolotech/jolo-mars/internal/infrastructure/database/migrations"
+	"github.com/jolotech/jolo-mars/internal/infrastructure/database/migrations"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -51,16 +51,16 @@ func ConnectDB() {
 	log.Println("✅ Database connected successfully")
 
 	DB = db
-	// DB = db
-	// tables := []string{"users", "admins", "business_settings", "notification_settings", "otp_verifications", "user_notifications", "wallet_transactions"}
+
+	tables := []string{"users", "admins", "business_settings", "notification_settings", "otp_verifications", "user_notifications", "wallet_transactions", "carts"}
 
 
-	// 	// 🚀 Automatically run migrations
-	// if err := migrations.RunAll(DB, tables); err != nil {
-	// 	log.Fatalf("❌ Migration failed: %v", err)
-	// }
+		// 🚀 Automatically run migrations
+	if err := migrations.RunAll(DB, tables); err != nil {
+		log.Fatalf("❌ Migration failed: %v", err)
+	}
 
-	// log.Println("✅ All migrations executed successfully.")
+	log.Println("✅ All migrations executed successfully.")
 
 
 }

@@ -62,6 +62,11 @@ func RunAll(db *gorm.DB, tables []string) error {
                 return fmt.Errorf("failed wallet transactions migration: %v", err)
             }
             log.Println("✅ wallet transactions table synced.")
+        case "carts":
+            if err := db.AutoMigrate(&models.Cart{}); err != nil {
+                return fmt.Errorf("failed carts migration: %v", err)
+            }
+            log.Println("✅ carts table synced.")
         default:
             log.Printf("⚠️ No migration defined for: %s", table)
         }
