@@ -42,7 +42,6 @@ func UpdateVerification(db *gorm.DB, verification models.OtpVerification) error 
 }
 
 
-
 func UpsertOTP(db *gorm.DB, value, otp string) error {
 	return db.Transaction(func(tx *gorm.DB) error {
 		var pv models.OtpVerification
@@ -59,7 +58,6 @@ func UpsertOTP(db *gorm.DB, value, otp string) error {
 
 		// update
 		pv.Token = otp
-		pv.OtpHitCount += 1
 		return tx.Save(&pv).Error
 	})
 }
