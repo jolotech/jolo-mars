@@ -37,8 +37,8 @@ func Init() *Container {
 
 
 	// Repositories
-	userAuthRepo := user_repository.NewUserAuthRepository(database.DB)
 	userMainRepo := user_repository.NewUserMainRepository(database.DB)
+	userAuthRepo := user_repository.NewUserAuthRepository(database.DB, userMainRepo)
 	adminMainRepo := admin_repository.NewAdminMainRepository(database.DB)
 	// orderRepo := repositories.NewOrderRepository(database.DB)
 	// adminRepo := repositories.NewAdminRepository(database.DB)
