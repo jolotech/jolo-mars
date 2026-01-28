@@ -422,6 +422,10 @@ func HandleOTP(db *gorm.DB, identifier string, sendOTP OTPSendFunc,) (string, in
 	lastOTP, _ := user_repository.GetVerification(db, identifier)
 	if lastOTP != nil {
 
+		if !lastOTP.IsActive {
+			return "OTP deactivated", nil, http.StatusBadRequest, errors.New("Invalid OTP")
+		}
+		
 		if user_repository.IsOtpLocked(lastOTP) {
 			lastOTP.IsActive = false
 			user_repository.UpdateVerification(db, *lastOTP)
