@@ -217,7 +217,7 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 		user_repository.DeleteVerification(s.DB, req.Phone)
 	} else {
 		user.IsEmailVerified = true
-		user_repository.DeleteVerification(s.DB, req.Phone)
+		user_repository.DeleteVerification(s.DB, req.Email)
 	}
 
 	// ================= TOKEN =================
