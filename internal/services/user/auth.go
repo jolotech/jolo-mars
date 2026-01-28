@@ -179,37 +179,6 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 		return msg, verification, statusCode, err
 	}
 
-	// verification, err := func() (*models.OtpVerification, error) {
-	// 	if isPhone {
-    //         return user_repository.GetVerification(s.DB, req.Phone)
-	// 	}
-    //     return user_repository.GetVerification(s.DB, req.Email)
-	// }()
-
-	// if err != nil || verification == nil {
-	// 	return "Invalid verification", nil, http.StatusUnavailableForLegalReasons, errors.New("Invalid verification")
-	// }
-
-	// if !verification.IsActive {
-	// 	return "OTP deactivated", nil, http.StatusBadRequest, errors.New("Invalid OTP")
-	// }
-
-	// // =================== Check FOR EXPIRED OTP ========================
-
-	// if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
-	// 	return "OTP expired", nil, http.StatusBadRequest, errors.New("OTP expired")
-	// }
-
-
-	// // ====================== GET OTP VERIFICATION =====================
-	// if verification.TOKEN != req.OTP {
-	// 	return "OTP does not match", nil, http.StatusBadRequest, errors.New("OTP does not match")
-	// }
-
-	// // ===================== DEACTIVATE OTP ========================
-	// verification.IsActive = false
-	// user_repository.UpdateVerification(s.DB, *verification)
-
 	// ===================== UPDATE USER STATUS AND DELETE VERIFICATION =================
 	if isPhone {
 		user.IsPhoneVerified = true
@@ -374,7 +343,6 @@ func (s *UserAuthService) ForgetPassword(req types.ResendOTPRequest) (string, an
 			return HandleOTP(s.DB, req.Phone, func(otp string) error {
 				if !otp_helpers.SendSMS(req.Phone, otp) {
 				    return errors.New("sms failed")
-					// return "failed to send sms",  405, errors.New("sms failed")
 			    }
 			    return nil
 		    },
