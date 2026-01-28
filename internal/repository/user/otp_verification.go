@@ -78,8 +78,8 @@ func UpsertOTP(db *gorm.DB, value, otp string) error {
 
 
 
-func DeleteVerification(db *gorm.DB, identifier, otp string) error {
-	if err := db.Where("verification_method = ? AND token = ?", identifier, otp).
+func DeleteVerification(db *gorm.DB, identifier string) error {
+	if err := db.Where("verification_method ?", identifier).
 		Delete(&models.OtpVerification{}).Error; err != nil {
 		return err
 	}
