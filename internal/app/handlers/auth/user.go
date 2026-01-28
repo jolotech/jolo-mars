@@ -65,6 +65,7 @@ func (h *UserAuthHandler) ResendOTP(c *gin.Context){
 	if err := c.ShouldBind(&req); err != nil {
 		msg := validations.HandleValidationError(err)
 		helpers.ErrorResponse(c, err, msg, http.StatusBadGateway)
+		return
 	}
 
 	msg, data, statusCode, err := h.UserAuthService.ResendOTP(req)
@@ -82,6 +83,7 @@ func (h *UserAuthHandler) ForgetPassword(c *gin.Context) {
 	if err := c.ShouldBind(&req); err != nil {
 		msg := validations.HandleValidationError(err)
 		helpers.ErrorResponse(c, err, msg, http.StatusBadGateway)
+		return
 	}
 
 	msg, data, statusCode, err := h.UserAuthService.ForgetPassword(req)
