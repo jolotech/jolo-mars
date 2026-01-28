@@ -406,7 +406,7 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 		return "passwords do not match", nil, http.StatusUnauthorized, errors.New("mismatch")
 	}
 	isOldPassword := utils.ComparePassword(user.Password, req.Password)
-	if !isOldPassword {
+	if isOldPassword {
 		return "cant use previous password", nil, http.StatusUnauthorized, errors.New("cant use old password update to a new password")
 	}
 
@@ -417,7 +417,7 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 		identifier = req.Email
 	}
 	msg, verification, statusCode, err := user_repository.OTPCheck(s.DB, identifier, req.ResetToken)
-	if err != nil || verification == nil {
+	if err != nil  {
 		return msg, verification, statusCode, err
 	}
 
