@@ -215,11 +215,10 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 	// ===================== UPDATE USER STATUS AND DELETE VERIFICATION =================
 	if isPhone {
 		user.IsPhoneVerified = true
-		user_repository.DeleteVerification(s.DB, identifier)
+		user_repository.DeleteVerification(s.DB, identifier, req.OTP)
 	} else {
-		log.Println("VErifying...", identifier)
 		user.IsEmailVerified = true
-		user_repository.DeleteVerification(s.DB, identifier)
+		user_repository.DeleteVerification(s.DB, identifier, req.OTP)
 	}
 
 	// ================= TOKEN =================
