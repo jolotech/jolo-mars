@@ -433,6 +433,10 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 		return "failed to update password", nil, http.StatusInternalServerError, err
 	}
 
+	//=============== DELETE VERIFICATION AND SEND EMAIL =====================
+	// user_repository.DeleteVerification(s.DB, )
+	email.SendEmail(nil, user).ResetPassword();
+
 	//================ SUCCESS RESPONSE ====================
 	return "Password changed successfully.", nil, http.StatusOK, nil
 }
