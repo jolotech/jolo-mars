@@ -93,3 +93,21 @@ func (h *UserAuthHandler) ForgetPassword(c *gin.Context) {
 }
 
 
+
+func (h *UserAuthHandler) ResetPassword(c *gin.Context) {
+
+	var req types.ResetPasswordSubmitRequest
+
+	if err := c.ShouldBind(&req); err != nil {
+		msg := validations.HandleValidationError(err)
+		helpers.ErrorResponse(c, err, msg, http.StatusBadGateway)
+	}
+
+	msg, data, statusCode, err := h.UserAuthService.ResetPassword(req)
+	if err != nil {
+		helpers.ErrorResponse(c, err, msg, statusCode)
+		return
+	}
+	helpers.SuccessResponse(c, data, msg, statusCode)
+}
+

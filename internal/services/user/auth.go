@@ -7,11 +7,12 @@ import (
 	"strings"
 
 	// "log"
-	"time"
+	// "time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	// "github.com/jolotech/jolo-mars/config"
 	"github.com/jolotech/jolo-mars/internal/helpers/email"
 	"github.com/jolotech/jolo-mars/internal/helpers/notifications"
 	"github.com/jolotech/jolo-mars/internal/helpers/verifications"
@@ -158,9 +159,9 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 // ================= VERIFY OTP =================
 
 func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, int, error) {
-	var err error
 
 	var isPhone = req.VerificationMethod == "phone"
+    var identifier string
 
 	// =====================GET USER =====================
 	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
@@ -168,36 +169,46 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 		return "User not found", nil, http.StatusNotFound, err
 	}
 
-	verification, err := func() (*models.OtpVerification, error) {
-		if isPhone {
-            return user_repository.GetVerification(s.DB, req.Phone)
-		}
-        return user_repository.GetVerification(s.DB, req.Email)
-	}()
-
+	if isPhone {
+		identifier = req.Phone
+	}else {
+		identifier = req.Email
+	}
+	msg, verification, statusCode, err := user_repository.OTPCheck(s.DB, identifier, req.OTP)
 	if err != nil || verification == nil {
-		return "Invalid verification", nil, http.StatusUnavailableForLegalReasons, errors.New("Invalid verification")
+		return msg, verification, statusCode, err
 	}
 
-	if !verification.IsActive {
-		return "OTP deactivated", nil, http.StatusBadRequest, errors.New("Invalid OTP")
-	}
+	// verification, err := func() (*models.OtpVerification, error) {
+	// 	if isPhone {
+    //         return user_repository.GetVerification(s.DB, req.Phone)
+	// 	}
+    //     return user_repository.GetVerification(s.DB, req.Email)
+	// }()
 
-	// =================== Check FOR EXPIRED OTP ========================
+	// if err != nil || verification == nil {
+	// 	return "Invalid verification", nil, http.StatusUnavailableForLegalReasons, errors.New("Invalid verification")
+	// }
 
-	if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
-		return "OTP expired", nil, http.StatusBadRequest, errors.New("OTP expired")
-	}
+	// if !verification.IsActive {
+	// 	return "OTP deactivated", nil, http.StatusBadRequest, errors.New("Invalid OTP")
+	// }
+
+	// // =================== Check FOR EXPIRED OTP ========================
+
+	// if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
+	// 	return "OTP expired", nil, http.StatusBadRequest, errors.New("OTP expired")
+	// }
 
 
-	// ====================== GET OTP VERIFICATION =====================
-	if verification.Token != req.OTP {
-		return "OTP does not match", nil, http.StatusBadRequest, errors.New("OTP does not match")
-	}
+	// // ====================== GET OTP VERIFICATION =====================
+	// if verification.TOKEN != req.OTP {
+	// 	return "OTP does not match", nil, http.StatusBadRequest, errors.New("OTP does not match")
+	// }
 
-	// ===================== DEACTIVATE OTP ========================
-	verification.IsActive = false
-	user_repository.UpdateVerification(s.DB, *verification)
+	// // ===================== DEACTIVATE OTP ========================
+	// verification.IsActive = false
+	// user_repository.UpdateVerification(s.DB, *verification)
 
 	// ===================== UPDATE USER VERIFICATION STATUS =================
 	if isPhone {
@@ -375,4 +386,43 @@ func (s *UserAuthService) ForgetPassword(req types.ResendOTPRequest) (string, an
 		},)
 	}
 	return "OTP Sent Successfully", nil, http.StatusOK, nil
+}
+
+func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (string, any, int, error) {
+
+	var identifier string
+	isPhone := req.VerificationMethod == "Phone"
+
+
+	if req.Password != req.ConfirmPassword {
+		return "passwords do not match", nil, http.StatusUnauthorized, errors.New("mismatch")
+	}
+
+	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
+	if err != nil || user == nil {
+		return "user not found", nil, http.StatusNotFound, errors.New("not found")
+	}
+
+	if isPhone {
+		identifier = req.Phone
+	}else {
+		identifier = req.Email
+	}
+	msg, verification, statusCode, err := user_repository.OTPCheck(s.DB, identifier, req.ResetToken)
+	if err != nil || verification == nil {
+		return msg, verification, statusCode, err
+	}
+
+	hashed, err := utils.HashPassword(req.ConfirmPassword)
+	if err != nil {
+		return "failed to hash password", nil, http.StatusInternalServerError, err
+	}
+
+	user.Password = hashed
+	if err := s.usermainRepo.UpdateUser(user); err != nil {
+		return "failed to update password", nil, http.StatusInternalServerError, err
+	}
+
+
+	return "Password changed successfully.", nil, http.StatusOK, nil
 }

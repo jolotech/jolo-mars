@@ -34,3 +34,12 @@ type ResendOTPRequest struct {
 	Phone            string `json:"phone,omitempty"`
 	Email            string `json:"email,omitempty"`
 }
+
+type ResetPasswordSubmitRequest struct {
+	ResetToken         string `json:"reset_token" binding:"required"`
+	Password           string `json:"password" binding:"required,min=8"`
+	ConfirmPassword    string `json:"confirm_password" binding:"required"`
+	VerificationMethod string `json:"verification_method" binding:"required,oneof=phone email"`
+	Phone              string `json:"phone"`
+	Email              string `json:"email"`
+}
