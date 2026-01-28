@@ -169,6 +169,7 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 		return "User not found", nil, http.StatusNotFound, err
 	}
 
+	//================== OTP CHECK =======================
 	if isPhone {
 		identifier = req.Phone
 	}else {
@@ -393,16 +394,18 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 	var identifier string
 	isPhone := req.VerificationMethod == "Phone"
 
-
+	// ============ Password CHECK ===============
 	if req.Password != req.ConfirmPassword {
 		return "passwords do not match", nil, http.StatusUnauthorized, errors.New("mismatch")
 	}
 
+	//==================== GET USER ===============
 	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
 	if err != nil || user == nil {
 		return "user not found", nil, http.StatusNotFound, errors.New("not found")
 	}
 
+	//================== OTP CHECK ===================
 	if isPhone {
 		identifier = req.Phone
 	}else {
@@ -413,16 +416,18 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 		return msg, verification, statusCode, err
 	}
 
-	hashed, err := utils.HashPassword(req.ConfirmPassword)
+	//=============== HASH NEW PASSWORD ===================
+	hashedPass, err := utils.HashPassword(req.ConfirmPassword)
 	if err != nil {
 		return "failed to hash password", nil, http.StatusInternalServerError, err
 	}
 
-	user.Password = hashed
+	//=============== SAVE PASSWORD =======================
+	user.Password = hashedPass
 	if err := s.usermainRepo.UpdateUser(user); err != nil {
 		return "failed to update password", nil, http.StatusInternalServerError, err
 	}
 
-
+	//================ SUCCESS RESPONSE ====================
 	return "Password changed successfully.", nil, http.StatusOK, nil
 }
