@@ -107,7 +107,6 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		PasswordHash: hashedPassword,
 		RefBy:    refBy,
 		Password: hashedPassword,
-		Status:   true,
 	}
 
 	// ================= TOKEN =================
