@@ -395,15 +395,19 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 	var identifier string
 	isPhone := req.VerificationMethod == "Phone"
 
-	// ============ Password CHECK ===============
-	if req.Password != req.ConfirmPassword {
-		return "passwords do not match", nil, http.StatusUnauthorized, errors.New("mismatch")
-	}
-
 	//==================== GET USER ===============
 	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
 	if err != nil || user == nil {
 		return "user not found", nil, http.StatusNotFound, errors.New("not found")
+	}
+
+	// ============ Password CHECK ===============
+	if req.Password != req.ConfirmPassword {
+		return "passwords do not match", nil, http.StatusUnauthorized, errors.New("mismatch")
+	}
+	isOldPassword := utils.ComparePassword(user.Password, req.Password)
+	if !isOldPassword {
+		return "cant use previous password", nil, http.StatusUnauthorized, errors.New("cant use old password update to a new password")
 	}
 
 	//================== OTP CHECK ===================
