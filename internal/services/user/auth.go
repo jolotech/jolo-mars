@@ -124,7 +124,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	if phoneOption && req.OtpOption == "phone" {
 
 	    if !firebaseOTP {
-			// ================= SAVE USER AND SEND OTP=================
+			// ================= SAVE USER AND SEND OTP SMS =================
 			s.authRepo.SaveSignUpUSer(user)
 			return HandleOTP(s.DB, req.Phone, func(otp string) error {
 				if !otp_helpers.SendSMS(req.Phone, otp) {
@@ -136,7 +136,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	    }
     }
 
-	// ================= SAVE USER AND SEND OTP=================
+	// ================= SAVE USER AND SEND OTP EMAIL =================
     if emailOption && req.OtpOption == "email" {
 		s.authRepo.SaveSignUpUSer(user)
 		return HandleOTP(s.DB, req.Email, func(otp string) error {

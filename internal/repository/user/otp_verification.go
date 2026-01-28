@@ -2,9 +2,10 @@ package user_repository
 
 import (
 	"errors"
+	"log"
 	// "log"
-	"time"
 	"net/http"
+	"time"
 
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/internal/utils"
@@ -64,13 +65,13 @@ func UpsertOTP(db *gorm.DB, value, otp string) error {
 			// insert
 			return tx.Create(&models.OtpVerification{
 				VerificationMethod: value,
-				TOKEN:       otp,
+				Token:       otp,
 				OtpHitCount: 0,
 			}).Error
 		}
 
 		// update
-		pv.TOKEN = otp
+		pv.Token = otp
 		return tx.Save(&pv).Error
 	})
 }
@@ -84,6 +85,8 @@ func OTPCheck(db *gorm.DB, identifier string, otp string)(string, any, int, erro
 		}
         return GetVerification(db, identifier)
 	}()
+
+	log.Println("Verification", verification)
 
 	if err != nil || verification == nil {
 		return "Invalid verification", nil, http.StatusUnavailableForLegalReasons, errors.New("Invalid verification")
@@ -99,9 +102,8 @@ func OTPCheck(db *gorm.DB, identifier string, otp string)(string, any, int, erro
 		return "OTP expired", nil, http.StatusBadRequest, errors.New("OTP expired")
 	}
 
-
 	// ====================== GET OTP VERIFICATION =====================
-	if verification.TOKEN != otp {
+	if verification.Token != otp {
 		return "OTP does not match", nil, http.StatusBadRequest, errors.New("OTP does not match")
 	}
 
