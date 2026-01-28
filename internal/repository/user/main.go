@@ -28,9 +28,9 @@ func (r *Main) UpdateUser(user *models.User) error {
 	return nil
 }
 
-func (r *Main) GetByEmailOrPhone(identifier string) (*models.User, error) {
+func (r *Main) GetByEmailOrPhone(email, phone string) (*models.User, error) {
 	var user models.User
-	err := r.db.Where("email = ? OR phone = ?", identifier, identifier).First(&user).Error
+	err := r.db.Where("email = ? OR phone = ?", email, phone).First(&user).Error
 	if err != nil {
 	    if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil 

@@ -32,12 +32,7 @@ type UserAuthService struct {
 type OTPSendFunc func(otp string) error
 
 func NewAuthService(authRepo *user_repository.Auth, usermainRepo *user_repository.Main, adminmainRepo *admin_repository.Main, db *gorm.DB) *UserAuthService {
-	return &UserAuthService{
-		authRepo: authRepo,
-		usermainRepo: usermainRepo,
-		adminmainRepo: adminmainRepo,
-		DB: db,
-	}
+	return &UserAuthService{authRepo, usermainRepo, adminmainRepo, db,}
 }
 
 func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (string, interface{}, int, error) {
@@ -163,18 +158,12 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 // ================= VERIFY OTP =================
 
 func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, int, error) {
-	var user *models.User
 	var err error
 
 	var isPhone = req.VerificationType == "phone"
 
 	// =====================GET USER =====================
-	if isPhone {
-		user, err = s.usermainRepo.GetByEmailOrPhone(req.Phone)
-	} else {
-		user, err = s.usermainRepo.GetByEmailOrPhone(req.Email)
-	}
-
+	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
 	if err != nil || user == nil {
 		return "User not found", nil, http.StatusNotFound, err
 	}
@@ -253,12 +242,7 @@ func (s *UserAuthService) ResendOTP(req types.ResendOTPRequest) (string, any, in
 	isEmail := req.VerificationType == "email"
 
 	// =====================GET USER =====================
-	if isPhone {
-		user, err = s.usermainRepo.GetByEmailOrPhone(req.Phone)
-	} else {
-		user, err = s.usermainRepo.GetByEmailOrPhone(req.Email)
-	}
-
+	user, err = s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
 	if err != nil || user == nil {
 		return "User not found", nil, http.StatusNotFound, err
 	}
@@ -333,4 +317,62 @@ func HandleOTP(db *gorm.DB, identifier string, sendOTP OTPSendFunc,) (string, in
 	user_repository.IncrementOtpHit(db, identifier)
 
 	return "OTP sent successfully", nil, http.StatusOK, nil
+}
+
+
+func (s *UserAuthService) ForgetPassword(req types.ResendOTPRequest) (string, any, int, error) {
+
+	isPhone := req.VerificationType == "phone"
+	isEmail := req.VerificationType == "email"
+	
+	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
+	if err != nil || user == nil{
+		return "user not found", nil, http.StatusNotFound, err
+	}
+
+	// ================= OTP SETTINGS =================
+	loginSettings := s.adminmainRepo.GetLoginSettings()
+	firebaseOTP := s.adminmainRepo.GetBusinessSetting("firebase_otp_verification").(bool)
+	phoneOption := loginSettings.PhoneVerification
+	emailOption := loginSettings.EmailVerification
+
+
+	// ================= OTP OPTION CHECK =================
+	if isPhone && !phoneOption {
+		return "phone otp not enabled", nil, http.StatusForbidden, errors.New("phone otp not enabled")
+	}
+	if isEmail && !emailOption {
+		return "email otp not enabled", nil, http.StatusForbidden, errors.New("email otp not enabled")
+	}
+
+	
+	// ================= OTP OPTION CHECK =================
+	if isPhone && !phoneOption {
+		return "phone otp not enabled", nil, http.StatusForbidden, errors.New("phone otp not enabled")
+	}
+	if isEmail && !emailOption {
+		return "email otp not enabled", nil, http.StatusForbidden, errors.New("email otp not enabled")
+	}
+
+	// ================= PHONE OTP =================
+	if phoneOption && isPhone {
+
+	    if !firebaseOTP {
+			return HandleOTP(s.DB, req.Phone, func(otp string) error {
+				if !otp_helpers.SendSMS(req.Phone, otp) {
+				    return errors.New("sms failed")
+					// return "failed to send sms",  405, errors.New("sms failed")
+			    }
+			    return nil
+		    },
+		)}
+    }
+
+	// ================= EMAIL OTP =================
+    if emailOption && isEmail {
+		return HandleOTP(s.DB, req.Email, func(otp string) error {
+			return email.SendEmail(otp, user).Verification()
+		},)
+	}
+	return "OTP Sent Successfully", nil, http.StatusOK, nil
 }
