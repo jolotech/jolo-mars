@@ -253,7 +253,6 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 		return "OTP deactivated", nil, http.StatusBadRequest, errors.New("Invalid OTP")
 	}
 
-
 	// =================== Check FOR EXPIRED OTP ========================
 
 	if user_repository.IsOTPExpired(verification.UpdatedAt, 10*time.Minute) {
@@ -273,16 +272,8 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 	// ===================== UPDATE USER VERIFICATION STATUS =================
 	if isPhone {
 		user.IsPhoneVerified = true
-		user.Status = true
-		user.IsNew = false
 	} else {
 		user.IsEmailVerified = true
-		user.Status = true
-		user.IsNew = false
-	}
-
-	if err := s.usermainRepo.UpdateUser(user); err != nil {
-		return "Failed to verify user", nil, http.StatusInternalServerError, err
 	}
 
 	// ================= TOKEN =================
@@ -291,6 +282,17 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 	// ================= MERGE GUEST CART =================
 	if req.GuestID != nil {
 		user_repository.MergeGuestCart(s.DB, user.ID, *req.GuestID)
+	}
+
+	if user.IsNew {
+		email.SendEmail(nil, user).Welcome()
+	}
+
+	user.Status = true
+	user.IsNew = false
+
+	if err := s.usermainRepo.UpdateUser(user); err != nil {
+		return "Failed to verify user", nil, http.StatusInternalServerError, err
 	}
 
 	// ================= RESPONSE =================
