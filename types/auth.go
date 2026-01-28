@@ -23,14 +23,14 @@ type LoginSettings struct {
 
 type VerifyOTPRequest struct {
 	OTP              string `json:"otp" binding:"required"`
-	VerificationType string `json:"verification_type" binding:"required,oneof=phone email"`
+	VerificationMethod string `json:"verification_method" binding:"required,oneof=phone email"`
 	Phone            string `json:"phone,omitempty"`
 	Email            string `json:"email,omitempty"`
 	GuestID          *string `json:"guest_id,omitempty"`
 }
 
 type ResendOTPRequest struct {
-	VerificationType string `json:"verification_type" binding:"required,oneof=phone email"`
+	VerificationMethod string `json:"verification_method" binding:"required,oneof=phone email"`
 	Phone            string `json:"phone,omitempty"`
 	Email            string `json:"email,omitempty"`
 }

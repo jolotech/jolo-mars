@@ -160,7 +160,7 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, int, error) {
 	var err error
 
-	var isPhone = req.VerificationType == "phone"
+	var isPhone = req.VerificationMethod == "phone"
 
 	// =====================GET USER =====================
 	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
@@ -238,8 +238,8 @@ func (s *UserAuthService) ResendOTP(req types.ResendOTPRequest) (string, any, in
 	var user *models.User
 	var err error
 
-	isPhone := req.VerificationType == "phone"
-	isEmail := req.VerificationType == "email"
+	isPhone := req.VerificationMethod == "phone"
+	isEmail := req.VerificationMethod == "email"
 
 	// =====================GET USER =====================
 	user, err = s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
@@ -322,8 +322,8 @@ func HandleOTP(db *gorm.DB, identifier string, sendOTP OTPSendFunc,) (string, in
 
 func (s *UserAuthService) ForgetPassword(req types.ResendOTPRequest) (string, any, int, error) {
 
-	isPhone := req.VerificationType == "phone"
-	isEmail := req.VerificationType == "email"
+	isPhone := req.VerificationMethod == "phone"
+	isEmail := req.VerificationMethod == "email"
 	
 	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
 	if err != nil || user == nil{
