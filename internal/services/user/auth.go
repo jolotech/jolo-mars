@@ -284,12 +284,11 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 		user_repository.MergeGuestCart(s.DB, user.ID, *req.GuestID)
 	}
 
-	if user.IsNew {
+	if !user.Status {
 		email.SendEmail(nil, user).Welcome()
 	}
 
 	user.Status = true
-	user.IsNew = false
 
 	if err := s.usermainRepo.UpdateUser(user); err != nil {
 		return "Failed to verify user", nil, http.StatusInternalServerError, err
