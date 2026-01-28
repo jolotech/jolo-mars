@@ -384,7 +384,7 @@ func (s *UserAuthService) ForgetPassword(req types.ResendOTPRequest) (string, an
 	// ================= EMAIL OTP =================
     if emailOption && isEmail {
 		return HandleOTP(s.DB, req.Email, func(otp string) error {
-			return email.SendEmail(otp, user).Verification()
+			return email.SendEmail(otp, user).ForgetPassword()
 		},)
 	}
 	return "OTP Sent Successfully", nil, http.StatusOK, nil
