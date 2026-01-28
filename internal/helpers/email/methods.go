@@ -26,7 +26,7 @@ func (s *EmailSender) Welcome() error {
 		return err
 	}
 
-	return sendMail(s.User.Email, "Welcome 🎉", body)
+	return sendMail(s.User.Email, "Welcome To Jolo Jolo 🎉", body)
 }
 
 func (s *EmailSender) ForgetPassword() error {
