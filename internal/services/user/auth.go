@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"log"
 	// "log"
 	"net/http"
 	"strings"
@@ -214,10 +215,11 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 	// ===================== UPDATE USER STATUS AND DELETE VERIFICATION =================
 	if isPhone {
 		user.IsPhoneVerified = true
-		user_repository.DeleteVerification(s.DB, req.Phone)
+		user_repository.DeleteVerification(s.DB, identifier)
 	} else {
+		log.Println("VErifying...", identifier)
 		user.IsEmailVerified = true
-		user_repository.DeleteVerification(s.DB, req.Email)
+		user_repository.DeleteVerification(s.DB, identifier)
 	}
 
 	// ================= TOKEN =================
