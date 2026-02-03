@@ -1,4 +1,4 @@
-package repo
+package guest_repo
 
 import (
 	"time"
