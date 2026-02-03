@@ -1,4 +1,4 @@
-package guest_service
+package services
 
 import (
 	"net/http"

@@ -8,12 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jolotech/jolo-mars/internal/helpers"
 	"github.com/jolotech/jolo-mars/internal/helpers/validations"
-	services "github.com/jolotech/jolo-mars/internal/services/user"
+	"github.com/jolotech/jolo-mars/internal/services/user"
+	"github.com/jolotech/jolo-mars/internal/services/guest"
 	"github.com/jolotech/jolo-mars/types"
 )
 
 type UserAuthHandler struct {
 	UserAuthService *services.UserAuthService
+	GuestService *services.
 }
 
 func NewUserAuhHandler(userAuthService *services.UserAuthService) *UserAuthHandler {
