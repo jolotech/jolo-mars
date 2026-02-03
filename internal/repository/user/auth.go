@@ -34,15 +34,6 @@ func (r *Auth) CreateUser(user *models.User) (*models.User, error) {
 	return user, nil
 }
 
-func (r *Auth) CreateGuest(guest *models.Guest) error {
-	guest.CreatedAt = time.Now()
-	guest.UpdatedAt = time.Now()
-	if err := r.db.Create(guest).Error; err != nil {
-		return err
-	}
-	return  nil
-}
-
 
 func (r *Auth) FindUserByRefCode(code string) (*models.User, error) {
 	var user models.User

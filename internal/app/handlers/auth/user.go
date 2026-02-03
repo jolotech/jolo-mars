@@ -43,6 +43,26 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 }
 
 
+func (h *) GuestRequest(c *gin.Context) {
+	var req types.GuestRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		msg := validations.HandleValidationError(err)
+		helpers.ErrorResponse(c, err, msg, http.StatusBadRequest)
+		return
+	}
+
+	ip := c.ClientIP()
+
+	msg, data, statusCode, err := h.GuestService.GuestRequest(c.Request.Context(), ip, req)
+	if err != nil {
+		helpers.ErrorResponse(c, err, msg, statusCode)
+		return
+	}
+
+	helpers.SuccessResponse(c, data, msg, statusCode)
+}
+
 // ================== VERIFY OTP =====================
 
 func (h *UserAuthHandler) VerifyOTP(c *gin.Context) {
