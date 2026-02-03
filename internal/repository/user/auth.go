@@ -34,13 +34,13 @@ func (r *Auth) CreateUser(user *models.User) (*models.User, error) {
 	return user, nil
 }
 
-func (r *Auth) Create(guest *models.Guest) (*models.Guest, error) {
+func (r *Auth) CreateGuest(guest *models.Guest) error {
 	guest.CreatedAt = time.Now()
 	guest.UpdatedAt = time.Now()
 	if err := r.db.Create(guest).Error; err != nil {
-		return nil, err
+		return err
 	}
-	return guest, nil
+	return  nil
 }
 
 

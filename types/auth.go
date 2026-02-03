@@ -45,7 +45,8 @@ type ResetPasswordSubmitRequest struct {
 }
 
 type GuestRequest struct {
-	FCMToken string `json:"fcm_token" binding:"required"`
+	FCMToken  string `json:"fcm_token" binding:"required"`
+	IPAddress string `json:"ip_address,omitempty"`
 }
 
 type GuestResponse struct {
