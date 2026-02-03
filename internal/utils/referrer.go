@@ -24,9 +24,8 @@ func GenerateRefererCode(db *gorm.DB) (string) {
 	}
 }
 
-// INTERNAL — builds the code
 func generateUniqueReferralCode() (string, error) {
-	randomPart, err := randomString(10) // ensures total length ≥ 12
+	randomPart, err := randomString(10) 
 	if err != nil {
 		return "", err
 	}
@@ -38,7 +37,6 @@ func generateUniqueReferralCode() (string, error) {
 	), nil
 }
 
-// INTERNAL — crypto-safe random
 func randomString(length int) (string, error) {
 	b := make([]byte, length)
 	_, err := rand.Read(b)
@@ -52,7 +50,6 @@ func randomString(length int) (string, error) {
 
 	return strings.ToUpper(string(b)), nil
 }
-// INTERNAL — checks DB for existing code
 
 func referralCodeExists(db *gorm.DB, code string) bool {
 	var count int64

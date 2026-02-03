@@ -35,18 +35,6 @@ func GetVerification(db *gorm.DB, value string) (*models.OtpVerification, error)
 	return &pv, nil
 }
 
-// func GetVerification(db *gorm.DB, email, phone string) (*models.OtpVerification, error) {
-// 	var pv models.OtpVerification
-// 	err := db.Where("email = ? OR phone = ?", email, phone).First(&pv).Error
-// 	if err != nil {
-// 	    if errors.Is(err, gorm.ErrRecordNotFound) {
-// 			return nil, nil 
-// 		}
-// 		return nil, err
-// 	}
-// 	return &pv, nil
-// }
-
 func UpdateVerification(db *gorm.DB, verification models.OtpVerification) error {
 	verification.UpdatedAt = time.Now()
 	if err := db.Save(verification).Error; err != nil {
@@ -54,7 +42,6 @@ func UpdateVerification(db *gorm.DB, verification models.OtpVerification) error 
 	}
 	return nil
 }
-
 
 func UpsertOTP(db *gorm.DB, value, otp string) error {
 	return db.Transaction(func(tx *gorm.DB) error {
