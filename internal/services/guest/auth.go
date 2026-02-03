@@ -1,4 +1,4 @@
-package services
+package guest_service
 
 import (
 	"net/http"
@@ -10,10 +10,10 @@ import (
 
 
 type GuestService struct {
-	guestRepo guest_repo.GuestRepo
+	guestRepo *guest_repo.GuestRepo
 }
 
-func NewGuestService(guestRepo guest_repo.GuestRepo) *GuestService {
+func NewGuestService(guestRepo *guest_repo.GuestRepo) *GuestService {
 	return &GuestService{guestRepo: guestRepo}
 }
 

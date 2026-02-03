@@ -15,7 +15,7 @@ import (
 
 type UserAuthHandler struct {
 	UserAuthService *services.UserAuthService
-	GuestService *services.
+	GuestService *guest_service.GuestService
 }
 
 func NewUserAuhHandler(userAuthService *services.UserAuthService) *UserAuthHandler {
@@ -45,7 +45,7 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 }
 
 
-func (h *) GuestRequest(c *gin.Context) {
+func (h *UserAuthHandler) GuestRequest(c *gin.Context) {
 	var req types.GuestRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
