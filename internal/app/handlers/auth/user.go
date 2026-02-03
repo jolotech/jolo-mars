@@ -22,6 +22,9 @@ func NewUserAuhHandler(userAuthService *services.UserAuthService) *UserAuthHandl
 	}
 }
 
+
+// ================= REGISER =======================
+
 func (h *UserAuthHandler) Register(c *gin.Context) {
 	var req types.RegisterRequest
 
@@ -38,6 +41,9 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 	}
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
+
+
+// ================== VERIFY OTP =====================
 
 func (h *UserAuthHandler) VerifyOTP(c *gin.Context) {
 	var req types.VerifyOTPRequest
@@ -77,6 +83,8 @@ func (h *UserAuthHandler) ResendOTP(c *gin.Context){
 }
 
 
+// ============== FORGET PASSWORD =======================
+
 func (h *UserAuthHandler) ForgetPassword(c *gin.Context) {
 	var req types.ResendOTPRequest
 
@@ -94,7 +102,7 @@ func (h *UserAuthHandler) ForgetPassword(c *gin.Context) {
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
 
-
+// ================ RESET PASSWORD =====================
 
 func (h *UserAuthHandler) ResetPassword(c *gin.Context) {
 
