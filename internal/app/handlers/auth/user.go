@@ -45,8 +45,12 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 }
 
 
+// ================ GUEST REQUEST =================
+
 func (h *UserAuthHandler) GuestRequest(c *gin.Context) {
 	var req types.GuestRequest
+
+	req.IPAddress = c.ClientIP()
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		msg := validations.HandleValidationError(err)
@@ -54,9 +58,7 @@ func (h *UserAuthHandler) GuestRequest(c *gin.Context) {
 		return
 	}
 
-	ip := c.ClientIP()
-
-	msg, data, statusCode, err := h.GuestService.GuestRequest(c.Request.Context(), ip, req)
+	msg, data, statusCode, err := h.GuestService.GuestRequest(req)
 	if err != nil {
 		helpers.ErrorResponse(c, err, msg, statusCode)
 		return
