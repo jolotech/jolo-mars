@@ -155,21 +155,6 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 	return "registration successful", nil, http.StatusOK, nil
 }
 
-// ================= CREATE GUEST ===============
-func (s *UserAuthService) GuestRequest(req types.GuestRequest) (string, any, int, error) {
-	guest := &models.Guest{
-		IPAddress: req.IPAddress,
-		FCMToken:  req.FCMToken,
-	}
-
-	if err := s.authRepo.CreateGuest(guest); err != nil {
-		// matches your Laravel "failed" path (but use 500 is more correct than 404)
-		return "failed", nil, http.StatusInternalServerError, err
-	}
-
-	return "guest verified", types.GuestResponse{GuestID: guest.ID}, http.StatusOK, nil
-}
-
 // ================= VERIFY OTP =================
 
 func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, int, error) {
