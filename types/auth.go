@@ -43,3 +43,11 @@ type ResetPasswordSubmitRequest struct {
 	Phone              string `json:"phone"`
 	Email              string `json:"email"`
 }
+
+type GuestRequest struct {
+	FCMToken string `json:"fcm_token" binding:"required"`
+}
+
+type GuestResponse struct {
+	GuestID uint `json:"guest_id"`
+}
