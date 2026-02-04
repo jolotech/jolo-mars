@@ -16,10 +16,15 @@ package models
 
 
 
-import "time"
+import (
+	"time"
+	"github.com/google/uuid"
 
+)
 type BusinessSetting struct {
-	ID uint `gorm:"primaryKey"`
+	// ID uint `gorm:"primaryKey"`
+	ID        uint      `gorm:"primaryKey" json:"-"`
+	PublicID  uuid.UUID `gorm:"type:char(36);uniqueIndex;not null" json:"public_id"`
 
 	// Referral & bonuses
 	RefEarningStatus        bool    `json:"ref_earning_status" gorm:"default:false"`
