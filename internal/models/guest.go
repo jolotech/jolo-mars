@@ -1,9 +1,14 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Guest struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
+	ID        uint      `gorm:"primaryKey" json:"-"`
+	PublicID  uuid.UUID `gorm:"type:char(36);uniqueIndex;not null" json:"public_id"`
 	IPAddress string    `gorm:"type:varchar(64);index" json:"ip_address"`
 	FCMToken  string    `gorm:"type:text" json:"fcm_token"`
 	CreatedAt time.Time `json:"created_at"`
