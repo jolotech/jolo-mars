@@ -4,10 +4,9 @@ import (
 	"net/http"
 
 	"github.com/jolotech/jolo-mars/internal/models"
-	"github.com/jolotech/jolo-mars/internal/repository/guest"
+	guest_repo "github.com/jolotech/jolo-mars/internal/repository/guest"
 	"github.com/jolotech/jolo-mars/types"
 )
-
 
 type GuestService struct {
 	guestRepo *guest_repo.GuestRepo
