@@ -8,12 +8,13 @@ package types
 // 	Token string
 // 	User  models.User
 // }
+type EmailUser struct {
+	Name  string
+	Email string
+}
 
 type Sender struct {
-	User *struct {
-		Name  string
-		Email string
-	}
+	User EmailUser
 	OTP   string
 	Token string
 }
