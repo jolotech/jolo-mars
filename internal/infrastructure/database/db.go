@@ -52,7 +52,7 @@ func ConnectDB() {
 
 	DB = db
 
-	tables := []string{"users", "admins", "business_settings", "notification_settings", "otp_verifications", "user_notifications", "wallet_transactions", "carts"}
+	tables := []string{"users", "admins", "business_settings", "notification_settings", "otp_verifications", "user_notifications", "guests", "wallet_transactions", "carts"}
 
 
 		// 🚀 Automatically run migrations
