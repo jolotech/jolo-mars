@@ -8,18 +8,16 @@ import (
 
 
 type User struct {
-	// ID               uint      `json:"id" gorm:"primaryKey"`
 	ID               uint      `gorm:"primaryKey" json:"-"`
-	PublicID         uuid.UUID `gorm:"type:char(36);uniqueIndex;not null" json:"public_id"`
+	PublicID         uuid.UUID `gorm:"type:char(15);uniqueIndex;not null" json:"public_id"`
+
 	FName            string    `json:"f_name" gorm:"column:f_name"`
 	LName            string    `json:"l_name" gorm:"column:l_name"`
 	Email            string    `json:"email" gorm:"unique"`
 	Phone            string    `json:"phone" gorm:"unique"`
-	// Password         string    `json:"-" gorm:"not null"`
 	Password         string   `json:"-" gorm:"column:password"`
 	PasswordHash     string   `json:"-" gorm:"column:password_hash"`
 	RefBy            *uint    `json:"ref_by" gorm:"column:ref_by"`
-	// RefCode          string    `json:"ref_code" gorm:"column:ref_code"`
 	RefCode          string    `json:"ref_code" gorm:"type:varchar(100);uniqueIndex"`
 	Status           bool      `json:"status" gorm:"default:false"`
 	IsNew            bool      `json:"is_new" gorm:"default:true"`

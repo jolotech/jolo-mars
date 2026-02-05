@@ -46,7 +46,7 @@ func UserRoutes(
 		//     dash.POST("/topup/init", paymentHandler.InitTopUp)
 		// 	public.GET("/topup/verify", paymentHandler.VerifyTopUp)
 		// 	dash.PUT("/debit/limit", paymentHandler.UpdateAutoDebitLimit)
-
+		
 		// 	dash.POST("/change-password", authHandler.ChangePassword)
 		// 	dash.POST("/update", authHandler.UpdatePartner)
 		// 	dash.PUT("/auto_debit/enable", authHandler.EnableAutodebit)
