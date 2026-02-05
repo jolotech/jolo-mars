@@ -3,6 +3,7 @@ package models
 
 import (
 	"time"
+	"gorm.io/gorm"
 	// "github.com/google/uuid"
 )
 
@@ -26,4 +27,13 @@ type User struct {
 	CMFirebaseToken  *string   `json:"cm_firebase_token" gorm:"column:cm_firebase_token"`
 	CreatedAt        time.Time `json:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at"`
+}
+
+
+
+func (g *Guest) BeforeCreateUser(tx *gorm.DB) (err error) {
+	if g.PublicID == "" {
+		g.PublicID = GeneratePublicID() // returns 15 chars
+	}
+	return nil
 }

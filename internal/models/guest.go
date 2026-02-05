@@ -5,8 +5,6 @@ import (
 
 	// "github.com/jolotech/jolo-mars/internal/utils"
 	"gorm.io/gorm"
-	"crypto/rand"
-	"encoding/base64"
 
 	// "github.com/google/uuid"
 )
@@ -21,27 +19,11 @@ type Guest struct {
 }
 
 
-func (g *Guest) BeforeCreate(tx *gorm.DB) (err error) {
+func (g *Guest) BeforeCreateGuest(tx *gorm.DB) (err error) {
 	if g.PublicID == "" {
-		g.PublicID = utils.GeneratePublicID() // returns 15 chars
+		g.PublicID = GeneratePublicID() // returns 15 chars
 	}
 	return nil
 }
 
 
-import (
-	"crypto/rand"
-	"encoding/base64"
-)
-
-// GeneratePublicID returns a URL-safe random string of exactly 15 characters
-func GeneratePublicID() string {
-	b := make([]byte, 11) // 11 bytes ≈ 15 chars base64
-	_, err := rand.Read(b)
-	if err != nil {
-		panic(err) // extremely rare; acceptable for ID generation
-	}
-
-	id := base64.RawURLEncoding.EncodeToString(b)
-	return id[:15]
-}
