@@ -29,3 +29,12 @@ func (r *GuestRepo) CreateGuest(guest *models.Guest) error {
 	}
 	return  nil
 }
+
+
+func DeleteVerification(db *gorm.DB, id string) error {
+	if err := db.Where("guest_id = ? ", id).
+		Delete(&models.Guest{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
