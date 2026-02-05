@@ -31,7 +31,7 @@ type User struct {
 
 
 
-func (g *Guest) BeforeCreateUser(tx *gorm.DB) (err error) {
+func (g *User) BeforeCreate(tx *gorm.DB) (err error) {
 	if g.PublicID == "" {
 		g.PublicID = GeneratePublicID() // returns 15 chars
 	}

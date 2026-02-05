@@ -19,7 +19,7 @@ type Guest struct {
 }
 
 
-func (g *Guest) BeforeCreateGuest(tx *gorm.DB) (err error) {
+func (g *Guest) BeforeCreate(tx *gorm.DB) (err error) {
 	if g.PublicID == "" {
 		g.PublicID = GeneratePublicID() // returns 15 chars
 	}
