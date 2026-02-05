@@ -20,7 +20,7 @@ import (
 	"github.com/jolotech/jolo-mars/internal/repository/user"
 	"github.com/jolotech/jolo-mars/internal/utils"
 	"github.com/jolotech/jolo-mars/types"
-	"github.com/google/uuid"
+	// "github.com/google/uuid"
 )
 
 
@@ -100,7 +100,6 @@ func (s *UserAuthService) Register(c *gin.Context, req types.RegisterRequest) (s
 		LName:    lastName,
 		Email:    req.Email,
 		Phone:    req.Phone,
-		PublicID: uuid.New(),
 		PasswordHash: hashedPassword,
 		RefBy:    refBy,
 		Password: hashedPassword,

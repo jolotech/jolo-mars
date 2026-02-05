@@ -3,13 +3,13 @@ package models
 
 import (
 	"time"
-	"github.com/google/uuid"
+	// "github.com/google/uuid"
 )
 
 
 type User struct {
 	ID               uint      `gorm:"primaryKey" json:"-"`
-	PublicID         uuid.UUID `gorm:"type:char(15);uniqueIndex;not null" json:"public_id"`
+	PublicID         string    `gorm:"type:char(15);uniqueIndex;not null" json:"public_id"`
 
 	FName            string    `json:"f_name" gorm:"column:f_name"`
 	LName            string    `json:"l_name" gorm:"column:l_name"`
