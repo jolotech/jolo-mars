@@ -5,7 +5,9 @@ import (
 	"github.com/jolotech/jolo-mars/internal/app/handlers/auth"
 	"github.com/jolotech/jolo-mars/internal/infrastructure/database"
 	"github.com/jolotech/jolo-mars/internal/repository/admin"
+	guest_repo "github.com/jolotech/jolo-mars/internal/repository/guest"
 	"github.com/jolotech/jolo-mars/internal/repository/user"
+	guest_service "github.com/jolotech/jolo-mars/internal/services/guest"
 	"github.com/jolotech/jolo-mars/internal/services/user"
 	// "github.com/jolotech/Logistic-gateway/internal/queue"
 	// "github.com/jolotech/Logistic-gateway/internal/worker"
@@ -40,6 +42,7 @@ func Init() *Container {
 	userMainRepo := user_repository.NewUserMainRepository(database.DB)
 	userAuthRepo := user_repository.NewUserAuthRepository(database.DB, userMainRepo)
 	adminMainRepo := admin_repository.NewAdminMainRepository(database.DB)
+	guestRepo := guest_repo.NewGuestRepo(database.DB)
 	// orderRepo := repositories.NewOrderRepository(database.DB)
 	// adminRepo := repositories.NewAdminRepository(database.DB)
 	// webhookRepo := repositories.NewWebhookRepository(database.DB)
@@ -50,6 +53,7 @@ func Init() *Container {
 
 	// Services
 	userAuthService := services.NewAuthService(userAuthRepo, userMainRepo, adminMainRepo, database.DB)
+	guestService:= guest_service.NewGuestService(guestRepo)
 	// webhookService := service.NewWebhookService(webhookRepo, queue, partnerRepo)
 	// webhookManager := service.NewWebhookManager(webhookService)
 	// orderService := service.NewOrderService(orderRepo, webhookManager)
@@ -65,7 +69,7 @@ func Init() *Container {
 
 
 	// Handlers
-	userAuthHandler := auth.NewUserAuhHandler(userAuthService)
+	userAuthHandler := auth.NewUserAuhHandler(userAuthService, guestService)
 	// orderHandler := partners.NewOrderHandler(orderService, distanceService, storeRepo)
 	// adminHandler := admin.NewAdminHandler(adminService, adminRepo, auditService)
 	// distanceHandler := partners.NewDistanceHandler(distanceService)

@@ -18,9 +18,10 @@ type UserAuthHandler struct {
 	GuestService *guest_service.GuestService
 }
 
-func NewUserAuhHandler(userAuthService *services.UserAuthService) *UserAuthHandler {
+func NewUserAuhHandler(userAuthService *services.UserAuthService, guestService *guest_service.GuestService) *UserAuthHandler {
 	return &UserAuthHandler{
 		UserAuthService: userAuthService,
+		GuestService: guestService,
 	}
 }
 
