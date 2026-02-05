@@ -57,6 +57,11 @@ func RunAll(db *gorm.DB, tables []string) error {
                 return fmt.Errorf("failed user notifications migration: %v", err)
             }
             log.Println("✅ user notifications table synced.")
+        case "guests":
+            if err := db.AutoMigrate(&models.Guest{}); err != nil {
+                return fmt.Errorf("failed guest migration: %v", err)
+            }
+            log.Println("✅ guest table synced.")
         case "wallet_transactions":
             if err := db.AutoMigrate(&models.WalletTransaction{}); err != nil {
                 return fmt.Errorf("failed wallet transactions migration: %v", err)

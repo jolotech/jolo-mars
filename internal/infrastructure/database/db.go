@@ -62,5 +62,4 @@ func ConnectDB() {
 
 	log.Println("✅ All migrations executed successfully.")
 
-
 }
