@@ -6,7 +6,7 @@ import (
 	"github.com/jolotech/jolo-mars/internal/models"
 	guest_repo "github.com/jolotech/jolo-mars/internal/repository/guest"
 	"github.com/jolotech/jolo-mars/types"
-	"github.com/google/uuid"
+	// "github.com/google/uuid"
 )
 
 type GuestService struct {
@@ -21,7 +21,6 @@ func NewGuestService(guestRepo *guest_repo.GuestRepo) *GuestService {
 func (s *GuestService) GuestRequest(req types.GuestRequest) (string, any, int, error) {
 	guest := &models.Guest{
 		IPAddress: req.IPAddress,
-		PublicID:  uuid.New(),
 		FCMToken:  req.FCMToken,
 	}
 

@@ -13,6 +13,10 @@ type GuestRepo struct {
 	db *gorm.DB
 }
 
+// type Repository interface {
+//     CreateGuest(guest *models.Guest) error
+// }
+
 func NewGuestRepo(db *gorm.DB) *GuestRepo {
 	return &GuestRepo{db: db}
 }
