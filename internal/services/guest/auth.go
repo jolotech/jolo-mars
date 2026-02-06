@@ -28,5 +28,5 @@ func (s *GuestService) GuestRequest(req types.GuestRequest) (string, any, int, e
 	if err := s.guestRepo.CreateGuest(guest); err != nil {
 		return "Something went wrong", nil, http.StatusInternalServerError, err
 	}
-	return "guest verified", types.GuestResponse{GuestID: guest.ID}, http.StatusOK, nil
+	return "guest verified", types.GuestResponse{GuestID: guest.PublicID}, http.StatusOK, nil
 }

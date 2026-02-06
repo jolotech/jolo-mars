@@ -7,15 +7,18 @@ import (
 
 	"gorm.io/gorm"
 	"github.com/jolotech/jolo-mars/internal/models"
+	guest_repo "github.com/jolotech/jolo-mars/internal/repository/guest"
+
 )
 
 type Main struct {
+	guestRepo *guest_repo.GuestRepo
 	db *gorm.DB
 }	
 
 
-func NewUserMainRepository(db *gorm.DB) *Main {
-	return &Main{db: db}
+func NewUserMainRepository(db *gorm.DB, GuestRepo *guest_repo.GuestRepo) *Main {
+	return &Main{db: db, guestRepo: GuestRepo}
 }
 
 
@@ -55,31 +58,63 @@ func (r *Main) GetByID(userID uint) (*models.User, error) {
 
 
 
-func MergeGuestCart(db *gorm.DB, userID uint, guestID string) bool {
+// func MergeGuestCart(db *gorm.DB, userID uint, guestID string) bool {
+// 	if guestID == "" || userID == 0 {
+// 		return true
+// 	}
+
+// 	var guestCartExists bool
+// 	db.Model(&models.Cart{}).
+// 		Where("user_id = ? AND is_guest = ?", guestID, true).
+// 		Select("count(1) > 0").
+// 		Scan(&guestCartExists)
+
+// 	if guestCartExists {
+// 		db.Where("user_id = ? AND is_guest = ?", userID, false).
+// 			Delete(&models.Cart{})
+// 	}
+
+// 	db.Model(&models.Cart{}).
+// 		Where("user_id = ?", guestID).
+// 		Updates(map[string]interface{}{
+// 			"user_id":  userID,
+// 			"is_guest": false,
+// 		})
+
+// 	return true
+// }
+
+
+func (r *Main) MergeGuestCart(db *gorm.DB, userID uint, guestID string) error {
 	if guestID == "" || userID == 0 {
-		return true
+		return nil
 	}
 
 	var guestCartExists bool
+
 	db.Model(&models.Cart{}).
-		Where("user_id = ? AND is_guest = ?", guestID, true).
+		Where("guest_id = ? AND is_guest = true", guestID).
 		Select("count(1) > 0").
 		Scan(&guestCartExists)
 
 	if guestCartExists {
-		db.Where("user_id = ? AND is_guest = ?", userID, false).
+		db.Where("user_id = ? AND is_guest = false", userID).
 			Delete(&models.Cart{})
 	}
 
 	db.Model(&models.Cart{}).
-		Where("user_id = ?", guestID).
+		Where("guest_id = ? AND is_guest = true", guestID).
 		Updates(map[string]interface{}{
 			"user_id":  userID,
+			"guest_id": nil,
 			"is_guest": false,
 		})
 
-	return true
+	r.guestRepo.DeleteGuest(db, guestID)    
+
+	return nil
 }
+
 
 
  

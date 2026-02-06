@@ -193,11 +193,6 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 	// ================= TOKEN =================
 	token, _ := utils.GenerateAuthToken(user.Email, user.ID)
 
-	// ================= MERGE GUEST CART =================
-	if req.GuestID != nil {
-		user_repository.MergeGuestCart(s.DB, user.ID, *req.GuestID)
-	}
-
 	if !user.Status {
 		email.SendEmail(nil, user).Welcome()
 	}
@@ -205,6 +200,11 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 	user.Status = true
 	if err := s.usermainRepo.UpdateUser(user); err != nil {
 		return "Failed to verify user", nil, http.StatusInternalServerError, err
+	}
+
+	// ================= MERGE GUEST CART =================
+	if req.GuestID != nil {
+		s.usermainRepo.MergeGuestCart(s.DB, user.ID, *req.GuestID)
 	}
 
 	// ================= RESPONSE =================

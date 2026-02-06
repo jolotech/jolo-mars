@@ -39,10 +39,11 @@ func Init() *Container {
 
 
 	// Repositories
-	userMainRepo := user_repository.NewUserMainRepository(database.DB)
+	guestRepo := guest_repo.NewGuestRepo(database.DB)
+	userMainRepo := user_repository.NewUserMainRepository(database.DB, guestRepo)
 	userAuthRepo := user_repository.NewUserAuthRepository(database.DB, userMainRepo)
 	adminMainRepo := admin_repository.NewAdminMainRepository(database.DB)
-	guestRepo := guest_repo.NewGuestRepo(database.DB)
+	
 	// orderRepo := repositories.NewOrderRepository(database.DB)
 	// adminRepo := repositories.NewAdminRepository(database.DB)
 	// webhookRepo := repositories.NewWebhookRepository(database.DB)

@@ -50,5 +50,5 @@ type GuestRequest struct {
 }
 
 type GuestResponse struct {
-	GuestID uint `json:"guest_id"`
+	GuestID string `json:"guest_id"`
 }

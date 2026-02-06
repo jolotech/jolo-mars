@@ -31,8 +31,8 @@ func (r *GuestRepo) CreateGuest(guest *models.Guest) error {
 }
 
 
-func DeleteVerification(db *gorm.DB, id string) error {
-	if err := db.Where("guest_id = ? ", id).
+func (r *GuestRepo) DeleteGuest(db *gorm.DB, id string) error {
+	if err := db.Where("id = ? ", id).
 		Delete(&models.Guest{}).Error; err != nil {
 		return err
 	}
