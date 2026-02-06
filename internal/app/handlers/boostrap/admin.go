@@ -18,6 +18,8 @@ func NewBootstrapHandler(service *bootstrap_service.BootstrapService) *Bootstrap
 
 // Run on app start
 func (h *BootstrapHandler) Run() {
+	log.Println("[bootstrap] starting super admin bootstrap...")
+
 	res, err := h.service.EnsureSuperAdminFromEnvSilently()
 	if err != nil {
 		// Your request says "fails silently" when admin exists.
