@@ -11,6 +11,8 @@ import (
 	"github.com/jolotech/jolo-mars/internal/app"
 	"github.com/jolotech/jolo-mars/internal/infrastructure/database"
 	"github.com/jolotech/jolo-mars/internal/infrastructure/jobs"
+	"github.com/jolotech/jolo-mars/internal/app/dependencies"
+
 	// redisInfra "github.com/jolotech/Logistic-gateway/internal/infrastructure/redis"
 	// "github.com/jolotech/jolo-mars/internal/infrastructure/redis"
 	// "github.com/jolotech/Logistic-gateway/internal/repository"
@@ -23,6 +25,8 @@ import (
 
 func main() {
 
+	var container *dependencies.Container
+
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: go run cmd/main.go <Your Name>")
 		return
@@ -34,6 +38,9 @@ func main() {
     config.LoadConfig()
 
     database.ConnectDB()
+	
+	container = dependencies.Init()
+	container.BoostrapAdminHandler.Run()
     // redisInfra.ConnectRedis()
     // ctx := context.Background()
 

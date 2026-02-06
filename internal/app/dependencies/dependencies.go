@@ -22,7 +22,7 @@ import (
 
 type Container struct {
 	UserAuthHandler *auth.UserAuthHandler
-	BoostrapHandler *bootstrap_handler.BootstrapHandler
+	BoostrapAdminHandler *bootstrap_handler.BootstrapHandler
 	// OrderHandler *partners.OrderHandler
 	// AdminHandler   *admin.AdminHandler
 	// PartnerRepository *repositories.PartnerRepository
@@ -96,7 +96,7 @@ func Init() *Container {
 
 	return &Container{
 		UserAuthHandler: userAuthHandler,
-		BoostrapHandler: bootstrapHandler,
+		BoostrapAdminHandler: bootstrapHandler,
 
 		// OrderHandler:   orderHandler,
 		// AdminHandler:   adminHandler,
