@@ -1,4 +1,4 @@
-package bootstrap
+package bootstrap_service
 
 import (
 	"os"
