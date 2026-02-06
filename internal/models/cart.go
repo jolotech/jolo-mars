@@ -21,7 +21,7 @@ import (
 
 type Cart struct {
 	ID       uint   `gorm:"primaryKey" json:"-"`
-	PublicID string `gorm:"type:char(15);uniqueIndex;not null" json:"cart_id"`
+	PublicID string `gorm:"type:char(15);uniqueIndex;not null" json:"public_id "`
 
 	UserID  *uint   `gorm:"index" json:"-"`                             
 	GuestID *string `gorm:"type:char(15);index" json:"-"`               

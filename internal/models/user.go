@@ -10,7 +10,7 @@ import (
 
 type User struct {
 	ID               uint      `gorm:"primaryKey" json:"-"`
-	PublicID         string    `gorm:"type:char(15);uniqueIndex;not null" json:"user_id"`
+	PublicID         string    `gorm:"type:char(15);uniqueIndex;not null" json:"public_id "`
 
 	FName            string    `json:"f_name" gorm:"column:f_name"`
 	LName            string    `json:"l_name" gorm:"column:l_name"`
