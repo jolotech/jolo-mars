@@ -43,6 +43,34 @@ func NewBootstrapHandler(service *bootstrap_service.BootstrapService) *Bootstrap
 
 
 
+// func (h *BootstrapHandler) Run() {
+// 	log.Println("[bootstrap] starting super admin bootstrap...")
+
+// 	res, err := h.service.EnsureSuperAdminFromEnvSilently()
+// 	if err != nil {
+// 		log.Printf("[bootstrap] error: %v\n", err)
+// 		return
+// 	}
+
+// 	if res == nil {
+// 		log.Println("[bootstrap] skipped (nil result)")
+// 		return
+// 	}
+
+// 	if !res.Created {
+// 		log.Printf("[bootstrap] skipped: %s\n", res.Reason)
+// 		return
+// 	}
+
+// 	log.Println("[bootstrap] ✅ super admin created successfully")
+// 	if res.TempPassword != "" {
+// 		log.Printf("[bootstrap] TEMP PASSWORD (copy now): %s\n", res.TempPassword)
+// 	} else {
+// 		log.Println("[bootstrap] password came from SUPER_ADMIN_PASSWORD env")
+// 	}
+// }
+
+
 func (h *BootstrapHandler) Run() {
 	log.Println("[bootstrap] starting super admin bootstrap...")
 
@@ -53,7 +81,7 @@ func (h *BootstrapHandler) Run() {
 	}
 
 	if res == nil {
-		log.Println("[bootstrap] skipped (nil result)")
+		log.Println("[bootstrap] skipped: nil result")
 		return
 	}
 
@@ -64,8 +92,6 @@ func (h *BootstrapHandler) Run() {
 
 	log.Println("[bootstrap] ✅ super admin created successfully")
 	if res.TempPassword != "" {
-		log.Printf("[bootstrap] TEMP PASSWORD (copy now): %s\n", res.TempPassword)
-	} else {
-		log.Println("[bootstrap] password came from SUPER_ADMIN_PASSWORD env")
+		log.Printf("[bootstrap] TEMP PASSWORD: %s\n", res.TempPassword)
 	}
 }
