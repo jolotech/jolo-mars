@@ -1,6 +1,10 @@
 package utils
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"golang.org/x/crypto/bcrypt"
+	"crypto/rand"
+	"math/big"
+)
 
 // Hash password (SIGNUP)
 func HashPassword(password string) (string, error) {
@@ -20,4 +24,16 @@ func ComparePassword(hashedPassword, rawPassword string) bool {
 		[]byte(rawPassword),
 	)
 	return err == nil
+}
+
+
+
+func GenerateStrongPassword(length int) string {
+	const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*"
+	out := make([]byte, length)
+	for i := 0; i < length; i++ {
+		n, _ := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
+		out[i] = chars[n.Int64()]
+	}
+	return string(out)
 }
