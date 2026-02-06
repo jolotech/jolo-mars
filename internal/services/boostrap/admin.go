@@ -95,10 +95,10 @@ type BootstrapResult struct {
 
 func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
 	gate := strings.ToLower(strings.TrimSpace(os.Getenv("BOOTSTRAP_SUPER_ADMIN")))
-	log.Panicln("Check fail Silently 1")
+	log.Println("Check fail Silently 1")
 
 	if gate != "true" {
-	    log.Panicln("Check fail Silently 2 == false")
+	    log.Println("Check fail Silently 2 == false")
 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
 	}
 
