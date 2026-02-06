@@ -15,9 +15,26 @@ func NewAdminRepo(db *gorm.DB) *AdminRepo {
 	return &AdminRepo{db: db}
 }
 
-func (r *AdminRepo) AnyAdminExists() (bool, error) {
+// func (r *AdminRepo) AnyAdminExists() (bool, error) {
+// 	var count int64
+// 	err := r.db.Model(&models.Admin{}).Count(&count).Error
+// 	return count > 0, err
+// }
+
+// func (r *AdminRepo) AnySuperAdminExists() (bool, error) {
+// 	var count int64
+// 	err := r.db.Model(&models.Admin{}).
+// 		Where("role = ?", "super-admin").
+// 		Count(&count).Error
+// 	return count > 0, err
+// }
+
+func (r *AdminRepo) ExistsByEmail(email string) (bool, error) {
 	var count int64
-	err := r.db.Model(&models.Admin{}).Count(&count).Error
+	err := r.db.Model(&models.Admin{}).
+		Where("email = ?", email).
+		Where("deleted_at IS NULL").
+		Count(&count).Error
 	return count > 0, err
 }
 
@@ -25,9 +42,11 @@ func (r *AdminRepo) AnySuperAdminExists() (bool, error) {
 	var count int64
 	err := r.db.Model(&models.Admin{}).
 		Where("role = ?", "super-admin").
+		Where("deleted_at IS NULL").
 		Count(&count).Error
 	return count > 0, err
 }
+
 
 func (r *AdminRepo) Create(a *models.Admin) error {
 	return r.db.Create(a).Error

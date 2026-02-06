@@ -1,7 +1,7 @@
 package bootstrap_service
 
 import (
-	"log"
+	// "log"
 	"os"
 	"strings"
 
@@ -93,21 +93,72 @@ type BootstrapResult struct {
 // }
 
 
+// func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
+// 	gate := strings.ToLower(strings.TrimSpace(os.Getenv("BOOTSTRAP_SUPER_ADMIN")))
+// 	log.Println("Check fail Silently 1")
+
+// 	if gate != "true" {
+// 	    log.Println("Check fail Silently 2 == false")
+// 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
+// 	}
+
+// 	exists, err := s.adminRepo.AnyAdminExists()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	if exists {
+// 		return &BootstrapResult{Created: false, Reason: "admin already exists"}, nil
+// 	}
+
+// 	name := strings.TrimSpace(os.Getenv("SUPER_ADMIN_NAME"))
+// 	email := strings.TrimSpace(strings.ToLower(os.Getenv("SUPER_ADMIN_EMAIL")))
+// 	pass := os.Getenv("SUPER_ADMIN_PASSWORD")
+
+// 	if name == "" || email == "" {
+// 		return &BootstrapResult{Created: false, Reason: "missing SUPER_ADMIN_NAME or SUPER_ADMIN_EMAIL"}, nil
+// 	}
+
+// 	temp := ""
+// 	if strings.TrimSpace(pass) == "" {
+// 		temp = utils.GenerateStrongPassword(16)
+// 		pass = temp
+// 	}
+
+// 	hash, err := utils.HashPassword(pass)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	admin := &models.Admin{
+// 		Name:               name,
+// 		Email:              email,
+// 		Password:           hash,
+// 		Role:               "super-admin",
+// 		MustChangePassword: true,
+// 		TwoFAEnabled:       false,
+// 	}
+
+// 	if err := s.adminRepo.Create(admin); err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &BootstrapResult{Created: true, TempPassword: temp, Reason: "created"}, nil
+// }
+
+
 func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
 	gate := strings.ToLower(strings.TrimSpace(os.Getenv("BOOTSTRAP_SUPER_ADMIN")))
-	log.Println("Check fail Silently 1")
-
 	if gate != "true" {
-	    log.Println("Check fail Silently 2 == false")
 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
 	}
 
-	exists, err := s.adminRepo.AnyAdminExists()
+	// ✅ Only block if SUPER ADMIN exists (not any admin)
+	superExists, err := s.adminRepo.AnySuperAdminExists()
 	if err != nil {
 		return nil, err
 	}
-	if exists {
-		return &BootstrapResult{Created: false, Reason: "admin already exists"}, nil
+	if superExists {
+		return &BootstrapResult{Created: false, Reason: "super admin already exists"}, nil
 	}
 
 	name := strings.TrimSpace(os.Getenv("SUPER_ADMIN_NAME"))
@@ -116,6 +167,15 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 
 	if name == "" || email == "" {
 		return &BootstrapResult{Created: false, Reason: "missing SUPER_ADMIN_NAME or SUPER_ADMIN_EMAIL"}, nil
+	}
+
+	// ✅ avoid duplicate email, even if role is manager/support
+	emailExists, err := s.adminRepo.ExistsByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	if emailExists {
+		return &BootstrapResult{Created: false, Reason: "email already exists (cannot bootstrap super admin)"}, nil
 	}
 
 	temp := ""
