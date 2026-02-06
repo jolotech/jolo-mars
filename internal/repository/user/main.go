@@ -84,39 +84,64 @@ func (r *Main) GetByID(userID uint) (*models.User, error) {
 // 	return true
 // }
 
+
+
 func (r *Main) MergeGuestCart(db *gorm.DB, userID uint, guestID string) error {
 	if guestID == "" || userID == 0 {
 		return nil
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
-		var guestCartExists bool
-
-		if err := tx.Model(&models.Cart{}).
+		// ===== LOAD GUESTT CARTS ITEMS ======
+		var guestItems []models.Cart
+		if err := tx.
 			Where("guest_id = ? AND is_guest = true", guestID).
-			Select("count(1) > 0").
-			Scan(&guestCartExists).Error; err != nil {
+			Find(&guestItems).Error; err != nil {
 			return err
 		}
 
-		if guestCartExists {
-			if err := tx.Where("user_id = ?", userID).
-				Delete(&models.Cart{}).Error; err != nil {
-				return err
-			}
+		// ====== NOTHING TO MEARGE DELETE GUEST =========
+		if len(guestItems) == 0 {
+			return r.guestRepo.DeleteGuest(tx, guestID)
+			// return nil
+		}
 
-			if err := tx.Model(&models.Cart{}).
-				Where("guest_id = ? AND is_guest = true", guestID).
-				Updates(map[string]interface{}{
-					"user_id":  userID,
-					"guest_id": gorm.Expr("NULL"),
-					"is_guest": false,
-				}).Error; err != nil {
+		for _, gItem := range guestItems {
+			// ======= CHECK IF USER AREADY HAS THIS PRODUCT ===========
+			var userItem models.Cart
+			err := tx.
+				Where("user_id = ? AND is_guest = false AND product_id = ?", userID, gItem.ProductID).
+				First(&userItem).Error
+
+			if err == nil {
+				// ====== USER HAS IT -> ADD QUANTITY ==============
+				if err := tx.Model(&models.Cart{}).
+					Where("id = ?", userItem.ID).
+					UpdateColumn("quantity", gorm.Expr("quantity + ?", gItem.Quantity)).Error; err != nil {
+					return err
+				}
+
+				// ============= DELETE GUEST ROW AFTER MARGING QUANTITY
+				if err := tx.Delete(&models.Cart{}, gItem.ID).Error; err != nil {
+					return err
+				}
+			} else if errors.Is(err, gorm.ErrRecordNotFound) {
+				// ===== UUSER DOESN'T HAVE IT -> MOVE GUEST ROW TO USER =======
+				if err := tx.Model(&models.Cart{}).
+					Where("id = ?", gItem.ID).
+					Updates(map[string]interface{}{
+						"user_id":  userID,
+						"guest_id": gorm.Expr("NULL"),
+						"is_guest": false,
+					}).Error; err != nil {
+					return err
+				}
+			} else {
 				return err
 			}
 		}
 
-		// Only delete the guest record if merge succeeded or if no cart exists (your choice)
+		
 		if err := r.guestRepo.DeleteGuest(tx, guestID); err != nil {
 			return err
 		}
