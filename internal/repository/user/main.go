@@ -84,37 +84,43 @@ func (r *Main) GetByID(userID uint) (*models.User, error) {
 // 	return true
 // }
 
-
 func (r *Main) MergeGuestCart(db *gorm.DB, userID uint, guestID string) error {
 	if guestID == "" || userID == 0 {
 		return nil
 	}
 
-	var guestCartExists bool
+	return db.Transaction(func(tx *gorm.DB) error {
+		var guestCartExists bool
 
-	db.Model(&models.Cart{}).
-		Where("guest_id = ? AND is_guest = true", guestID).
-		Select("count(1) > 0").
-		Scan(&guestCartExists)
+		if err := tx.Model(&models.Cart{}).
+			Where("guest_id = ? AND is_guest = true", guestID).
+			Select("count(1) > 0").
+			Scan(&guestCartExists).Error; err != nil {
+			return err
+		}
 
-	if guestCartExists {
-		db.Where("user_id = ? AND is_guest = false", userID).
-			Delete(&models.Cart{})
-	}
+		if guestCartExists {
+			if err := tx.Where("user_id = ?", userID).
+				Delete(&models.Cart{}).Error; err != nil {
+				return err
+			}
 
-	db.Model(&models.Cart{}).
-		Where("guest_id = ? AND is_guest = true", guestID).
-		Updates(map[string]interface{}{
-			"user_id":  userID,
-			"guest_id": nil,
-			"is_guest": false,
-		})
+			if err := tx.Model(&models.Cart{}).
+				Where("guest_id = ? AND is_guest = true", guestID).
+				Updates(map[string]interface{}{
+					"user_id":  userID,
+					"guest_id": gorm.Expr("NULL"),
+					"is_guest": false,
+				}).Error; err != nil {
+				return err
+			}
+		}
 
-	r.guestRepo.DeleteGuest(db, guestID)    
+		// Only delete the guest record if merge succeeded or if no cart exists (your choice)
+		if err := r.guestRepo.DeleteGuest(tx, guestID); err != nil {
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
-
-
-
- 
