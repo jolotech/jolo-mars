@@ -14,6 +14,13 @@ type UserClaims struct {
 	jwt.RegisteredClaims
 }
 
+type AdminClaims struct {
+	AdminID uint   `json:"admin_id"`
+	Email   string `json:"email"`
+	Purpose string `json:"purpose"` // "access" or "pwd_change"
+	jwt.RegisteredClaims
+}
+
 func GenerateAuthToken(email string, userID uint) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 
@@ -33,3 +40,37 @@ func GenerateAuthToken(email string, userID uint) (string, error) {
 
 	return token.SignedString([]byte(secret))
 }
+
+
+
+func SignAdminToken(secret string, adminID uint, email string, purpose string, ttl time.Duration) (string, error) {
+	now := time.Now()
+	
+	claims := AdminClaims{
+		AdminID: adminID,
+		Email:   email,
+		Purpose: purpose,
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(ttl)),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(secret))
+}
+
+func ParseAdminToken(secret, token string) (*AdminClaims, error) {
+	parsed, err := jwt.ParseWithClaims(token, &AdminClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := parsed.Claims.(*AdminClaims)
+	if !ok || !parsed.Valid {
+		return nil, jwt.ErrTokenMalformed
+	}
+	return claims, nil
+}
+
