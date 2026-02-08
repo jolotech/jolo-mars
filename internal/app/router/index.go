@@ -49,6 +49,7 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 
 	// Initialize user routes
 	routes.UserRoutes(router, container.UserAuthHandler)
+	routes.AdminRoutes(router, container.AdminAuthHandler)
 
 	// 404 handler
 	NotFoundHandler(router)

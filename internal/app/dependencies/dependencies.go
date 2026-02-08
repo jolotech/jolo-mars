@@ -5,10 +5,11 @@ import (
 	"github.com/jolotech/jolo-mars/internal/app/handlers/auth"
 	bootstrap_handler "github.com/jolotech/jolo-mars/internal/app/handlers/boostrap"
 	"github.com/jolotech/jolo-mars/internal/infrastructure/database"
+	admin_repo "github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/repository/boostrap"
 	guest_repo "github.com/jolotech/jolo-mars/internal/repository/guest"
-	admin_repo "github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/repository/user"
+	admin_services "github.com/jolotech/jolo-mars/internal/services/admin"
 	guest_service "github.com/jolotech/jolo-mars/internal/services/guest"
 	"github.com/jolotech/jolo-mars/internal/services/user"
 
@@ -24,6 +25,7 @@ import (
 type Container struct {
 	UserAuthHandler *auth.UserAuthHandler
 	BoostrapAdminHandler *bootstrap_handler.BootstrapHandler
+	AdminAuthHandler *auth.AdminAuthHandler
 	// OrderHandler *partners.OrderHandler
 	// AdminHandler   *admin.AdminHandler
 	// PartnerRepository *repositories.PartnerRepository
@@ -51,6 +53,7 @@ func Init() *Container {
 	adminAuthRepo := admin_repo.NewAdminAuthRepo(database.DB)
 	adminMainRepo := admin_repo.NewAdminMainRepository(database.DB)
 	bootstrapAdminRepo := admin_repository.NewAdminBoostrapRepository(database.DB)
+	adminAuthRepo = admin_repo.NewAdminAuthRepo(database.DB)
 	
 	// orderRepo := repositories.NewOrderRepository(database.DB)
 	// adminRepo := repositories.NewAdminRepository(database.DB)
@@ -64,6 +67,7 @@ func Init() *Container {
 	userAuthService := services.NewAuthService(userAuthRepo, userMainRepo, adminMainRepo, database.DB)
 	guestService:= guest_service.NewGuestService(guestRepo)
 	bootstrapService := bootstrap_service.NewBootstrapService(adminAuthRepo, bootstrapAdminRepo)
+	adminAuthService := admin_services.NewAdminAuthService(adminAuthRepo)
 
 	// webhookService := service.NewWebhookService(webhookRepo, queue, partnerRepo)
 	// webhookManager := service.NewWebhookManager(webhookService)
@@ -82,6 +86,7 @@ func Init() *Container {
 	// Handlers
 	userAuthHandler := auth.NewUserAuhHandler(userAuthService, guestService)
 	bootstrapHandler := bootstrap_handler.NewBootstrapHandler(bootstrapService)
+	adminAuthHandler := auth.NewAdminAuthHandler(adminAuthService)
 
 	// orderHandler := partners.NewOrderHandler(orderService, distanceService, storeRepo)
 	// adminHandler := admin.NewAdminHandler(adminService, adminRepo, auditService)
@@ -99,6 +104,7 @@ func Init() *Container {
 	return &Container{
 		UserAuthHandler: userAuthHandler,
 		BoostrapAdminHandler: bootstrapHandler,
+		AdminAuthHandler: adminAuthHandler,
 
 		// OrderHandler:   orderHandler,
 		// AdminHandler:   adminHandler,
