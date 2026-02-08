@@ -39,27 +39,32 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 
 	// Must change password first
 	if admin.MustChangePassword {
-		setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "pwd_change", admin.ID, 15*time.Minute)
+		setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "pwd_change", admin.ID)
 		if err != nil {
 			return "failed to create token", nil, http.StatusInternalServerError, err
 		}
 
-		return "password change required", types.AdminLoginResponse{
+		data := types.AdminLoginResponse{
 			PasswordChangeRequired: true,
 			SetupToken:             setupToken,
-		}, http.StatusOK, nil
+		}
+
+		return "password change required", data, http.StatusOK, nil
 	}
 
 	// Normal access token
-	accessToken, err := jwt.SignAdminToken(cfg.JWTSecret, admin.ID, admin.Email, "access", 24*time.Hour)
+	accessToken, err := utils.GenerateAdminAuthToken(admin.Email, "access", admin.ID)
 	if err != nil {
 		return "failed to create token", nil, http.StatusInternalServerError, err
 	}
 
-	return "login successful", types.AdminLoginResponse{
+	data := types.AdminLoginResponse{
 		AccessToken:            accessToken,
 		PasswordChangeRequired: false,
-	}, http.StatusOK, nil
+		Admin: admin,
+	}
+
+	return "login successful", data, http.StatusOK, nil
 }
 
 // Uses SetupToken from Authorization: Bearer <token>
