@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/jolotech/jolo-mars/internal/app/handlers/auth"
+	"github.com/jolotech/jolo-mars/internal/app/middlewares"
 )
 
 
@@ -24,6 +25,8 @@ func AdminRoutes(
 			auth := public.Group("/auth")
 			{
 				auth.POST("/login", authHandler.Login)
+				middlewares.AdminAuthMiddleware()
+				middlewares.RequireAdminTokenPurpose("pwd-change")
 				auth.PUT("/change-password", authHandler.ChangePassword)
 			}
 		}
