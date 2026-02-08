@@ -29,6 +29,7 @@ func NewBootstrapService(adminRepo *admin_repo.AdminAuthRepo, adminBoostrapRepo 
 
 type BootstrapResult struct {
 	Created      bool
+	Email        string
 	TempPassword string
 	Reason       string
 }
@@ -207,5 +208,5 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 		return nil, err
 	}
 
-	return &BootstrapResult{Created: true, TempPassword: temp, Reason: "created"}, nil
+	return &BootstrapResult{Created: true, Email: email, TempPassword: temp, Reason: "created"}, nil
 }
