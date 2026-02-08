@@ -2,7 +2,7 @@ package auth
 
 import (
 	"net/http"
-	"strings"
+	// "strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jolotech/jolo-mars/internal/helpers"
@@ -47,15 +47,13 @@ func (h *AdminAuthHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	// Authorization: Bearer <setup_token>
-	auth := c.GetHeader("Authorization")
-	token := strings.TrimSpace(strings.TrimPrefix(auth, "Bearer"))
-	if token == "" {
-		helpers.ErrorResponse(c, nil, "missing authorization token", http.StatusUnauthorized)
+	_, exists := helpers.GetAdminEmailFromContext(c)
+	if !exists {
+		helpers.ErrorResponse(c, nil, "UnAuthorized access", http.StatusUnauthorized)
 		return
 	}
 
-	msg, data, statusCode, err := h.AdminAuthService.ChangePassword(c, token, req)
+	msg, data, statusCode, err := h.AdminAuthService.ChangePassword(req)
 	if err != nil {
 		helpers.ErrorResponse(c, err, msg, statusCode)
 		return

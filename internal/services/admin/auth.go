@@ -68,16 +68,7 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 }
 
 // Uses SetupToken from Authorization: Bearer <token>
-func (s *AdminAuthService) ChangePassword(ctx context.Context, setupToken string, req types.AdminChangePasswordRequest) (string, any, int, error) {
-	cfg := config.LoadConfig()
-
-	claims, err := jwt.ParseAdminToken(cfg.JWTSecret, setupToken)
-	if err != nil {
-		return "invalid token", nil, http.StatusUnauthorized, err
-	}
-	if claims.Purpose != "pwd_change" {
-		return "invalid token purpose", nil, http.StatusUnauthorized, errors.New("invalid token purpose")
-	}
+func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) (string, any, int, error) {
 
 	admin, err := s.repo.GetByEmail(strings.ToLower(strings.TrimSpace(claims.Email)))
 	if err != nil {
