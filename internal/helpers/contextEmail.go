@@ -6,7 +6,7 @@ import (
 )
 
 // GetPartnerEmailFromContext extracts the partnerEmail from Gin context
-func GetPartnerEmailFromContext(c *gin.Context) (string, bool) {
+func GetEmailFromContext(c *gin.Context) (string, bool) {
 	emailVal, exists := c.Get("partnerEmail")
 	if !exists {
 		return "", false
