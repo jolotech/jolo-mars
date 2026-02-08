@@ -1,13 +1,13 @@
 package admin_services
 
 import (
-	"context"
+	// "context"
 	"errors"
 	"net/http"
 	"strings"
-	"time"
+	// "time"
 
-	"github.com/jolotech/jolo-mars/config"
+	// "github.com/jolotech/jolo-mars/config"
 	"github.com/jolotech/jolo-mars/internal/repository/admin"
 	// "github.com/jolotech/jolo-mars/internal/utils/jwt"
 	"github.com/jolotech/jolo-mars/internal/utils"
@@ -70,42 +70,41 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 // Uses SetupToken from Authorization: Bearer <token>
 func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) (string, any, int, error) {
 
-	admin, err := s.repo.GetByEmail(strings.ToLower(strings.TrimSpace(claims.Email)))
+	admin, err := s.adminAuthRepo.GetByEmail(req.EMAIL)
 	if err != nil {
 		return "failed", nil, http.StatusInternalServerError, err
 	}
-	if admin == nil || admin.ID != claims.AdminID {
-		return "invalid token", nil, http.StatusUnauthorized, errors.New("invalid token")
-	}
 
 	// Verify current password
-	if !security.VerifyPassword(admin.Password, req.CurrentPassword) {
+	if !utils.ComparePassword(admin.Password, req.CurrentPassword) {
 		return "current password incorrect", nil, http.StatusUnauthorized, errors.New("wrong password")
 	}
 
 	// Strong password check
-	ok, msg := security.IsStrongPassword(req.NewPassword)
+	ok, msg := utils.IsStrongPassword(req.NewPassword)
 	if !ok {
 		return msg, nil, http.StatusBadRequest, errors.New(msg)
 	}
 
 	// Hash and update
-	hash, err := security.HashPassword(req.NewPassword)
+	hash, err := utils.HashPassword(req.NewPassword)
 	if err != nil {
 		return "failed", nil, http.StatusInternalServerError, err
 	}
 
-	if err := s.repo.UpdatePassword(admin.ID, hash, false); err != nil {
+	if err := s.adminAuthRepo.UpdatePassword(admin.ID, hash, false); err != nil {
 		return "failed", nil, http.StatusInternalServerError, err
 	}
 
-	// Optionally issue access token immediately after change
-	accessToken, err := jwt.SignAdminToken(cfg.JWTSecret, admin.ID, admin.Email, "access", 24*time.Hour)
+	// issue access token immediately after change
+	accessToken, err := utils.GenerateAdminAuthToken(admin.Email, "access", admin.ID)
 	if err != nil {
-		return "password updated but token failed", nil, http.StatusInternalServerError, err
+		return "password updated but access granted failed", nil, http.StatusInternalServerError, err
 	}
 
-	return "password updated successfully", map[string]any{
-		"access_token": accessToken,
-	}, http.StatusOK, nil
+	data := types.AdminLoginResponse{
+		AccessToken: accessToken,
+		Admin: admin,
+	}
+	return "password updated successfully", data, http.StatusOK, nil
 }
