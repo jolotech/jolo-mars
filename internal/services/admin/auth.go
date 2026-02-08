@@ -75,6 +75,10 @@ func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) 
 		return "failed", nil, http.StatusInternalServerError, err
 	}
 
+	if req.NewPassword != req.ConfirmPassword {
+		return "password does not match", nil, http.StatusBadRequest, errors.New("pasword mismatch")
+	}
+
 	// Verify current password
 	if !utils.ComparePassword(admin.Password, req.CurrentPassword) {
 		return "current password incorrect", nil, http.StatusUnauthorized, errors.New("wrong password")
