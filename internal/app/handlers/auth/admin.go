@@ -53,7 +53,7 @@ func (h *AdminAuthHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	req.EMAIL = email
+	req.Email = email
 
 	msg, data, statusCode, err := h.AdminAuthService.ChangePassword(req)
 	if err != nil {

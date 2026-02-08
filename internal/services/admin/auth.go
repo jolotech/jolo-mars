@@ -70,7 +70,7 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 // Uses SetupToken from Authorization: Bearer <token>
 func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) (string, any, int, error) {
 
-	admin, err := s.adminAuthRepo.GetByEmail(req.EMAIL)
+	admin, err := s.adminAuthRepo.GetByEmail(req.Email)
 	if err != nil {
 		return "failed", nil, http.StatusInternalServerError, err
 	}
