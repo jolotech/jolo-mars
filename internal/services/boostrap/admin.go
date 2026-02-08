@@ -14,7 +14,7 @@ import (
 )
 
 type BootstrapService struct {
-	adminRepo *admin_repo.AdminAuthRepo
+	adminAuthRepo *admin_repo.AdminAuthRepo
 	adminBoostrapRepo *admin_repository.AdminBoostrap
 }
 
@@ -23,7 +23,7 @@ type BootstrapService struct {
 func NewBootstrapService(adminRepo *admin_repo.AdminAuthRepo, adminBoostrapRepo *admin_repository.AdminBoostrap) *BootstrapService {
 	return &BootstrapService{
 		adminBoostrapRepo: adminBoostrapRepo,
-		adminRepo: adminRepo,
+		adminAuthRepo: adminRepo,
 	}
 }
 
@@ -175,7 +175,7 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 	}
 
 	// ✅ avoid duplicate email, even if role is manager/support
-	emailExists, err := s.adminRepo.ExistsByEmail(email)
+	emailExists, err := s.adminAuthRepo.ExistsByEmail(email)
 	if err != nil {
 		return nil, err
 	}
