@@ -75,3 +75,29 @@ func AdminAuthMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+
+func RequireAdminTokenPurpose(allowed ...string) gin.HandlerFunc {
+	allowedSet := map[string]bool{}
+	for _, a := range allowed {
+		allowedSet[a] = true
+	}
+
+	return func(c *gin.Context) {
+		purposeVal, ok := c.Get("adminPurpose")
+		if !ok {
+			helpers.ErrorResponse(c, nil, "Missing token purpose", http.StatusUnauthorized)
+			c.Abort()
+			return
+		}
+
+		purpose, _ := purposeVal.(string)
+		if purpose == "" || !allowedSet[purpose] {
+			helpers.ErrorResponse(c, nil, "Invalid token purpose", http.StatusUnauthorized)
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
