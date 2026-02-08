@@ -47,11 +47,13 @@ func (h *AdminAuthHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	_, exists := helpers.GetAdminEmailFromContext(c)
+	email, exists := helpers.GetAdminEmailFromContext(c)
 	if !exists {
 		helpers.ErrorResponse(c, nil, "UnAuthorized access", http.StatusUnauthorized)
 		return
 	}
+
+	req.EMAIL = email
 
 	msg, data, statusCode, err := h.AdminAuthService.ChangePassword(req)
 	if err != nil {
