@@ -21,7 +21,7 @@ type AdminClaims struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateUserAuthToken(email string, userID uint) (string, error) {
+func GenerateAuthToken(email string, userID uint) (string, error) {
 	cfg := config.LoadConfig()
 
 	expiry, err := time.ParseDuration(cfg.AuthExpIn)
