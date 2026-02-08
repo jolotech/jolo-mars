@@ -41,7 +41,26 @@ func GenerateAuthToken(email string, userID uint) (string, error) {
 	return token.SignedString([]byte(secret))
 }
 
+func GenerateAdminAuthToken(email, purpose string, adminID uint) (string, error) {
+	secret := os.Getenv("ADMIN_JWT_SECRET")
 
+	expiry, err := time.ParseDuration(os.Getenv("JWT_EXPIRES_IN"))
+	if err != nil {
+		expiry = 24 * time.Hour
+	}
+
+	claims := jwt.MapClaims{
+		"email": email,
+		"admin_id": adminID,
+		"purpose": purpose,
+		"exp":   time.Now().Add(expiry).Unix(),
+		"iat":   time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(secret))
+}
 
 func SignAdminToken(secret string, adminID uint, email string, purpose string, ttl time.Duration) (string, error) {
 	now := time.Now()
@@ -58,19 +77,5 @@ func SignAdminToken(secret string, adminID uint, email string, purpose string, t
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret))
-}
-
-func ParseAdminToken(secret, token string) (*AdminClaims, error) {
-	parsed, err := jwt.ParseWithClaims(token, &AdminClaims{}, func(t *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	claims, ok := parsed.Claims.(*AdminClaims)
-	if !ok || !parsed.Valid {
-		return nil, jwt.ErrTokenMalformed
-	}
-	return claims, nil
 }
 
