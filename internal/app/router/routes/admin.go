@@ -25,8 +25,8 @@ func AdminRoutes(
 			auth := public.Group("/auth")
 			{
 				auth.POST("/login", authHandler.Login)
-				middlewares.AdminAuthMiddleware()
-				middlewares.RequireAdminTokenPurpose("pwd_change")
+				auth.Use(middlewares.AdminAuthMiddleware())
+				auth.Use(middlewares.RequireAdminTokenPurpose("pwd_change"))
 				auth.PUT("/change-password", authHandler.ChangePassword)
 			}
 		}
