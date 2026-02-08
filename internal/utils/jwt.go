@@ -1,4 +1,3 @@
-
 package utils
 
 import (
@@ -6,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jolotech/jolo-mars/config"
 )
 
 type UserClaims struct {
@@ -22,9 +22,9 @@ type AdminClaims struct {
 }
 
 func GenerateAuthToken(email string, userID uint) (string, error) {
-	secret := os.Getenv("JWT_SECRET")
+	cfg := config.LoadConfig()
 
-	expiry, err := time.ParseDuration(os.Getenv("JWT_EXPIRES_IN"))
+	expiry, err := time.ParseDuration(cfg.AuthExpIn)
 	if err != nil {
 		expiry = 24 * time.Hour
 	}
@@ -38,16 +38,27 @@ func GenerateAuthToken(email string, userID uint) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(secret))
+	return token.SignedString([]byte(cfg.AuthSecret))
 }
 
 func GenerateAdminAuthToken(email, purpose string, adminID uint) (string, error) {
-	secret := os.Getenv("ADMIN_JWT_SECRET")
+	cfg := config.LoadConfig()
 
-	expiry, err := time.ParseDuration(os.Getenv("JWT_EXPIRES_IN"))
-	if err != nil {
-		expiry = 24 * time.Hour
+	var expiry time.Duration
+
+	if purpose == "pwd_change"{
+		expiry, err := time.ParseDuration(cfg.AuthPassExpIn)
+		if err != nil {
+		    expiry = 24 * time.Hour
+		}
 	}
+	if purpose == "auth_token" {
+	    expiry, err := time.ParseDuration(cfg.AuthExpIn)
+		if err != nil {
+		    expiry = 15 * time.Hour
+		}
+	}
+
 
 	claims := jwt.MapClaims{
 		"email": email,
@@ -59,7 +70,7 @@ func GenerateAdminAuthToken(email, purpose string, adminID uint) (string, error)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(secret))
+	return token.SignedString([]byte(cfg.AdminAuthSecret))
 }
 
 func SignAdminToken(secret string, adminID uint, email string, purpose string, ttl time.Duration) (string, error) {

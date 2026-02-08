@@ -39,6 +39,12 @@ type Config struct {
 	SMTPPass             string  // valid
 	SMTPHost             string  // valid
 	SMTPPort             string  // valid
+
+	// Auth Token (JWT)
+	AdminAuthSecret      string // valid
+	AuthSecret           string // valid
+	AuthExpIn            string // valid
+    AuthPassExpIn        string // valid
 }
 
 // LoadConfig loads .env variables or system env
@@ -81,6 +87,12 @@ func LoadConfig() *Config {
 		SMTPPass: 	  os.Getenv("SMTPPass"),
 		SMTPHost:    os.Getenv("SMTPHost"),
 		SMTPPort:    os.Getenv("SMTPPort"),
+
+		// Auth Token (JWT)
+		AdminAuthSecret: os.Getenv("ADMIN_JWT_SECRET"),
+		AuthSecret: os.Getenv("JWT_SECRET"),
+		AuthExpIn: os.Getenv("JWT_EXPIRES_IN"),
+		AuthPassExpIn: os.Getenv("ADMIN_PASS_EXPIRES_IN"),
 	}
 
 	return cfg

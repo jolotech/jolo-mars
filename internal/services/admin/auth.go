@@ -9,24 +9,23 @@ import (
 
 	"github.com/jolotech/jolo-mars/config"
 	"github.com/jolotech/jolo-mars/internal/repository/admin"
-	"github.com/jolotech/jolo-mars/internal/utils/jwt"
-	"github.com/jolotech/jolo-mars/internal/utils/security"
+	// "github.com/jolotech/jolo-mars/internal/utils/jwt"
+	"github.com/jolotech/jolo-mars/internal/utils"
 	"github.com/jolotech/jolo-mars/types"
 )
 
 type AdminAuthService struct {
-	repo *admin_repository.AdminAuthRepo
+	adminAuthRepo *admin_repository.AdminAuthRepo
 }
 
-func NewAdminAuthService(repo *admin_repository.AdminAuthRepo) *AdminAuthService {
-	return &AdminAuthService{repo: repo}
+func NewAdminAuthService(adminAuthRepo *admin_repository.AdminAuthRepo) *AdminAuthService {
+	return &AdminAuthService{adminAuthRepo: adminAuthRepo}
 }
 
-func (s *AdminAuthService) Login(ctx context.Context, req types.AdminLoginRequest) (string, any, int, error) {
-	cfg := config.LoadConfig()
+func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int, error) {
 	email := strings.ToLower(strings.TrimSpace(req.Email))
 
-	admin, err := s.repo.GetByEmail(email)
+	admin, err := s.adminAuthRepo.GetByEmail(email)
 	if err != nil {
 		return "failed", nil, http.StatusInternalServerError, err
 	}
@@ -34,13 +33,13 @@ func (s *AdminAuthService) Login(ctx context.Context, req types.AdminLoginReques
 		return "invalid credentials", nil, http.StatusUnauthorized, errors.New("invalid credentials")
 	}
 
-	if !security.VerifyPassword(admin.Password, req.Password) {
+	if !utils.ComparePassword(admin.Password, req.Password) {
 		return "invalid credentials", nil, http.StatusUnauthorized, errors.New("invalid credentials")
 	}
 
 	// Must change password first
 	if admin.MustChangePassword {
-		setupToken, err := jwt.SignAdminToken(cfg.JWTSecret, admin.ID, admin.Email, "pwd_change", 15*time.Minute)
+		setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "pwd_change", admin.ID, 15*time.Minute)
 		if err != nil {
 			return "failed to create token", nil, http.StatusInternalServerError, err
 		}

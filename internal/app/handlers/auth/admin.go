@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jolotech/jolo-mars/internal/helpers"
 	"github.com/jolotech/jolo-mars/internal/services/admin"
-	"github.com/jolotech/jolo-mars/internal/validations"
+	"github.com/jolotech/jolo-mars/internal/helpers/validations"
 	"github.com/jolotech/jolo-mars/types"
 )
 
@@ -28,13 +28,15 @@ func (h *AdminAuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	msg, data, statusCode, err := h.AdminAuthService.Login(c, req)
+	msg, data, statusCode, err := h.AdminAuthService.Login(req)
 	if err != nil {
 		helpers.ErrorResponse(c, err, msg, statusCode)
 		return
 	}
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
+
+
 
 func (h *AdminAuthHandler) ChangePassword(c *gin.Context) {
 	var req types.AdminChangePasswordRequest
