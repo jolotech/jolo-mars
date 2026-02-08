@@ -25,10 +25,13 @@ func AdminRoutes(
 			auth := public.Group("/auth")
 			{
 				auth.POST("/login", authHandler.Login)
-				auth.Use(middlewares.AdminAuthMiddleware())
-				auth.Use(middlewares.RequireAdminTokenPurpose("pwd_change"))
-				auth.PUT("/change-password", authHandler.ChangePassword)
 			}
-		}
 
+			dash := public.Group("/dash")
+			dash.Use(middlewares.AdminAuthMiddleware())
+			{
+			    dash.Use(middlewares.RequireAdminTokenPurpose("pwd_change"))
+			    dash.PUT("/change-password", authHandler.ChangePassword)
+		    }
+		}
 }
