@@ -44,19 +44,19 @@ func GenerateStrongPassword(length int) string {
 // - at least 1 upper, 1 lower, 1 number, 1 special
 func IsStrongPassword(p string) (bool, string) {
 	if len(p) < 10 {
-		return false, "password must be at least 10 characters"
+		return false, "new password must be at least 10 characters"
 	}
 	if !regexp.MustCompile(`[a-z]`).MatchString(p) {
-		return false, "password must include at least one lowercase letter"
+		return false, "new password must include at least one lowercase letter"
 	}
 	if !regexp.MustCompile(`[A-Z]`).MatchString(p) {
-		return false, "password must include at least one uppercase letter"
+		return false, "new password must include at least one uppercase letter"
 	}
 	if !regexp.MustCompile(`[0-9]`).MatchString(p) {
-		return false, "password must include at least one number"
+		return false, "new password must include at least one number"
 	}
 	if !regexp.MustCompile(`[^a-zA-Z0-9]`).MatchString(p) {
-		return false, "password must include at least one special character"
+		return false, "new password must include at least one special character"
 	}
 	return true, ""
 }
