@@ -8,7 +8,7 @@ type AdminLoginRequest struct {
 type AdminChangePasswordRequest struct {
 	CurrentPassword string `json:"current_password" binding:"required"`
 	NewPassword     string `json:"new_password" binding:"required,min=10"`
-	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=NewPassword"`
+	ConfirmPassword string `json:"confirm_password" binding:"required,min=10"`
 	Email           string `json:"email,omitempty"`
 }
 
