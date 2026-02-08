@@ -14,13 +14,13 @@ import (
 )
 
 type BootstrapService struct {
-	adminRepo *admin_repo.AdminAthRepo
+	adminRepo *admin_repo.AdminAuthRepo
 	adminBoostrapRepo *admin_repository.AdminBoostrap
 }
 
 
 
-func NewBootstrapService(adminRepo *admin_repo.AdminAthRepo, adminBoostrapRepo *admin_repository.AdminBoostrap) *BootstrapService {
+func NewBootstrapService(adminRepo *admin_repo.AdminAuthRepo, adminBoostrapRepo *admin_repository.AdminBoostrap) *BootstrapService {
 	return &BootstrapService{
 		adminBoostrapRepo: adminBoostrapRepo,
 		adminRepo: adminRepo,

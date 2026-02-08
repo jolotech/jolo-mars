@@ -7,15 +7,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type AdminAthRepo struct {
+type AdminAuthRepo struct {
 	db *gorm.DB
 }
 
-func NewAdminAuthRepo(db *gorm.DB) *AdminAthRepo {
-	return &AdminAthRepo{db: db}
+func NewAdminAuthRepo(db *gorm.DB) *AdminAuthRepo {
+	return &AdminAuthRepo{db: db}
 }
 
-func (r *AdminAthRepo) ExistsByEmail(email string) (bool, error) {
+
+func (r *AdminAuthRepo) UpdatePassword(adminID uint, newHash string, mustChange bool) error {
+	return r.db.Model(&models.Admin{}).
+		Where("id = ?", adminID).
+		Updates(map[string]any{
+			"password":             newHash,
+			"must_change_password": mustChange,
+		}).Error
+}
+
+
+func (r *AdminAuthRepo) ExistsByEmail(email string) (bool, error) {
 	var count int64
 	err := r.db.Model(&models.Admin{}).
 		Where("email = ?", email).
@@ -25,11 +36,11 @@ func (r *AdminAthRepo) ExistsByEmail(email string) (bool, error) {
 }
 
 
-func (r *AdminAthRepo) CreateAdmin(a *models.Admin) error {
+func (r *AdminAuthRepo) CreateAdmin(a *models.Admin) error {
 	return r.db.Create(a).Error
 }
 
-func (r *AdminAthRepo) GetByEmail(email string) (*models.Admin, error) {
+func (r *AdminAuthRepo) GetByEmail(email string) (*models.Admin, error) {
 	var a models.Admin
 	err := r.db.Where("email = ?", email).First(&a).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
