@@ -24,6 +24,7 @@ func AdminRoutes(
 			auth := public.Group("/auth")
 			{
 				auth.POST("/login", authHandler.Login)
+				auth.PUT("/change-password", authHandler.ChangePassword)
 			}
 		}
 
