@@ -8,18 +8,23 @@ import (
 	// "time"
 
 	"github.com/jolotech/jolo-mars/internal/models"
-	"github.com/jolotech/jolo-mars/internal/repository/admin"
+	"github.com/jolotech/jolo-mars/internal/repository/boostrap"
+	admin_repo "github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/utils"
 )
 
 type BootstrapService struct {
-	adminRepo *admin_repository.AdminRepo
+	adminRepo *admin_repo.AdminAthRepo
+	adminBoostrapRepo *admin_repository.AdminBoostrap
 }
 
 
 
-func NewBootstrapService(adminRepo *admin_repository.AdminRepo) *BootstrapService {
-	return &BootstrapService{adminRepo: adminRepo}
+func NewBootstrapService(adminRepo *admin_repo.AdminAthRepo, adminBoostrapRepo *admin_repository.AdminBoostrap) *BootstrapService {
+	return &BootstrapService{
+		adminBoostrapRepo: adminBoostrapRepo,
+		adminRepo: adminRepo,
+	}
 }
 
 type BootstrapResult struct {
@@ -153,7 +158,7 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 	}
 
 	// ✅ Only block if SUPER ADMIN exists (not any admin)
-	superExists, err := s.adminRepo.AnySuperAdminExists()
+	superExists, err := s.adminBoostrapRepo.AnySuperAdminExists()
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +203,7 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 		TwoFAEnabled:       false,
 	}
 
-	if err := s.adminRepo.Create(admin); err != nil {
+	if err := s.adminBoostrapRepo.CreateSuperAdmin(admin); err != nil {
 		return nil, err
 	}
 

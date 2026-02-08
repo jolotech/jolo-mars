@@ -10,7 +10,7 @@ type AdminBoostrap struct {
 	db *gorm.DB
 }
 
-func NewAdminBoostrap(db *gorm.DB) *AdminBoostrap {
+func NewAdminBoostrapRepository(db *gorm.DB) *AdminBoostrap {
 	return &AdminBoostrap{db: db}
 }
 

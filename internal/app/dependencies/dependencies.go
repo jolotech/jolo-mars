@@ -5,8 +5,9 @@ import (
 	"github.com/jolotech/jolo-mars/internal/app/handlers/auth"
 	bootstrap_handler "github.com/jolotech/jolo-mars/internal/app/handlers/boostrap"
 	"github.com/jolotech/jolo-mars/internal/infrastructure/database"
-	"github.com/jolotech/jolo-mars/internal/repository/admin"
+	"github.com/jolotech/jolo-mars/internal/repository/boostrap"
 	guest_repo "github.com/jolotech/jolo-mars/internal/repository/guest"
+	admin_repo "github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/repository/user"
 	guest_service "github.com/jolotech/jolo-mars/internal/services/guest"
 	"github.com/jolotech/jolo-mars/internal/services/user"
@@ -47,8 +48,9 @@ func Init() *Container {
 	guestRepo := guest_repo.NewGuestRepo(database.DB)
 	userMainRepo := user_repository.NewUserMainRepository(database.DB, guestRepo)
 	userAuthRepo := user_repository.NewUserAuthRepository(database.DB, userMainRepo)
-	adminMainRepo := admin_repository.NewAdminMainRepository(database.DB)
-	bootstrapAdminRepo := admin_repository.NewAdminRepo(database.DB)
+	adminAuthRepo := admin_repo.NewAdminAuthRepo(database.DB)
+	adminMainRepo := admin_repo.NewAdminMainRepository(database.DB)
+	bootstrapAdminRepo := admin_repository.NewAdminBoostrapRepository(database.DB)
 	
 	// orderRepo := repositories.NewOrderRepository(database.DB)
 	// adminRepo := repositories.NewAdminRepository(database.DB)
@@ -61,7 +63,7 @@ func Init() *Container {
 	// Services
 	userAuthService := services.NewAuthService(userAuthRepo, userMainRepo, adminMainRepo, database.DB)
 	guestService:= guest_service.NewGuestService(guestRepo)
-	bootstrapService := bootstrap_service.NewBootstrapService(bootstrapAdminRepo)
+	bootstrapService := bootstrap_service.NewBootstrapService(adminAuthRepo, bootstrapAdminRepo)
 
 	// webhookService := service.NewWebhookService(webhookRepo, queue, partnerRepo)
 	// webhookManager := service.NewWebhookManager(webhookService)

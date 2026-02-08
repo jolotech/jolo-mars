@@ -7,15 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type AdminRepo struct {
+type AdminAthRepo struct {
 	db *gorm.DB
 }
 
-func NewAdminRepo(db *gorm.DB) *AdminRepo {
-	return &AdminRepo{db: db}
+func NewAdminAuthRepo(db *gorm.DB) *AdminAthRepo {
+	return &AdminAthRepo{db: db}
 }
 
-func (r *AdminRepo) ExistsByEmail(email string) (bool, error) {
+func (r *AdminAthRepo) ExistsByEmail(email string) (bool, error) {
 	var count int64
 	err := r.db.Model(&models.Admin{}).
 		Where("email = ?", email).
@@ -25,11 +25,11 @@ func (r *AdminRepo) ExistsByEmail(email string) (bool, error) {
 }
 
 
-func (r *AdminRepo) CreateAdmin(a *models.Admin) error {
+func (r *AdminAthRepo) CreateAdmin(a *models.Admin) error {
 	return r.db.Create(a).Error
 }
 
-func (r *AdminRepo) GetByEmail(email string) (*models.Admin, error) {
+func (r *AdminAthRepo) GetByEmail(email string) (*models.Admin, error) {
 	var a models.Admin
 	err := r.db.Where("email = ?", email).First(&a).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
