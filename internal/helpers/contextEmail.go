@@ -5,9 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetPartnerEmailFromContext extracts the partnerEmail from Gin context
+// GetUserEmailFromContext extracts the partnerEmail from Gin context
 func GetEmailFromContext(c *gin.Context) (string, bool) {
-	emailVal, exists := c.Get("partnerEmail")
+	emailVal, exists := c.Get("userEmail")
 	if !exists {
 		return "", false
 	}
