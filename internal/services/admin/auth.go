@@ -8,7 +8,6 @@ import (
 	// "time"
 
 	"github.com/jolotech/jolo-mars/internal/repository/admin"
-	// "github.com/jolotech/jolo-mars/internal/utils/jwt"
 	"github.com/jolotech/jolo-mars/internal/utils"
 	"github.com/jolotech/jolo-mars/types"
 )
