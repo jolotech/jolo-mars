@@ -146,3 +146,7 @@ func (h *UserAuthHandler) ResetPassword(c *gin.Context) {
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
 
+
+func (h *UserAuthHandler) Login(c *gin.Context){
+
+}
