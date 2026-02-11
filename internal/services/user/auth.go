@@ -414,46 +414,41 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 
 func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, error) {
 	// 1) Find user
-	var user *models.User
+	// var user *models.User
 	var err error
 
-	switch req.Method {
-	case "email":
-		user, err = s.userRepo.FindByEmail(ctx, req.EmailOrPhone)
-	case "phone":
-		user, err = s.userRepo.FindByPhone(ctx, req.EmailOrPhone)
-	default:
-		return "invalid field_type", nil, http.StatusBadRequest, errors.New("invalid field_type")
-	}
+	// switch req.Method {
+	// case "email":
+	// 	user, err = s.userRepo.FindByEmail(ctx, req.EmailOrPhone)
+	// case "phone":
+	// 	user, err = s.userRepo.FindByPhone(ctx, req.EmailOrPhone)
+	// default:
+	// 	return "invalid field_type", nil, http.StatusBadRequest, errors.New("invalid field_type")
+	// }
 
-	if err != nil {
-		// If not found -> same as credential mismatch
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "User credential does not match", nil, http.StatusUnauthorized, err
-		}
-		return "failed to login", nil, http.StatusInternalServerError, err
-	}
-
-	// 2) Verify password
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+	// =====================GET USER =====================
+	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
+	if err != nil || user == nil {
 		return "User credential does not match", nil, http.StatusUnauthorized, err
+	}
+
+	isCoorectPassword := utils.ComparePassword(user.Password, req.Password)
+	if !isCoorectPassword {
+		return "User credential does not match", nil, http.StatusUnauthorized, errors.New("incorect password")
 	}
 
 	// 3) Blocked check
 	if !user.Status {
-		return "your account is blocked", nil, http.StatusForbidden, errors.New("account blocked")
+		return "your account is temporarily blocked", nil, http.StatusForbidden, errors.New("account blocked")
 	}
 
 	// 4) check-ref-code (Ensure ref_code exists)
 	// Only generate + update if missing.
-	if user.RefCode == nil || *user.RefCode == "" {
-		ref, genErr := helpers.GenerateRefCode()
-		if genErr != nil {
-			return "failed to generate ref code", nil, http.StatusInternalServerError, genErr
-		}
+	if  user.RefCode == "" {
+		refCode := utils.GenerateRefererCode(s.DB)
 
 		// Update only if still empty (safe for concurrency)
-		_, upErr := s.userRepo.EnsureRefCode(ctx, user.ID, ref)
+		_, upErr := s.usermainRepo.EnsureRefCode(user.ID, refCode)
 		if upErr != nil {
 			return "failed to update ref code", nil, http.StatusInternalServerError, upErr
 		}

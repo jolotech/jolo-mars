@@ -98,6 +98,21 @@ func (r *Main) FindByPublicID(userPublicID string) (*models.User, error) {
 	return &user, nil
 }
 
+// EnsureRefCode: only update if ref_code is null/empty.
+func (r *Main) EnsureRefCode(userID uint, refCode string) (bool, error) {
+	if refCode == "" {
+		return false, errors.New("refCode cannot be empty")
+	}
+
+	res := r.db.Model(&models.User{}).
+		Where("id = ? AND (ref_code IS NULL OR ref_code = '')", userID).
+		Update("ref_code", refCode)
+
+	if res.Error != nil {
+		return false, res.Error
+	}
+	return res.RowsAffected > 0, nil
+}
 
 
 // func MergeGuestCart(db *gorm.DB, userID uint, guestID string) bool {
