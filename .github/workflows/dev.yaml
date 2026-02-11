@@ -28,7 +28,7 @@ jobs:
       # Verify Secrets
       - name: Verify Secrets
         run: |
-          echo "🔍 Checking environment secrets..."
+          echo "🔍 Checking environment secrets.."
           if [ -z "${{ secrets.STAGING_USER }}" ] || [ -z "${{ secrets.STAGING_HOST }}" ]; then
             echo "❌ Missing one or more required secrets!"
             exit 1
