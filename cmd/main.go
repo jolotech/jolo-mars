@@ -3,8 +3,8 @@ package main
 import (
 	// "context"
 	// "log"
-	"fmt"
-	"os"
+	// "fmt"
+	// "os"
 
 	"github.com/joho/godotenv"
 	"github.com/jolotech/jolo-mars/config"
@@ -27,11 +27,11 @@ func main() {
 
 	var container *dependencies.Container
 
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run cmd/main.go <Your Name>")
-		return
-	}
-	fmt.Printf("Hello, %s!\n", os.Args[1])
+	// if len(os.Args) < 2 {
+	// 	fmt.Println("Usage: go run cmd/main.go <Your Name>")
+	// 	return
+	// }
+	// fmt.Printf("Hello, %s!\n", os.Args[1])
 
 
     godotenv.Load()
