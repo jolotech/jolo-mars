@@ -54,9 +54,10 @@ type GuestResponse struct {
 }
 
 type UserLoginRequest struct {
-	FieldType     string `json:"field_type" binding:"required,oneof=email phone"`
-	EmailOrPhone  string `json:"email_or_phone" binding:"required"`
-	Password      string `json:"password" binding:"required"`
+	Method        string  `json:"method" binding:"required,oneof=email phone"`
+	Email         string  `json:"email" binding:"required"`
+	Phone         string  `json:"phone" binding:"required"`
+	Password      string  `json:"password" binding:"required"`
 	GuestID       *string `json:"guest_id,omitempty"` // optional
 }
 

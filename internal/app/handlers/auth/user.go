@@ -148,27 +148,6 @@ func (h *UserAuthHandler) ResetPassword(c *gin.Context) {
 
 // ================ LOGIN ==========================
 
-// handlers/user_auth_handler.go
-package handlers
-
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-	"github.com/jolotech/jolo-mars/internal/helpers"
-	"github.com/jolotech/jolo-mars/internal/validations"
-	"github.com/jolotech/jolo-mars/services"
-	"github.com/jolotech/jolo-mars/types"
-)
-
-type UserAuthHandler struct {
-	UserAuthService *services.UserAuthService
-}
-
-func NewUserAuthHandler(svc *services.UserAuthService) *UserAuthHandler {
-	return &UserAuthHandler{UserAuthService: svc}
-}
-
 func (h *UserAuthHandler) Login(c *gin.Context) {
 	var req types.UserLoginRequest
 
