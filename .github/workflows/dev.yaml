@@ -58,7 +58,7 @@ jobs:
           git fetch --all --prune && git reset --hard origin/main
 
           echo "🔧 Updating environment variables..."
-          echo "${{ secrets.APP_ENV }}" | tr -d '\r' > .env
+          echo "${{ secrets.STAGING_ENV }}" | tr -d '\r' > .env
           echo "✅ Environment updated."
 
           echo "🧹 Optional Docker cleanup..."
