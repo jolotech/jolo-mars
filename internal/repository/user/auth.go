@@ -63,3 +63,10 @@ func(r *Auth) SaveSignUpUSer(user models.User) (string, any, int, error) {
 	}
 	return "", nil, http.StatusOK, nil
 }
+
+func (r *Auth) SetLoginMedium(userID uint, medium string) error {
+	return r.db.Model(&models.User{}).
+		Where("id = ?", userID).
+		Update("login_medium", medium).
+		Error
+}
