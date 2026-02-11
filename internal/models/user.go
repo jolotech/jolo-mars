@@ -23,6 +23,7 @@ type User struct {
 	Status             bool      `json:"status" gorm:"default:false"`
 	// requireExistingOtp bool      `json:"require_existing_otp" gorm:"default:true"`
 	IsNew              bool      `json:"is_new" gorm:"default:true"`
+	LoginMedium        *string   `json:"login_medium" gorm:"column:login_medium"`
 	IsPhoneVerified    bool      `json:"is_phone_verified" gorm:"column:is_phone_verified;default:false"`
 	IsEmailVerified    bool      `json:"is_email_verified" gorm:"column:is_email_verified;default:false"`
 	CMFirebaseToken    *string   `json:"cm_firebase_token" gorm:"column:cm_firebase_token"`
