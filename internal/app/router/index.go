@@ -25,12 +25,15 @@ import (
 
 func InitRoutes(container *dependencies.Container) *gin.Engine {
 	// logger.InitLogger()
+
 	cfg := config.LoadConfig()
 
 	healthHandler := &handlers.HealthHandler{
 		StartTime: time.Now(),
 		Version:   cfg.AppVersion,
 	}
+
+	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
 
@@ -39,7 +42,7 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 	router.Use(middlewares.CORS())
 
 	router.Use(gin.Recovery())
-	router.Use(gin.Logger())
+	// router.Use(gin.Logger())
 	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*.html")
 
