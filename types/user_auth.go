@@ -52,3 +52,20 @@ type GuestRequest struct {
 type GuestResponse struct {
 	GuestID string `json:"guest_id"`
 }
+
+type UserLoginRequest struct {
+	FieldType     string `json:"field_type" binding:"required,oneof=email phone"`
+	EmailOrPhone  string `json:"email_or_phone" binding:"required"`
+	Password      string `json:"password" binding:"required"`
+	GuestID       *string `json:"guest_id,omitempty"` // optional
+}
+
+type UserLoginResponse struct {
+	Token           *string `json:"token"`
+	IsPhoneVerified int     `json:"is_phone_verified"`
+	IsEmailVerified int     `json:"is_email_verified"`
+	IsPersonalInfo  int     `json:"is_personal_info"`
+	IsExistUser     any     `json:"is_exist_user"`
+	LoginType       string  `json:"login_type"`
+	Email           *string `json:"email"`
+}
