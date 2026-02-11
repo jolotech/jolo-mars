@@ -27,4 +27,4 @@ COPY --from=builder /app/server /app/server
 EXPOSE 3456
 
 # If your app needs migrations etc, do it in entrypoint script (optional)
-CMD ["/app/server"]
+CMD ["make start"]
