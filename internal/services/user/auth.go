@@ -422,7 +422,7 @@ func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, e
 	// =====================GET USER =====================
 	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
 	if err != nil || user == nil {
-		return "User credential does not match", nil, http.StatusUnauthorized, err
+		return "User credential does not match", nil, http.StatusUnauthorized, errors.New("user not found")
 	}
 
 	isCoorectPassword := utils.ComparePassword(user.Password, req.Password)
