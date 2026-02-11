@@ -157,7 +157,7 @@ func (h *UserAuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	msg, data, statusCode, err := h.UserAuthService.Login(c.Request.Context(), req)
+	msg, data, statusCode, err := h.UserAuthService.Login(req)
 	if err != nil {
 		helpers.ErrorResponse(c, err, msg, statusCode)
 		return
