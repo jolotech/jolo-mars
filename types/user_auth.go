@@ -24,11 +24,11 @@ type LoginSettings struct {
 }
 
 type VerifyOTPRequest struct {
-	OTP              string `json:"otp" binding:"required"`
+	OTP                string `json:"otp" binding:"required"`
 	VerificationMethod string `json:"verification_method" binding:"required,oneof=phone email"`
-	Phone            string `json:"phone,omitempty"`
-	Email            string `json:"email,omitempty"`
-	GuestID          *string `json:"guest_id,omitempty"`
+	Phone              string `json:"phone,omitempty"`
+	Email              string `json:"email,omitempty"`
+	GuestID            *string `json:"guest_id,omitempty"`
 }
 
 type ResendOTPRequest struct {
@@ -56,8 +56,9 @@ type GuestResponse struct {
 }
 
 type UserLoginRequest struct {
-	Email         string  `json:"email" binding:"required"`
-	Phone         string  `json:"phone" binding:"required"`
+	Method string `json:"method" binding:"required,oneof=phone email"`
+	Phone         string `json:"phone,omitempty"`
+	Email         string `json:"email,omitempty"`
 	Password      string  `json:"password" binding:"required"`
 	GuestID       *string `json:"guest_id,omitempty"` // optional
 }
