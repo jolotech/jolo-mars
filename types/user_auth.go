@@ -66,5 +66,5 @@ type UserLoginRequest struct {
 
 type AuthLoginData struct {
 	User  *models.User `json:"user"`
-	Token *string      `json:"token,omitempty"`
+	Token  string      `json:"token,omitempty"`
 }

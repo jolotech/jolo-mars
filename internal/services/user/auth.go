@@ -208,9 +208,14 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 	}
 
 	// ================= RESPONSE =================
-	data := map[string]interface{}{
-		"user":              user,
-		"token":             token,
+	// data := map[string]interface{}{
+	// 	"user":              user,
+	// 	"token":             token,
+	// }
+
+	data := &types.AuthLoginData{
+		User:              user,
+		Token:             token,
 	}
 
 	return "Verification successful", data, http.StatusOK, nil
@@ -456,13 +461,13 @@ func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, e
 
 
 	// 7) Token only when personal info exists 
-	var token *string
+	var token string
 	// if isPersonalInfo == 1 {
 		tk, tkErr := utils.GenerateAuthToken(user.Email, user.ID)
 		if tkErr != nil {
 			return "login error", nil, http.StatusInternalServerError, tkErr
 		}
-		token = &tk
+		token = tk
 
 		// 8) merge guest cart if guest_id provided
 		if req.GuestID != nil && *req.GuestID != "" {
@@ -479,9 +484,9 @@ func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, e
 	// 9) response payload (matches your PHP response)
 	
 
-	data := map[string]interface{}{
-		"user":              user,
-		"token":             token,
+	data := &types.AuthLoginData{
+		User:              user,
+		Token:             token,
 	}
 
 	return "login successful", data, http.StatusOK, nil
