@@ -1,5 +1,7 @@
 package types
 
+import "github.com/jolotech/jolo-mars/internal/models"
+
 
 type RegisterRequest struct {
 	Name      string `json:"name" binding:"required"`
@@ -61,12 +63,8 @@ type UserLoginRequest struct {
 	GuestID       *string `json:"guest_id,omitempty"` // optional
 }
 
-type UserLoginResponse struct {
-	Token           *string `json:"token"`
-	IsPhoneVerified int     `json:"is_phone_verified"`
-	IsEmailVerified int     `json:"is_email_verified"`
-	IsPersonalInfo  int     `json:"is_personal_info"`
-	IsExistUser     any     `json:"is_exist_user"`
-	LoginType       string  `json:"login_type"`
-	Email           *string `json:"email"`
+
+type AuthLoginData struct {
+	User  *models.User `json:"user"`
+	Token *string      `json:"token,omitempty"`
 }
