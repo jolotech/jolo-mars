@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  jolo_go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: JOLO_DELIVERY
+    restart: always
+    env_file:
+      - .env
+    expose:
+      - "8023"
+    networks:
+      - appnet
+
+  jolo_web:
+    image: nginx:alpine
+    container_name: jolo_web
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - jolo_go
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
