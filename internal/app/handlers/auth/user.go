@@ -45,7 +45,6 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
 
-
 // ================ GUEST REQUEST =================
 
 func (h *UserAuthHandler) GuestRequest(c *gin.Context) {
@@ -147,6 +146,43 @@ func (h *UserAuthHandler) ResetPassword(c *gin.Context) {
 }
 
 
-func (h *UserAuthHandler) Login(c *gin.Context){
+// ================ LOGIN ==========================
 
+// handlers/user_auth_handler.go
+package handlers
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jolotech/jolo-mars/internal/helpers"
+	"github.com/jolotech/jolo-mars/internal/validations"
+	"github.com/jolotech/jolo-mars/services"
+	"github.com/jolotech/jolo-mars/types"
+)
+
+type UserAuthHandler struct {
+	UserAuthService *services.UserAuthService
+}
+
+func NewUserAuthHandler(svc *services.UserAuthService) *UserAuthHandler {
+	return &UserAuthHandler{UserAuthService: svc}
+}
+
+func (h *UserAuthHandler) Login(c *gin.Context) {
+	var req types.UserLoginRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		msg := validations.HandleValidationError(err)
+		helpers.ErrorResponse(c, err, msg, http.StatusBadRequest)
+		return
+	}
+
+	msg, data, statusCode, err := h.UserAuthService.Login(c.Request.Context(), req)
+	if err != nil {
+		helpers.ErrorResponse(c, err, msg, statusCode)
+		return
+	}
+
+	helpers.SuccessResponse(c, data, msg, statusCode)
 }
