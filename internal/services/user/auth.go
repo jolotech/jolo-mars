@@ -450,57 +450,39 @@ func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, e
 		// Update only if still empty (safe for concurrency)
 		_, upErr := s.usermainRepo.EnsureRefCode(user.ID, refCode)
 		if upErr != nil {
-			return "failed to update ref code", nil, http.StatusInternalServerError, upErr
+			return "failed to update referal code", nil, http.StatusInternalServerError, upErr
 		}
 	}
 
-	// 5) is_personal_info
-	isPersonalInfo := 0
-	if user.FName != nil && *user.FName != "" {
-		isPersonalInfo = 1
-	}
 
-	// 6) login_medium = manual
-	if err := s.userRepo.SetLoginMedium(ctx, user.ID, "manual"); err != nil {
-		return "failed to update login medium", nil, http.StatusInternalServerError, err
-	}
-
-	// 7) Token only when personal info exists (same as your PHP)
+	// 7) Token only when personal info exists 
 	var token *string
-	if isPersonalInfo == 1 {
-		tk, tkErr := helpers.CreateUserAuthToken(*user) // you said you already have this
+	// if isPersonalInfo == 1 {
+		tk, tkErr := utils.GenerateAuthToken(user.Email, user.ID)
 		if tkErr != nil {
-			return "failed to create token", nil, http.StatusInternalServerError, tkErr
+			return "login error", nil, http.StatusInternalServerError, tkErr
 		}
 		token = &tk
 
 		// 8) merge guest cart if guest_id provided
-		if req.GuestID != nil && *req.GuestID != "" && s.cartService != nil {
+		if req.GuestID != nil && *req.GuestID != "" {
 			// if merge fails you can decide:
 			// - either fail login
 			// - or ignore and still login
-			if err := s.cartService.MergeGuestCart(ctx, user.ID, *req.GuestID); err != nil {
+			if err := s.usermainRepo.MergeGuestCart(s.DB, user.ID, *req.GuestID); err != nil {
 				// I recommend: don't block login, but log error
 				// return "failed to merge guest cart", nil, http.StatusInternalServerError, err
 			}
 		}
-	}
+	// }
 
 	// 9) response payload (matches your PHP response)
-	var email *string
-	if user.Email != nil && *user.Email != "" {
-		email = user.Email
+	
+
+	data := map[string]interface{}{
+		"user":              user,
+		"token":             token,
 	}
 
-	resp := types.UserLoginResponse{
-		Token:           token,
-		IsPhoneVerified: 1,
-		IsEmailVerified: 1,
-		IsPersonalInfo:  isPersonalInfo,
-		IsExistUser:     nil,
-		LoginType:       "manual",
-		Email:           email,
-	}
-
-	return "login successful", resp, http.StatusOK, nil
+	return "login successful", data, http.StatusOK, nil
 }
