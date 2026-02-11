@@ -43,6 +43,31 @@ func (r *Main) GetByEmailOrPhone(email, phone string) (*models.User, error) {
 	return &user, nil
 }
 
+func (r *Main) FindByEmail(email string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound){
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *Main) FindByPhone(phone string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("phone = ?", phone).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil 
+		}
+		return nil, err
+	}
+	return &user, nil
+}
+
+
 func (r *Main) IsWalletReferenceUsed(reference string) bool {
 	var tx models.WalletTransaction
 	err := r.db.Where("reference = ?", reference).First(&tx).Error
