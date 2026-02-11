@@ -59,7 +59,7 @@ type UserLoginRequest struct {
 	Method string `json:"method" binding:"required,oneof=phone email"`
 	Phone         string `json:"phone,omitempty"`
 	Email         string `json:"email,omitempty"`
-	Password      string  `json:"password" binding:"required"`
+	Password      string  `json:"password" binding:"required,min=8"`
 	GuestID       *string `json:"guest_id,omitempty"` // optional
 }
 
