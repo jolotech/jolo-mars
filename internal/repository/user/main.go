@@ -77,8 +77,25 @@ func (r *Main) IsWalletReferenceUsed(reference string) bool {
 
 func (r *Main) GetByID(userID uint) (*models.User, error) {
 	var user models.User
-	err := r.db.First(&user, userID).Error
+	err := r.db.Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound){
+			return nil, nil
+		}
+	}
 	return &user, err
+}
+
+func (r *Main) FindByPublicID(userPublicID string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("public_id = ?", userPublicID).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound){
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
 }
 
 
