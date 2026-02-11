@@ -24,7 +24,7 @@ RUN apk add --no-cache ca-certificates
 
 COPY --from=builder /app/server /app/server
 
-EXPOSE 3456
+EXPOSE 8023
 
 # If your app needs migrations etc, do it in entrypoint script (optional)
 CMD ["make start"]
