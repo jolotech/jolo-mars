@@ -20,9 +20,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
-
-
 func InitRoutes(container *dependencies.Container) *gin.Engine {
 	// logger.InitLogger()
 
