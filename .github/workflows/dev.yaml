@@ -55,10 +55,10 @@ jobs:
           ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
           echo "🔄 Pulling latest changes..."
-          git fetch --all --prune && git reset --hard origin/staging
+          git fetch --all --prune && git reset --hard origin/main
 
           echo "🔧 Updating environment variables..."
-          echo "${{ secrets.STAGING_ENV }}" | tr -d '\r' > .env
+          echo "${{ secrets.APP_ENV }}" | tr -d '\r' > .env
           echo "✅ Environment updated."
 
           echo "🧹 Optional Docker cleanup..."
