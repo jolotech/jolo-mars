@@ -34,6 +34,7 @@ func UserRoutes(
 			auth.POST("/resend-otp", authHandler.ResendOTP)
 			auth.POST("/forget-password", authHandler.ForgetPassword)
 			auth.PUT("/reset-password", authHandler.ResetPassword)
+			auth.POST("/login", authHandler.Login)
 		}
 
 		// --------------------------
