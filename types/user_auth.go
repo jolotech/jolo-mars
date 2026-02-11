@@ -56,7 +56,6 @@ type GuestResponse struct {
 }
 
 type UserLoginRequest struct {
-	Method        string  `json:"method" binding:"required,oneof=email phone"`
 	Email         string  `json:"email" binding:"required"`
 	Phone         string  `json:"phone" binding:"required"`
 	Password      string  `json:"password" binding:"required"`
