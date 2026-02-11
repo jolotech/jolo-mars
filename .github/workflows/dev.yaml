@@ -40,7 +40,6 @@ jobs:
         run: |
           ssh -i private_key -o StrictHostKeyChecking=no \
             ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} \
-            "whoami && hostname && echo OK"
             "echo '✅ SSH connection successful!'"
 
       # Deploy Application
