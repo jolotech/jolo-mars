@@ -418,19 +418,7 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 
 
 func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, error) {
-	// 1) Find user
-	// var user *models.User
-	var err error
-
-	// switch req.Method {
-	// case "email":
-	// 	user, err = s.userRepo.FindByEmail(ctx, req.EmailOrPhone)
-	// case "phone":
-	// 	user, err = s.userRepo.FindByPhone(ctx, req.EmailOrPhone)
-	// default:
-	// 	return "invalid field_type", nil, http.StatusBadRequest, errors.New("invalid field_type")
-	// }
-
+	
 	// =====================GET USER =====================
 	user, err := s.usermainRepo.GetByEmailOrPhone(req.Email, req.Phone)
 	if err != nil || user == nil {
@@ -461,13 +449,10 @@ func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, e
 
 
 	// 7) Token only when personal info exists 
-	var token string
-	// if isPersonalInfo == 1 {
-		tk, tkErr := utils.GenerateAuthToken(user.Email, user.ID)
+		token, tkErr := utils.GenerateAuthToken(user.Email, user.ID)
 		if tkErr != nil {
 			return "login error", nil, http.StatusInternalServerError, tkErr
 		}
-		token = tk
 
 		// 8) merge guest cart if guest_id provided
 		if req.GuestID != nil && *req.GuestID != "" {
