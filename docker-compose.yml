@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: JOLO_DELIVERY
+    container_name: JOLO_DELIVERY_STAGING
     restart: always
     env_file:
       - .env
@@ -16,7 +16,7 @@ services:
 
   jolo_web:
     image: nginx:alpine
-    container_name: jolo_web
+    container_name: jolo_web_stadging
     restart: always
     ports:
       - "80:80"
