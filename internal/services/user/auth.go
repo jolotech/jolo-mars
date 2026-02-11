@@ -410,3 +410,102 @@ func (s *UserAuthService) ResetPassword(req types.ResetPasswordSubmitRequest) (s
 	//================ SUCCESS RESPONSE ====================
 	return "Password changed successfully.", nil, http.StatusOK, nil
 }
+
+
+func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, error) {
+	// 1) Find user
+	var user *models.User
+	var err error
+
+	switch req.Method {
+	case "email":
+		user, err = s.userRepo.FindByEmail(ctx, req.EmailOrPhone)
+	case "phone":
+		user, err = s.userRepo.FindByPhone(ctx, req.EmailOrPhone)
+	default:
+		return "invalid field_type", nil, http.StatusBadRequest, errors.New("invalid field_type")
+	}
+
+	if err != nil {
+		// If not found -> same as credential mismatch
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "User credential does not match", nil, http.StatusUnauthorized, err
+		}
+		return "failed to login", nil, http.StatusInternalServerError, err
+	}
+
+	// 2) Verify password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+		return "User credential does not match", nil, http.StatusUnauthorized, err
+	}
+
+	// 3) Blocked check
+	if !user.Status {
+		return "your account is blocked", nil, http.StatusForbidden, errors.New("account blocked")
+	}
+
+	// 4) check-ref-code (Ensure ref_code exists)
+	// Only generate + update if missing.
+	if user.RefCode == nil || *user.RefCode == "" {
+		ref, genErr := helpers.GenerateRefCode()
+		if genErr != nil {
+			return "failed to generate ref code", nil, http.StatusInternalServerError, genErr
+		}
+
+		// Update only if still empty (safe for concurrency)
+		_, upErr := s.userRepo.EnsureRefCode(ctx, user.ID, ref)
+		if upErr != nil {
+			return "failed to update ref code", nil, http.StatusInternalServerError, upErr
+		}
+	}
+
+	// 5) is_personal_info
+	isPersonalInfo := 0
+	if user.FName != nil && *user.FName != "" {
+		isPersonalInfo = 1
+	}
+
+	// 6) login_medium = manual
+	if err := s.userRepo.SetLoginMedium(ctx, user.ID, "manual"); err != nil {
+		return "failed to update login medium", nil, http.StatusInternalServerError, err
+	}
+
+	// 7) Token only when personal info exists (same as your PHP)
+	var token *string
+	if isPersonalInfo == 1 {
+		tk, tkErr := helpers.CreateUserAuthToken(*user) // you said you already have this
+		if tkErr != nil {
+			return "failed to create token", nil, http.StatusInternalServerError, tkErr
+		}
+		token = &tk
+
+		// 8) merge guest cart if guest_id provided
+		if req.GuestID != nil && *req.GuestID != "" && s.cartService != nil {
+			// if merge fails you can decide:
+			// - either fail login
+			// - or ignore and still login
+			if err := s.cartService.MergeGuestCart(ctx, user.ID, *req.GuestID); err != nil {
+				// I recommend: don't block login, but log error
+				// return "failed to merge guest cart", nil, http.StatusInternalServerError, err
+			}
+		}
+	}
+
+	// 9) response payload (matches your PHP response)
+	var email *string
+	if user.Email != nil && *user.Email != "" {
+		email = user.Email
+	}
+
+	resp := types.UserLoginResponse{
+		Token:           token,
+		IsPhoneVerified: 1,
+		IsEmailVerified: 1,
+		IsPersonalInfo:  isPersonalInfo,
+		IsExistUser:     nil,
+		LoginType:       "manual",
+		Email:           email,
+	}
+
+	return "login successful", resp, http.StatusOK, nil
+}
