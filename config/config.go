@@ -83,10 +83,10 @@ func LoadConfig() *Config {
 		FROM:                  os.Getenv("TWILIO_FROM"),
 
 		// Zoho SMTP configuration 
-		SMTPUser: 	  os.Getenv("SMTPUser"),
-		SMTPPass: 	  os.Getenv("SMTPPass"),
-		SMTPHost:    os.Getenv("SMTPHost"),
-		SMTPPort:    os.Getenv("SMTPPort"),
+		SMTPUser: 	  os.Getenv("SMTP_USER"),
+		SMTPPass: 	  os.Getenv("SMTP_PASSWORD"),
+		SMTPHost:    os.Getenv("SMTP_HOST"),
+		SMTPPort:    os.Getenv("SMTP_PORT"),
 
 		// Auth Token (JWT)
 		AdminAuthSecret: os.Getenv("ADMIN_JWT_SECRET"),
