@@ -71,6 +71,8 @@ WORKDIR /app
 RUN apk add --no-cache ca-certificates
 
 COPY --from=builder /app/server /app/server
+COPY --from=builder /app/templates /app/templates
+COPY --from=builder /app/static /app/static
 
 EXPOSE 8023
 CMD ["/app/server"]

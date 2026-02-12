@@ -11,6 +11,8 @@ services:
       - .env
     expose:
       - "8023"
+    # ports:
+    #   - "8023:8023"
     networks:
       - appnet
 
