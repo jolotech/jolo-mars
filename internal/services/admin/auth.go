@@ -39,6 +39,23 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 		return "invalid credentials", nil, http.StatusUnauthorized, errors.New("invalid credentials")
 	}
 
+	if admin.TwoFAEnabled {
+	// twoFAToken, err := s.createAdmin2FAToken(admin.ID) // short lived
+	    setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "pwd_change", admin.ID)
+        if err != nil {
+			return "failed to create token", nil, http.StatusInternalServerError, err
+		}
+		data := types.AdminLoginResponse{
+		    Requires2FA: true,
+		    TwoFAToken:  setupToken,
+	    }
+	    return "2FA required", data, 200, nil
+	}
+
+	if !admin.TwoFAEnabled{
+		return "2FA not setup", nil, http.StatusForbidden, errors.New("2FA not setup")
+	}
+
 	// Must change password first
 	if admin.MustChangePassword {
 		setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "pwd_change", admin.ID)
