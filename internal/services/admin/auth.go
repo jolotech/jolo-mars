@@ -39,7 +39,7 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 		return "invalid credentials", nil, http.StatusUnauthorized, errors.New("invalid credentials")
 	}
 
-	setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2fa", admin.PublicID)
+	setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2FA", admin.PublicID)
 
 	data := types.AdminLoginResponse{
 		    Requires2FA: true,
