@@ -191,7 +191,7 @@ func (s *UserAuthService) VerifyOTP(req types.VerifyOTPRequest) (string, any, in
 	}
 
 	// ================= TOKEN =================
-	token, _ := utils.GenerateAuthToken(user.Email, user.ID)
+	token, _ := utils.GenerateAuthToken(user.Email, user.PublicID)
 
 	if !user.Status {
 		email.SendEmail(nil, user).Welcome()
@@ -449,7 +449,7 @@ func (s *UserAuthService) Login(req types.UserLoginRequest) (string, any, int, e
 
 
 	// 7) Token only when personal info exists 
-		token, tkErr := utils.GenerateAuthToken(user.Email, user.ID)
+		token, tkErr := utils.GenerateAuthToken(user.Email, user.PublicID)
 		if tkErr != nil {
 			return "login error", nil, http.StatusInternalServerError, tkErr
 		}

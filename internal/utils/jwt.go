@@ -15,13 +15,13 @@ type UserClaims struct {
 }
 
 type AdminClaims struct {
-	AdminID uint   `json:"admin_id"`
+	AdminID string   `json:"admin_id"`
 	Email   string `json:"email"`
 	Purpose string `json:"purpose"` // "access" or "pwd_change"
 	jwt.RegisteredClaims
 }
 
-func GenerateAuthToken(email string, userID uint) (string, error) {
+func GenerateAuthToken(email string, userId string) (string, error) {
 	cfg := config.LoadConfig()
 
 	expiry, err := time.ParseDuration(cfg.AuthExpIn)
@@ -31,7 +31,7 @@ func GenerateAuthToken(email string, userID uint) (string, error) {
 
 	claims := jwt.MapClaims{
 		"email": email,
-		"user_id": userID,
+		"user_id": userId,
 		"exp":   time.Now().Add(expiry).Unix(),
 		"iat":   time.Now().Unix(),
 	}
@@ -82,11 +82,11 @@ func GenerateAdminAuthToken(email, purpose string, adminID uint) (string, error)
 }
 
 
-func SignAdminToken(secret string, adminID uint, email string, purpose string, ttl time.Duration) (string, error) {
+func SignAdminToken(secret string, adminId, email, purpose string, ttl time.Duration) (string, error) {
 	now := time.Now()
 	
 	claims := AdminClaims{
-		AdminID: adminID,
+		AdminID: adminId,
 		Email:   email,
 		Purpose: purpose,
 		RegisteredClaims: jwt.RegisteredClaims{
