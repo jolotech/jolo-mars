@@ -25,10 +25,14 @@ func AdminRoutes(
 			auth := public.Group("/auth")
 			{
 				auth.POST("/login", authHandler.Login)
-				auth.POST("/setup-2fa", authHandler.Setup2FA)
+
+				twoFa := auth.Group("/2fa")
 				auth.Use(middlewares.AdminAuthMiddleware())
-				auth.Use(middlewares.RequireAdminTokenPurpose("2fa"))
-				auth.POST("/confirm-2fa", authHandler.Confirm2FA)
+				{
+					twoFa.POST("/setup", authHandler.Setup2FA)
+				    auth.Use(middlewares.RequireAdminTokenPurpose("2FA"))
+				    auth.POST("/confirm", authHandler.Confirm2FA)
+				}
 			}
 
 			dash := public.Group("/dash")
