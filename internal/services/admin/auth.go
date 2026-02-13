@@ -100,11 +100,12 @@ func (s *AdminAuthService) Setup2FA(adminID uint) (string, any, int, error) {
 	return "2fa setup successful", types.AdminTwoFASetupResponse{OtpAuthURL: key.URL()}, http.StatusOK, nil
 }
 
-func (s *AdminAuthService) Confirm2FA(string, adminID uint, code string) (string, any, int, error) {
-	admin, err := s.adminAuthRepo.GetByID(adminID)
-	if err != nil {
+func (s *AdminAuthService) Confirm2FA(adminId, code string) (string, any, int, error) {
+	admin, err := s.adminAuthRepo.GetByPublicID(adminId)
+	if err != nil || admin == nil{
 		return "failed", nil, http.StatusInternalServerError, err
 	}
+	
 	if admin.TwoFASecretEnc == "" {
 		return "2fa not initialized", nil, http.StatusForbidden, errors.New("2fa not initialized")
 	}

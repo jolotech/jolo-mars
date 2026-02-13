@@ -36,7 +36,20 @@ func (h *AdminAuthHandler) Login(c *gin.Context) {
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
 
+func (h *AdminAuthHandler) Setup2FA(c *gin.Context) {
+	adminID := c.GetString("admin_id") // set this in your admin auth middleware
+
+	msg, data, statusCode, err := h.AdminAuthService.Setup2FA(adminID)
+	if err != nil {
+		helpers.ErrorResponse(c, err, msg, statusCode)
+		return
+	}
+	helpers.SuccessResponse(c, data, msg, statusCode)
+}
+
+
 func (h *AdminAuthHandler) Confirm2FA(c *gin.Context) {
+	adminID := c.GetString("admin_id")
 
 	var req types.AdminTwoFAConfirmRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -45,7 +58,7 @@ func (h *AdminAuthHandler) Confirm2FA(c *gin.Context) {
 		return
 	}
 
-	msg, data, statusCode, err := h.AdminAuthService.Confirm2FA(req)
+	msg, data, statusCode, err := h.AdminAuthService.Confirm2FA(adminID, req.Code)
 	
 	if err != nil {
 		helpers.ErrorResponse(c, err, msg, statusCode)

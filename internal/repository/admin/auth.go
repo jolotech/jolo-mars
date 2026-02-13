@@ -50,6 +50,15 @@ func (r *AdminAuthRepo) GetByEmail(email string) (*models.Admin, error) {
 	return &a, err
 }
 
+func (r *AdminAuthRepo) GetByPublicID(id string) (*models.Admin, error) {
+	var a models.Admin
+	err := r.db.Where("public_id = ?", id).First(&a).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &a, err
+}
+
 func (r *AdminAuthRepo) GetByID(id uint) (*models.Admin, error) {
 	var a models.Admin
 	if err := r.db.First(&a, id).Error; err != nil {
