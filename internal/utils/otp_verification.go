@@ -7,6 +7,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/totp"
 )
 
 func GenerateOTP() string {
@@ -76,3 +79,27 @@ func CanResendOTP(updatedAt time.Time) (bool, int) {
 	}
 	return true, 0
 }
+
+
+// Generate a new TOTP key (issuer + account)
+func GenerateTOTPKey(issuer, accountName string) (*otp.Key, error) {
+	return totp.Generate(totp.GenerateOpts{
+		Issuer:      issuer,
+		AccountName: accountName, // usually email
+		Period:      30,
+		SecretSize:  20,
+		Digits:      otp.DigitsSix,
+		Algorithm:   otp.AlgorithmSHA1,
+	})
+}
+
+
+// func VerifyTOTP(code, secret string) bool {
+// 	// Allow +/- 1 step for clock drift
+// 	return totp.ValidateCustom(code, secret, time.Now(), totp.ValidateOpts{
+// 		Period:    30,
+// 		Skew:      1,
+// 		Digits:    otp.DigitsSix,
+// 		Algorithm: otp.AlgorithmSHA1,
+// 	})
+// }
