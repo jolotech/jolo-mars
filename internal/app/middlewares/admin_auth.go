@@ -60,16 +60,15 @@ func AdminAuthMiddleware() gin.HandlerFunc {
 		email, _ := claims["email"].(string)
 		purpose, _ := claims["purpose"].(string)
 
-		adminIDFloat, ok := claims["admin_id"].(float64)
+		adminId, ok := claims["admin_id"].(string)
 		if !ok || email == "" {
 			helpers.ErrorResponse(c, nil, "Invalid token payload", http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
-		adminID := uint(adminIDFloat)
 
 		c.Set("adminEmail", email)
-		c.Set("adminId", adminID)
+		c.Set("adminId", adminId)
 		c.Set("adminPurpose", purpose)
 
 		c.Next()
