@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -18,9 +19,49 @@ func GenerateOTP() string {
 }
 
 
+// func OTPWaitError(wait int) string {
+// 	return "Please try again after " + strconv.Itoa(wait) + " seconds"
+// }
+
 func OTPWaitError(wait int) string {
-	return "Please try again after " + strconv.Itoa(wait) + " seconds"
+	if wait <= 0 {
+		return "Please try again shortly"
+	}
+
+	hours := wait / 3600
+	minutes := (wait % 3600) / 60
+	seconds := wait % 60
+
+	var parts []string
+
+	if hours > 0 {
+		if hours == 1 {
+			parts = append(parts, "1 hour")
+		} else {
+			parts = append(parts, strconv.Itoa(hours)+" hours")
+		}
+	}
+
+	if minutes > 0 {
+		if minutes == 1 {
+			parts = append(parts, "1 minute")
+		} else {
+			parts = append(parts, strconv.Itoa(minutes)+" minutes")
+		}
+	}
+
+	if seconds > 0 && hours == 0 { 
+		// Only show seconds if less than 1 hour
+		if seconds == 1 {
+			parts = append(parts, "1 second")
+		} else {
+			parts = append(parts, strconv.Itoa(seconds)+" seconds")
+		}
+	}
+
+	return "Please try again after " + strings.Join(parts, " ")
 }
+
 
 
 func IsOTPExpired(updatedAt time.Time) bool {
