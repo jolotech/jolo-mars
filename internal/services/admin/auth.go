@@ -41,15 +41,17 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 
 	setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2fa", admin.PublicID)
 
+	data := types.AdminLoginResponse{
+		    Requires2FA: true,
+	        Requires2FAMessage: "2FA is required for this account",
+		    TwoFAToken:  setupToken,
+	    }
+
 	if admin.TwoFAEnabled {
 	// twoFAToken, err := s.createAdmin2FAToken(admin.ID) // short lived
         if err != nil {
 			return "failed to create token", nil, http.StatusInternalServerError, err
 		}
-		data := types.AdminLoginResponse{
-		    Requires2FA: true,
-		    TwoFAToken:  setupToken,
-	    }
 	    return "2FA required", data, 200, nil
 	}
 
