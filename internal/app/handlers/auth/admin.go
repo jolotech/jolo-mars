@@ -37,7 +37,7 @@ func (h *AdminAuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AdminAuthHandler) Setup2FA(c *gin.Context) {
-	adminID := c.GetString("admin_id") // set this in your admin auth middleware
+	adminID := c.GetString("adminid") // set this in your admin auth middleware
 
 	msg, data, statusCode, err := h.AdminAuthService.Setup2FA(adminID)
 	if err != nil {
@@ -49,7 +49,7 @@ func (h *AdminAuthHandler) Setup2FA(c *gin.Context) {
 
 
 func (h *AdminAuthHandler) Confirm2FA(c *gin.Context) {
-	adminID := c.GetString("admin_id")
+	adminID := c.GetString("adminid")
 
 	var req types.AdminTwoFAConfirmRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
