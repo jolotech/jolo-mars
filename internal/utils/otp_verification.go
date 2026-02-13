@@ -82,7 +82,7 @@ func CanResendOTP(updatedAt time.Time) (bool, int) {
 
 
 // Generate a new TOTP key (issuer + account)
-func GenerateTOTPKey(issuer, accountName string) (*otp.Key, error) {
+func Generate2faTOTPKey(issuer, accountName string) (*otp.Key, error) {
 	return totp.Generate(totp.GenerateOpts{
 		Issuer:      issuer,
 		AccountName: accountName, // usually email
@@ -94,7 +94,7 @@ func GenerateTOTPKey(issuer, accountName string) (*otp.Key, error) {
 }
 
 
-// func VerifyTOTP(code, secret string) bool {
+// func Verify2faTOTP(code, secret string) bool {
 // 	// Allow +/- 1 step for clock drift
 // 	return totp.ValidateCustom(code, secret, time.Now(), totp.ValidateOpts{
 // 		Period:    30,
