@@ -94,12 +94,16 @@ func Generate2faTOTPKey(issuer, accountName string) (*otp.Key, error) {
 }
 
 
-// func Verify2faTOTP(code, secret string) bool {
-// 	// Allow +/- 1 step for clock drift
-// 	return totp.ValidateCustom(code, secret, time.Now(), totp.ValidateOpts{
-// 		Period:    30,
-// 		Skew:      1,
-// 		Digits:    otp.DigitsSix,
-// 		Algorithm: otp.AlgorithmSHA1,
-// 	})
-// }
+func Verify2faTOTP(code, secret string) bool {
+	// Allow +/- 1 step for clock drift
+	valid, err := totp.ValidateCustom(code, secret, time.Now(), totp.ValidateOpts{
+		Period:    30,
+		Skew:      1,
+		Digits:    otp.DigitsSix,
+		Algorithm: otp.AlgorithmSHA1,
+	})
+	if err != nil {
+		return false
+	}
+	return valid
+}
