@@ -36,6 +36,25 @@ func (h *AdminAuthHandler) Login(c *gin.Context) {
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
 
+func (h *AdminAuthHandler) Confirm2FA(c *gin.Context) {
+
+	var req types.AdminTwoFAConfirmRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		msg := validations.HandleValidationError(err)
+		helpers.ErrorResponse(c, err, msg, http.StatusBadRequest)
+		return
+	}
+
+	msg, data, statusCode, err := h.AdminAuthService.Confirm2FA(req)
+	
+	if err != nil {
+		helpers.ErrorResponse(c, err, msg, statusCode)
+		return
+	}
+
+	helpers.SuccessResponse(c, data, msg, statusCode)
+}
+
 
 
 func (h *AdminAuthHandler) ChangePassword(c *gin.Context) {
