@@ -2,6 +2,7 @@ package admin_repository
 
 import (
 	"errors"
+	"time"
 
 	"github.com/jolotech/jolo-mars/internal/models"
 	"gorm.io/gorm"
@@ -47,4 +48,32 @@ func (r *AdminAuthRepo) GetByEmail(email string) (*models.Admin, error) {
 		return nil, nil
 	}
 	return &a, err
+}
+
+func (r *AdminAuthRepo) GetByID(id uint) (*models.Admin, error) {
+	var a models.Admin
+	if err := r.db.First(&a, id).Error; err != nil {
+		return nil, err
+	}
+	return &a, nil
+}
+
+func (r *AdminAuthRepo) Save2FASecret(id uint, encSecret string) error {
+	return r.db.Model(&models.Admin{}).
+		Where("id = ?", id).
+		Updates(map[string]any{
+			"two_fa_secret_enc":   encSecret,
+			"two_fa_enabled":      false,
+			"two_fa_confirmed_at": nil,
+		}).Error
+}
+
+func (r *AdminAuthRepo) Enable2FA(id uint) error {
+	now := time.Now()
+	return r.db.Model(&models.Admin{}).
+		Where("id = ?", id).
+		Updates(map[string]any{
+			"two_fa_enabled":      true,
+			"two_fa_confirmed_at": &now,
+		}).Error
 }

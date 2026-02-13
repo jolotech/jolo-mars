@@ -97,6 +97,31 @@ func (s *AdminAuthService) Setup2FA(adminID uint) (types.AdminTwoFASetupResponse
 
 	return types.AdminTwoFASetupResponse{OtpAuthURL: key.URL()}, nil
 }
+
+func (s *AdminAuthService) Confirm2FA(adminID uint, code string) error {
+	admin, err := s.adminAuthRepo.GetByID(adminID)
+	if err != nil {
+		return err
+	}
+	if admin.TwoFASecretEnc == "" {
+		return errors.New("2fa not initialized")
+	}
+
+	encKeyB64 := os.Getenv("TWO_FA_ENC_KEY")
+	encKey, _ := base64.StdEncoding.DecodeString(encKeyB64)
+
+	secret, err := utils.DecryptString(admin.TwoFASecretEnc, encKey)
+	if err != nil {
+		return errors.New("failed to decrypt 2fa secret")
+	}
+
+	if !utils.VerifyTOTP(code, secret) {
+		return errors.New("invalid 2fa code")
+	}
+
+	return s.adminAuthRepo.Enable2FA(admin.ID)
+}
+
 // Uses SetupToken from Authorization: Bearer <token>
 func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) (string, any, int, error) {
 
