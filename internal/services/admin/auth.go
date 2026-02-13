@@ -57,23 +57,12 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 	}
 
 	// Normal access token
-	accessToken, err := utils.GenerateAdminAuthToken(admin.Email, "access", admin.ID)
-	if err != nil {
-		return "failed to create token", nil, http.StatusInternalServerError, err
-	}
-
-	data := types.AdminLoginResponse{
-		AccessToken:            accessToken,
-		PasswordChangeRequired: false,
-		Admin: admin,
-	}
-
-	return "login successful", data, http.StatusOK, nil
+	return "account malfunction", nil, http.StatusBadRequest, errors.New("bad or Admin account malfunction")
 }
 
-func (s *AdminAuthService) Setup2FA(adminID uint) (string, any, int, error) {
-	admin, err := s.adminAuthRepo.GetByID(adminID)
-	if err != nil {
+func (s *AdminAuthService) Setup2FA(adminId string) (string, any, int, error) {
+	admin, err := s.adminAuthRepo.GetByPublicID(adminId)
+	if err != nil || admin == nil {
 		return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
 	}
 
@@ -105,7 +94,7 @@ func (s *AdminAuthService) Confirm2FA(adminId, code string) (string, any, int, e
 	if err != nil || admin == nil{
 		return "failed", nil, http.StatusInternalServerError, err
 	}
-	
+
 	if admin.TwoFASecretEnc == "" {
 		return "2fa not initialized", nil, http.StatusForbidden, errors.New("2fa not initialized")
 	}
