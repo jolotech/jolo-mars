@@ -41,7 +41,7 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 
 	if admin.TwoFAEnabled {
 	// twoFAToken, err := s.createAdmin2FAToken(admin.ID) // short lived
-	    setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2fa", admin.ID)
+	    setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2fa", admin.PublicID)
         if err != nil {
 			return "failed to create token", nil, http.StatusInternalServerError, err
 		}
@@ -117,7 +117,7 @@ func (s *AdminAuthService) Confirm2FA(adminId, code string) (string, any, int, e
 
 	// Must change password first
 	if admin.MustChangePassword {
-		setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "pwd_change", admin.ID)
+		setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "pwd_change", admin.PublicID)
 		if err != nil {
 			return "failed to create token", nil, http.StatusInternalServerError, err
 		}
@@ -131,7 +131,7 @@ func (s *AdminAuthService) Confirm2FA(adminId, code string) (string, any, int, e
 	}
 
 	// Normal access token
-	accessToken, err := utils.GenerateAdminAuthToken(admin.Email, "access", admin.ID)
+	accessToken, err := utils.GenerateAdminAuthToken(admin.Email, "access", admin.PublicID)
 	if err != nil {
 		return "failed to create token", nil, http.StatusInternalServerError, err
 	}
@@ -179,7 +179,7 @@ func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) 
 	}
 
 	// issue access token immediately after change
-	accessToken, err := utils.GenerateAdminAuthToken(admin.Email, "access", admin.ID)
+	accessToken, err := utils.GenerateAdminAuthToken(admin.Email, "access", admin.PublicID)
 	if err != nil {
 		return "password updated but access granted failed", nil, http.StatusInternalServerError, err
 	}
