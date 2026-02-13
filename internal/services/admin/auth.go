@@ -4,6 +4,12 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"encoding/base64"
+	"os"
+
+	// "github.com/jolotech/jolo-mars/internal/repository"
+	// "github.com/jolotech/jolo-mars/internal/utils"
+	// "github.com/jolotech/jolo-mars/types"
 
 	"github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/utils"
@@ -63,6 +69,34 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 	return "login successful", data, http.StatusOK, nil
 }
 
+func (s *AdminAuthService) Setup2FA(adminID uint) (types.AdminTwoFASetupResponse, error) {
+	admin, err := s.adminAuthRepo.GetByID(adminID)
+	if err != nil {
+		return types.AdminTwoFASetupResponse{}, err
+	}
+
+	key, err := utils.Generate2faTOTPKey("Jolo Admin", admin.Email)
+	if err != nil {
+		return types.AdminTwoFASetupResponse{}, err
+	}
+
+	encKeyB64 := os.Getenv("TWO_FA_ENC_KEY")
+	encKey, err := base64.StdEncoding.DecodeString(encKeyB64)
+	if err != nil || len(encKey) != 32 {
+		return types.AdminTwoFASetupResponse{}, errors.New("invalid TWO_FA_ENC_KEY (must be base64 of 32 bytes)")
+	}
+
+	encSecret, err := utils.EncryptString(key.Secret(), encKey)
+	if err != nil {
+		return types.AdminTwoFASetupResponse{}, err
+	}
+
+	if err := s.adminAuthRepo.Save2FASecret(admin.ID, encSecret); err != nil {
+		return types.AdminTwoFASetupResponse{}, err
+	}
+
+	return types.AdminTwoFASetupResponse{OtpAuthURL: key.URL()}, nil
+}
 // Uses SetupToken from Authorization: Bearer <token>
 func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) (string, any, int, error) {
 
