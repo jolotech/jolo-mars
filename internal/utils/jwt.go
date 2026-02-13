@@ -41,7 +41,7 @@ func GenerateAuthToken(email string, userId string) (string, error) {
 	return token.SignedString([]byte(cfg.AuthSecret))
 }
 
-func GenerateAdminAuthToken(email, purpose string, adminID uint) (string, error) {
+func GenerateAdminAuthToken(email, purpose, adminId string) (string, error) {
 	cfg := config.LoadConfig()
 
 	expiry := 24 * time.Hour
@@ -71,7 +71,7 @@ func GenerateAdminAuthToken(email, purpose string, adminID uint) (string, error)
 
 	claims := jwt.MapClaims{
 		"email":    email,
-		"admin_id": adminID,
+		"admin_id": adminId,
 		"purpose":  purpose,
 		"exp":      now.Add(expiry).Unix(),
 		"iat":      now.Unix(),
