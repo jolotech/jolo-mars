@@ -55,13 +55,12 @@ func UserAuthMiddleware() gin.HandlerFunc {
 		}
 
 		email, ok := claims["email"].(string)
-		userIdFloat, ok := claims["user_id"].(float64)
+		userId, ok := claims["user_id"].(string)
 		if !ok || email == "" {
 			helpers.ErrorResponse(c, nil, "Invalid token payload", http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
-		userId := uint(userIdFloat)
 
 		// pass email/userId forward
 		c.Set("userEmail", email)
