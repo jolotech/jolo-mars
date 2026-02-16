@@ -38,6 +38,7 @@ func OTPWaitError(wait int) string {
 	var parts []string
 
 	if hours > 0 {
+		
 		if hours == 1 {
 			parts = append(parts, "1 hour")
 		} else {
