@@ -50,7 +50,6 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 	    }
 
 	if admin.TwoFAEnabled {
-	// twoFAToken, err := s.createAdmin2FAToken(admin.ID) // short lived
         if err != nil {
 			return "failed to create token", nil, http.StatusInternalServerError, err
 		}
