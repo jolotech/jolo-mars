@@ -10,7 +10,7 @@ import (
 
 const referralCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-// PUBLIC FUNCTION — call this
+// PUBLIC FUNCTION — call this to generate a unique referral code
 func GenerateRefererCode(db *gorm.DB) (string) {
 	for {
 		code, err := generateUniqueReferralCode()
