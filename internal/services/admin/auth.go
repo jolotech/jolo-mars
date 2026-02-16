@@ -151,7 +151,6 @@ func (s *AdminAuthService) Confirm2FA(adminId, code string) (string, any, int, e
 	return "login successful", data, http.StatusOK, nil
 }
 
-// Uses SetupToken from Authorization: Bearer <token>
 func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) (string, any, int, error) {
 
 	admin, err := s.adminAuthRepo.GetByEmail(req.Email)
