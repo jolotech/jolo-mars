@@ -1,10 +1,7 @@
 package main
 
 import (
-	// "context"
-	// "log"
-	// "fmt"
-	// "os"
+	
 
 	"github.com/joho/godotenv"
 	"github.com/jolotech/jolo-mars/config"
@@ -13,14 +10,6 @@ import (
 	"github.com/jolotech/jolo-mars/internal/infrastructure/jobs"
 	"github.com/jolotech/jolo-mars/internal/app/dependencies"
 
-	// redisInfra "github.com/jolotech/Logistic-gateway/internal/infrastructure/redis"
-	// "github.com/jolotech/jolo-mars/internal/infrastructure/redis"
-	// "github.com/jolotech/Logistic-gateway/internal/repository"
-	// "github.com/jolotech/Logistic-gateway/internal/queue"
-	// "github.com/jolotech/Logistic-gateway/internal/service"
-	// "github.com/jolotech/Logistic-gateway/internal/worker"
-	// "github.com/jolotech/jolo-mars/internal/app/dependencies"
-	// "github.com/robfig/cron/v3"
 )
 
 func main() {
