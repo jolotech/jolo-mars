@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: JOLO_DELIVERY_STAGING
+    container_name: JOLO_STAGING
     restart: always
     env_file:
       - .env
