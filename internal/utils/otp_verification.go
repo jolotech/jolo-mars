@@ -82,10 +82,10 @@ func CanResendOTP(updatedAt time.Time) (bool, int) {
 
 
 // Generate a new TOTP key (issuer + account)
-func Generate2faTOTPKey(issuer, accountName string) (*otp.Key, error) {
+func Generate2faTOTPKey(issuer, email string) (*otp.Key, error) {
 	return totp.Generate(totp.GenerateOpts{
 		Issuer:      issuer,
-		AccountName: accountName, // usually email
+		Email: email, // usually email
 		Period:      30,
 		SecretSize:  20,
 		Digits:      otp.DigitsSix,
