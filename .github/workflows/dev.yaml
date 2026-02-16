@@ -36,25 +36,11 @@ jobs:
           echo "✅ Secrets loaded correctly!"
 
       # Test SSH Connection
-      # - name: Test SSH Connection
-      #   run: |
-      #     ssh -i private_key -o StrictHostKeyChecking=no \
-      #       ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} \
-      #       "echo '✅ SSH connection successful!'"
-
-     
       - name: Test SSH Connection
-        shell: bash
         run: |
-          set -euo pipefail
-          USER="${{ secrets.STAGING_USER }}"
-          HOST="${{ secrets.STAGING_HOST }}"
-          PORT="${{ secrets.STAGING_PORT }}"
-          [[ -n "${PORT// }" ]] || PORT="22"
-
-          ssh -p "$PORT" -i private_key -o StrictHostKeyChecking=no \
-            "$USER@$HOST" \
-            "echo '✅ SSH connection successful!' && whoami && hostname" 
+          ssh -i private_key -o StrictHostKeyChecking=no \
+            ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} \
+            "echo '✅ SSH connection successful!'"
 
       # Deploy Application
       - name: Deploy Application
