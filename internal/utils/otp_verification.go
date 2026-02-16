@@ -38,7 +38,7 @@ func OTPWaitError(wait int) string {
 	var parts []string
 
 	if hours > 0 {
-		
+
 		if hours == 1 {
 			parts = append(parts, "1 hour")
 		} else {
@@ -86,7 +86,7 @@ func CanResendOTP(updatedAt time.Time) (bool, int) {
 func Generate2faTOTPKey(issuer, email string) (*otp.Key, error) {
 	return totp.Generate(totp.GenerateOpts{
 		Issuer:      issuer,
-		Email: email, // usually email
+		AccountName: email, // usually email
 		Period:      30,
 		SecretSize:  20,
 		Digits:      otp.DigitsSix,
