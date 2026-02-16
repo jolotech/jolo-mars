@@ -18,14 +18,12 @@ type AdminLoginResponse struct {
 	Requires2FAMessage string `json:"requires_2fa_message,omitempty"`
 	TwoFAToken  string `json:"two_fa_token,omitempty"`
 	PasswordChangeRequired bool   `json:"password_change_required"`
-	SetupToken             string `json:"setup_token,omitempty"` // used only for forced password change
+	SetupToken             string `json:"setup_token,omitempty"`
 	Admin                  any    `json:"admin,omitempty"`
 }
 
 type AdminTwoFASetupResponse struct {
 	OtpAuthURL string `json:"otpauth_url"`
-	// If you want, frontend can generate QR.
-	// Or you can return QRBase64 too.
 }
 
 type AdminTwoFAConfirmRequest struct {
