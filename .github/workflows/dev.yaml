@@ -1,3 +1,87 @@
+# name: Deploy to Digital Ocean
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+
+#       # Checkout Code
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       # Setup SSH Key
+#       - name: Setup SSH Key
+#         run: |
+#           echo "${{ secrets.STAGING_KEY }}" | base64 --decode > private_key
+#           chmod 600 private_key
+#           eval "$(ssh-agent -s)"
+#           ssh-add private_key
+
+#       # Verify Secrets
+#       - name: Verify Secrets
+#         run: |
+#           echo "🔍 Checking environment secrets..."
+#           if [ -z "${{ secrets.STAGING_USER }}" ] || [ -z "${{ secrets.STAGING_HOST }}" ]; then
+#             echo "❌ Missing one or more required secrets!"
+#             exit 1
+#           fi
+#           echo "✅ Secrets loaded correctly!"
+
+#       # Test SSH Connection
+#       - name: Test SSH Connection
+#         run: |
+#           ssh -i private_key -o StrictHostKeyChecking=no \
+#             ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} \
+#             "echo '✅ SSH connection successful!'"
+
+#       # Deploy Application
+#       - name: Deploy Application
+#         run: |
+#           ssh -i private_key -o ServerAliveInterval=60 -o StrictHostKeyChecking=no \
+#             ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} << 'EOF'
+#           set -e
+#           APP_DIR="${{ secrets.APP_DIR }}"
+#           cd $APP_DIR || { echo "❌ Directory not found: $APP_DIR"; exit 1; }
+
+#           mkdir -p ~/.ssh
+#           ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+#           echo "🔄 Pulling latest changes..."
+#           git fetch --all --prune && git reset --hard origin/main
+
+#           echo "🔧 Updating environment variables..."
+#           echo "${{ secrets.STAGING_ENV }}" | tr -d '\r' > .env
+#           echo "✅ Environment updated."
+
+#           echo "🧹 Optional Docker cleanup..."
+#           docker container prune -f || true
+#           docker image prune -af || true
+#           docker builder prune -af || true
+#           docker volume prune -f || true
+
+#           echo "🚀 Rebuilding & restarting containers..."
+#           docker compose down
+#           docker compose up --build -d
+
+#           echo "✅ Deployment completed successfully!"
+#           EOF
+
+
+#       # Cleanup
+#       - name: Cleanup
+#         run: rm -f private_key
+
+
+
+
 name: Deploy to Digital Ocean
 
 on:
@@ -10,71 +94,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      # Checkout Code
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Setup SSH Key
       - name: Setup SSH Key
         run: |
           echo "${{ secrets.STAGING_KEY }}" | base64 --decode > private_key
           chmod 600 private_key
-          eval "$(ssh-agent -s)"
-          ssh-add private_key
 
-      # Verify Secrets
-      - name: Verify Secrets
-        run: |
-          echo "🔍 Checking environment secrets..."
-          if [ -z "${{ secrets.STAGING_USER }}" ] || [ -z "${{ secrets.STAGING_HOST }}" ]; then
-            echo "❌ Missing one or more required secrets!"
-            exit 1
-          fi
-          echo "✅ Secrets loaded correctly!"
-
-      # Test SSH Connection
       - name: Test SSH Connection
         run: |
           ssh -i private_key -o StrictHostKeyChecking=no \
             ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} \
-            "echo '✅ SSH connection successful!'"
+            "echo '✅ SSH connection successful!' && whoami && hostname"
 
-      # Deploy Application
       - name: Deploy Application
         run: |
           ssh -i private_key -o ServerAliveInterval=60 -o StrictHostKeyChecking=no \
             ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} << 'EOF'
-          set -e
-          APP_DIR="${{ secrets.APP_DIR }}"
-          cd $APP_DIR || { echo "❌ Directory not found: $APP_DIR"; exit 1; }
+          set -euo pipefail
 
-          mkdir -p ~/.ssh
-          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+          APP_DIR="${{ secrets.APP_DIR }}"
+          echo "📁 APP_DIR=$APP_DIR"
+          cd "$APP_DIR" || { echo "❌ Directory not found: $APP_DIR"; exit 1; }
 
           echo "🔄 Pulling latest changes..."
-          git fetch --all --prune && git reset --hard origin/main
+          git fetch --all --prune
+          git reset --hard origin/main
+          git clean -fd
 
-          echo "🔧 Updating environment variables..."
-          echo "${{ secrets.STAGING_ENV }}" | tr -d '\r' > .env
-          echo "✅ Environment updated."
+          echo "🔧 Writing .env (safe)..."
+          cat > .env << 'ENVEOF'${{ secrets.STAGING_ENV }}
+          ENVEOF
+          tr -d '\r' < .env > .env.tmp && mv .env.tmp .env
+          chmod 600 .env
 
-          echo "🧹 Optional Docker cleanup..."
-          docker container prune -f || true
-          docker image prune -af || true
-          docker builder prune -af || true
-          docker volume prune -f || true
+          echo "🔎 Sanity check:"
+          ls -la .env docker-compose.yml
 
           echo "🚀 Rebuilding & restarting containers..."
-          docker compose down
+          docker compose down --remove-orphans
           docker compose up --build -d
 
-          echo "✅ Deployment completed successfully!"
+          echo "✅ Running containers:"
+          docker ps
           EOF
 
-
-      # Cleanup
       - name: Cleanup
         run: rm -f private_key
