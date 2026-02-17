@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 	// "strings"
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jolotech/jolo-mars/internal/helpers"
