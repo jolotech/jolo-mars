@@ -34,3 +34,7 @@ type AdminLogin2FARequest struct {
 	TwoFAToken string `json:"two_fa_token" binding:"required"`
 	Code       string `json:"code" binding:"required,len=6,numeric"`
 }
+
+type DeleteAdminByEmailRequest struct {
+	Email string `json:"email" binding:"required,email"`
+}
