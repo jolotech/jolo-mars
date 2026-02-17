@@ -94,6 +94,7 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 			Requires2FA:        true,
 			Requires2FAMessage: "2FA is required for this account",
 			TwoFAToken:         twoFAToken,
+			PasswordChangeRequired: admin.MustChangePassword,
 		}
 
 		return "2FA required", data, http.StatusOK, nil
@@ -109,6 +110,7 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 		Requires2FA:        true,
 		Requires2FAMessage: "2FA not setup for this account, please setup 2FA to secure your account",
 		SetupToken:         setupToken,
+		PasswordChangeRequired: admin.MustChangePassword,
 	}
 
 	return "2FA not setup. Please use setup endpoint", data, http.StatusOK, nil
