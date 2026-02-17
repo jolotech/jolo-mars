@@ -109,7 +109,7 @@ func (h *AdminAuthHandler) DeleteAdmin(c *gin.Context) {
 		return
 	}
 
-	msg, data, statusCode, err := h.AdminAuthService.Login(req)
+	msg, data, statusCode, err := h.AdminAuthService.DeleteAdminByEmail(req)
 	if err != nil {
 		helpers.ErrorResponse(c, err, msg, statusCode)
 		return
