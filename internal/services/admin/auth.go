@@ -59,7 +59,7 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 	data.Requires2FAMessage = "2FA not setup for this account, please setup 2FA to secure your account"
 
 	if !admin.TwoFAEnabled{
-		return "2FA not setup Please use the setup 2fa endpoint", data, http.StatusForbidden, errors.New("2FA not setup")
+		return "2FA not setup Please use the setup 2fa endpoint", data, http.StatusFound, nil
 	}
 
 	// Normal access token
