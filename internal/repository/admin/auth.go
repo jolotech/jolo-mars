@@ -67,18 +67,39 @@ func (r *AdminAuthRepo) GetByID(id uint) (*models.Admin, error) {
 	return &a, nil
 }
 
-func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
-	var a models.Admin
+// func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
+// 	var a models.Admin
 
-	err := r.db.Where("email = ?", email).
-		Delete(&models.Admin{}).Error 
+// 	err := r.db.Where("email = ?", email).
+// 		Delete(&models.Admin{}).Error 
 		
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, nil
+// 	if errors.Is(err, gorm.ErrRecordNotFound) {
+// 		return nil, nil
+// 	}
+
+// 	return &a, nil
+// }
+
+
+func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
+	var admin models.Admin
+
+	// find the admin
+	if err := r.db.Where("email = ?", email).First(&admin).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
 	}
 
-	return &a, nil
+	// Then delete the admin
+	if err := r.db.Delete(&admin).Error; err != nil {
+		return nil, err
+	}
+
+	return &admin, nil
 }
+
 
 func (r *AdminAuthRepo) Save2FASecret(id uint, encSecret string) error {
 	return r.db.Model(&models.Admin{}).
