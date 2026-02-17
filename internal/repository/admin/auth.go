@@ -4,8 +4,6 @@ import (
 	"errors"
 	"time"
 
-	"strings"
-
 	"github.com/jolotech/jolo-mars/internal/models"
 	"gorm.io/gorm"
 )
@@ -69,19 +67,17 @@ func (r *AdminAuthRepo) GetByID(id uint) (*models.Admin, error) {
 	return &a, nil
 }
 
-func (r *AdminAuthRepo) DeleteByEmail(email string) error {
-	email = strings.TrimSpace(strings.ToLower(email))
+func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
+	var a models.Admin
 
-	res := r.db.Unscoped().Where("email = ?", email).Delete(&models.Admin{})
-	if res.Error != nil {
-		return res.Error
+	err := r.db.Where("email = ?", email).
+		Delete(&models.OtpVerification{}).Error 
+		
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
 	}
 
-	if res.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
-	}
-
-	return nil
+	return &a, nil
 }
 
 func (r *AdminAuthRepo) Save2FASecret(id uint, encSecret string) error {

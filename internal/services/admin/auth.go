@@ -197,3 +197,13 @@ func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) 
 	return "password updated successfully", data, http.StatusOK, nil
 }
 
+func (s *AdminAuthService) DeleteAdminByEmail(email string) (string, any, int, error) {
+	email = strings.TrimSpace(strings.ToLower(email))
+
+	admin, err := s.adminAuthRepo.DeleteByEmail(email)
+
+	if err != nil || admin == nil {
+		return "failed to delete admin", nil, http.StatusInternalServerError, err
+	}
+	return "admin deleted successfully", admin, http.StatusOK, nil
+}
