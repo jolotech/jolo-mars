@@ -1,9 +1,34 @@
 package email
 
 import (
+	"fmt"
 	// "github.com/jolotech/jolo-mars/internal/models"
 	// "github.com/jolotech/jolo-mars/types"
 )
+
+func (s *EmailSender) AdminBootstrapCredentials(appName, role, tempPassword, loginURL, surpportEmail string) error {
+	// fallback if name empty
+	name := s.ToName
+	if name == "" {
+		name = "Admin"
+	}
+
+	body, err := renderTemplate("admin_bootstrap_credentials.html", map[string]any{
+		"Name":         name,
+		"Email":        s.ToEmail,
+		"TempPassword": tempPassword, // can be ""
+		"Role":         role,
+		"AppName":      appName,
+		"LoginURL":     loginURL,
+		"SupportEmail": surpportEmail,
+	})
+	if err != nil {
+		return err
+	}
+
+	subject := fmt.Sprintf("%s Admin Access Details", appName)
+	return sendMail(s.ToEmail, subject, body)
+}
 
 
 func (s *EmailSender) Verification() error {

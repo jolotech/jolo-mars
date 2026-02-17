@@ -11,6 +11,8 @@ import (
 	"github.com/jolotech/jolo-mars/internal/repository/boostrap"
 	admin_repo "github.com/jolotech/jolo-mars/internal/repository/admin"
 	"github.com/jolotech/jolo-mars/internal/utils"
+	"github.com/jolotech/jolo-mars/internal/helpers/email"
+
 )
 
 type BootstrapService struct {
@@ -35,13 +37,71 @@ type BootstrapResult struct {
 }
 
 
+// func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
+// 	gate := strings.ToLower(strings.TrimSpace(os.Getenv("BOOTSTRAP_SUPER_ADMIN")))
+// 	if gate != "true" {
+// 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
+// 	}
+
+// 	// Only block if SUPER ADMIN exists (not any admin)
+// 	superExists, err := s.adminBoostrapRepo.AnySuperAdminExists()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	if superExists {
+// 		return &BootstrapResult{Created: false, Reason: "super admin already exists"}, nil
+// 	}
+
+// 	name := strings.TrimSpace(os.Getenv("SUPER_ADMIN_NAME"))
+// 	email := strings.TrimSpace(strings.ToLower(os.Getenv("SUPER_ADMIN_EMAIL")))
+// 	pass := os.Getenv("SUPER_ADMIN_PASSWORD")
+
+// 	if name == "" || email == "" {
+// 		return &BootstrapResult{Created: false, Reason: "missing SUPER_ADMIN_NAME or SUPER_ADMIN_EMAIL"}, nil
+// 	}
+
+// 	emailExists, err := s.adminAuthRepo.ExistsByEmail(email)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	if emailExists {
+// 		return &BootstrapResult{Created: false, Reason: "email already exists (cannot bootstrap super admin)"}, nil
+// 	}
+
+// 	temp := ""
+// 	if strings.TrimSpace(pass) == "" {
+// 		temp = utils.GenerateStrongPassword(16)
+// 		pass = temp
+// 	}
+
+// 	hash, err := utils.HashPassword(pass)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	admin := &models.Admin{
+// 		Name:               name,
+// 		Email:              email,
+// 		Password:           hash,
+// 		Role:               "super-admin",
+// 		MustChangePassword: true,
+// 		TwoFAEnabled:       false,
+// 	}
+
+// 	if err := s.adminBoostrapRepo.CreateSuperAdmin(admin); err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &BootstrapResult{Created: true, Email: email, TempPassword: temp, Reason: "created"}, nil
+// }
+
+
 func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
 	gate := strings.ToLower(strings.TrimSpace(os.Getenv("BOOTSTRAP_SUPER_ADMIN")))
 	if gate != "true" {
 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
 	}
 
-	// Only block if SUPER ADMIN exists (not any admin)
 	superExists, err := s.adminBoostrapRepo.AnySuperAdminExists()
 	if err != nil {
 		return nil, err
@@ -51,14 +111,14 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 	}
 
 	name := strings.TrimSpace(os.Getenv("SUPER_ADMIN_NAME"))
-	email := strings.TrimSpace(strings.ToLower(os.Getenv("SUPER_ADMIN_EMAIL")))
+	emailAddr := strings.TrimSpace(strings.ToLower(os.Getenv("SUPER_ADMIN_EMAIL")))
 	pass := os.Getenv("SUPER_ADMIN_PASSWORD")
 
-	if name == "" || email == "" {
+	if name == "" || emailAddr == "" {
 		return &BootstrapResult{Created: false, Reason: "missing SUPER_ADMIN_NAME or SUPER_ADMIN_EMAIL"}, nil
 	}
 
-	emailExists, err := s.adminAuthRepo.ExistsByEmail(email)
+	emailExists, err := s.adminAuthRepo.ExistsByEmail(emailAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +139,7 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 
 	admin := &models.Admin{
 		Name:               name,
-		Email:              email,
+		Email:              emailAddr,
 		Password:           hash,
 		Role:               "super-admin",
 		MustChangePassword: true,
@@ -90,5 +150,15 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 		return nil, err
 	}
 
-	return &BootstrapResult{Created: true, Email: email, TempPassword: temp, Reason: "created"}, nil
+	appName := strings.TrimSpace(os.Getenv("APP_NAME"))
+	if appName == "" {
+		appName = "Jolo Admin"
+	}
+
+	loginURL := strings.TrimSpace(os.Getenv("ADMIN_LOGIN_URL"))
+	supportEmail := strings.TrimSpace(os.Getenv("SUPPORT_EMAIL"))
+
+	_ = email.SendEmail(nil, nil).AdminBootstrapCredentials(appName, "super-admin", temp, loginURL, supportEmail)
+
+	return &BootstrapResult{Created: true, Email: emailAddr, TempPassword: temp, Reason: "created"}, nil
 }

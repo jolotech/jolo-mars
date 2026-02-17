@@ -14,6 +14,8 @@ type EmailSender struct {
 	OTP   string
 	Token string
 	User  *models.User
+	ToEmail string
+	ToName  string
 }
 
 
@@ -26,4 +28,12 @@ func SendEmail(value interface{}, user *models.User) *EmailSender {
 	}
 
 	return s
+}
+
+
+func SendAdminEmail(toEmail, toName string) *EmailSender {
+	return &EmailSender{
+		ToEmail: toEmail,
+		ToName:  toName,
+	}
 }
