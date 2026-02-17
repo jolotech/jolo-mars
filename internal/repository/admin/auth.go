@@ -67,19 +67,6 @@ func (r *AdminAuthRepo) GetByID(id uint) (*models.Admin, error) {
 	return &a, nil
 }
 
-func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
-	var a models.Admin
-
-	err := r.db.Where("email = ?", email).
-		Delete(&models.OtpVerification{}).Error 
-		
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, nil
-	}
-
-	return &a, nil
-}
-
 func (r *AdminAuthRepo) Save2FASecret(id uint, encSecret string) error {
 	return r.db.Model(&models.Admin{}).
 		Where("id = ?", id).
