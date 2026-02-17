@@ -22,7 +22,7 @@ func NewAdminAuthHandler(svc *admin_services.AdminAuthService) *AdminAuthHandler
 
 
 
-
+// ==================== ADMIN LOGIN =====================
 
 func (h *AdminAuthHandler) Login(c *gin.Context) {
 	var req types.AdminLoginRequest
@@ -41,6 +41,8 @@ func (h *AdminAuthHandler) Login(c *gin.Context) {
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
 
+
+// ==================== 2FA SETUP =====================
 func (h *AdminAuthHandler) Setup2FA(c *gin.Context) {
 	adminId := c.GetString("adminId")
 	log.Println("adminId from token:.......", adminId)
@@ -54,6 +56,7 @@ func (h *AdminAuthHandler) Setup2FA(c *gin.Context) {
 }
 
 
+// ==================== 2FA CONFIRMATION =====================
 func (h *AdminAuthHandler) Confirm2FA(c *gin.Context) {
 	adminId := c.GetString("adminId")
 
@@ -75,7 +78,7 @@ func (h *AdminAuthHandler) Confirm2FA(c *gin.Context) {
 }
 
 
-
+// ==================== CHANGE PASSWORD =====================
 func (h *AdminAuthHandler) ChangePassword(c *gin.Context) {
 	var req types.AdminChangePasswordRequest
 
@@ -101,7 +104,7 @@ func (h *AdminAuthHandler) ChangePassword(c *gin.Context) {
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
 
-
+// ==================== DELETE ADMIN BY EMAIL (FOR TESTING) =====================
 func (h *AdminAuthHandler) DeleteAdmin(c *gin.Context) {
 	var req types.DeleteAdminRequest
 

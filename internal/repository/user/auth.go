@@ -36,11 +36,14 @@ func (r *Auth) CreateUser(user *models.User) (*models.User, error) {
 }
 
 
+// ==================== FIND USER BY REF CODE =====================
 func (r *Auth) FindUserByRefCode(code string) (*models.User, error) {
 	var user models.User
 	err := r.db.Where("ref_code = ?", code).First(&user).Error
 	return &user, err
 }
+
+
 
 func (r *Auth) CreateUserNotification(userID uint, data map[string]interface{}) error {
 
