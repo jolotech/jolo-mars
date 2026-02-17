@@ -1,7 +1,6 @@
 package admin_repository
 
 import (
-	"errors"
 	"gorm.io/gorm"
 	"github.com/jolotech/jolo-mars/internal/models"
 	"github.com/jolotech/jolo-mars/types"
@@ -39,18 +38,6 @@ func (r *Main) GetBusinessSetting(key string) interface{} {
 	}
 }
 
-func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
-	var a models.Admin
-
-	err := r.db.Where("email = ?", email).
-		Delete(&models.OtpVerification{}).Error 
-		
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, nil
-	}
-
-	return &a, nil
-}
 
 func (r *Main) GetLoginSettings() *types.LoginSettings {
 	var bs models.BusinessSetting
