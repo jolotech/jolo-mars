@@ -25,6 +25,7 @@ type Config struct {
 	CloudinaryApiSecrete string    
 	AppEnv               string    // valid values: "development", "staging", "production"
 	AppVersion           string    // valid
+	AppName              string
 
 
 	// Twilio configuration
@@ -45,6 +46,15 @@ type Config struct {
 	AuthSecret           string // valid
 	AuthExpIn            string // valid
     AuthPassExpIn        string // valid
+
+	// Boostrap Admin
+	BoostrapSuperAdmin   string // valid
+	SuperAdminName       string // valid
+	SuperAdminPassword   string // valid
+	SuperAdminEmail      string // valid
+	AdminLoginUrl        string // valid
+	SurpportEmail        string // valid
+
 }
 
 // LoadConfig loads .env variables or system env
@@ -74,6 +84,7 @@ func LoadConfig() *Config {
 		AppSecrete: os.Getenv("APP_SIGNATURE_SECRET"),
 		AppEnv:    os.Getenv("ENV"),
 		AppVersion: os.Getenv("APP_VERSION"),
+		AppName:    os.Getenv("APP_NAME"),
 
 		// Twilio configuration
 		SID:            os.Getenv("TWILIO_SID"),
@@ -93,6 +104,17 @@ func LoadConfig() *Config {
 		AuthSecret: os.Getenv("JWT_SECRET"),
 		AuthExpIn: os.Getenv("JWT_EXPIRES_IN"),
 		AuthPassExpIn: os.Getenv("ADMIN_PASS_EXPIRES_IN"),
+
+
+		// Boostrap super admin 
+		BoostrapSuperAdmin: os.Getenv("BOOTSTRAP_SUPER_ADMIN"),
+		SuperAdminName: os.Getenv("SUPER_ADMIN_NAME"),
+		SuperAdminPassword: os.Getenv("SUPER_ADMIN_PASSWORD"),
+		SuperAdminEmail: os.Getenv("SUPER_ADMIN_EMAIL"),
+		AdminLoginUrl: os.Getenv("ADMIN_LOGIN_URL"),
+		SurpportEmail: os.Getenv("SUPPORT_EMAIL"),
+
+
 	}
 
 	return cfg

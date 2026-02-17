@@ -7,12 +7,12 @@ import (
 
 	// "time"
 
-	"github.com/jolotech/jolo-mars/internal/models"
-	"github.com/jolotech/jolo-mars/internal/repository/boostrap"
-	admin_repo "github.com/jolotech/jolo-mars/internal/repository/admin"
-	"github.com/jolotech/jolo-mars/internal/utils"
+	"github.com/jolotech/jolo-mars/config"
 	"github.com/jolotech/jolo-mars/internal/helpers/email"
-
+	"github.com/jolotech/jolo-mars/internal/models"
+	admin_repo "github.com/jolotech/jolo-mars/internal/repository/admin"
+	"github.com/jolotech/jolo-mars/internal/repository/boostrap"
+	"github.com/jolotech/jolo-mars/internal/utils"
 )
 
 type BootstrapService struct {
@@ -97,6 +97,7 @@ type BootstrapResult struct {
 
 
 func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
+	cfg := config.LoadConfig()
 	gate := strings.ToLower(strings.TrimSpace(os.Getenv("BOOTSTRAP_SUPER_ADMIN")))
 	if gate != "true" {
 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
