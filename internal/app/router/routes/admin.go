@@ -25,7 +25,7 @@ func AdminRoutes(
 			auth := public.Group("/auth")
 			{
 				auth.POST("/login", authHandler.Login)
-				auth.POST("/delete", authHandler.DeleteAdmin)
+				auth.DELETE("/delete", authHandler.DeleteAdmin)
 
 				twoFa := auth.Group("/2fa")
 				auth.Use(middlewares.AdminAuthMiddleware())
