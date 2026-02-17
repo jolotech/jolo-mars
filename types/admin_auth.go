@@ -35,6 +35,6 @@ type AdminLogin2FARequest struct {
 	Code       string `json:"code" binding:"required,len=6,numeric"`
 }
 
-type DeleteAdminByEmailRequest struct {
+type DeleteAdminRequest struct {
 	Email string `json:"email" binding:"required,email"`
 }

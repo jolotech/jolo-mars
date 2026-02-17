@@ -98,3 +98,21 @@ func (h *AdminAuthHandler) ChangePassword(c *gin.Context) {
 	}
 	helpers.SuccessResponse(c, data, msg, statusCode)
 }
+
+
+func (h *AdminAuthHandler) DeleteAdmin(c *gin.Context) {
+	var req types.DeleteAdminRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		msg := validations.HandleValidationError(err)
+		helpers.ErrorResponse(c, err, msg, http.StatusBadRequest)
+		return
+	}
+
+	msg, data, statusCode, err := h.AdminAuthService.Login(req)
+	if err != nil {
+		helpers.ErrorResponse(c, err, msg, statusCode)
+		return
+	}
+	helpers.SuccessResponse(c, data, msg, statusCode)
+}
