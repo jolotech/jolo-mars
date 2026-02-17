@@ -95,6 +95,7 @@ func (s *AdminAuthService) Setup2FA(adminId string) (string, any, int, error) {
 	return "2fa setup successful", types.AdminTwoFASetupResponse{OtpAuthURL: key.URL()}, http.StatusOK, nil
 }
 
+
 func (s *AdminAuthService) Confirm2FA(adminId, code string) (string, any, int, error) {
 	admin, err := s.adminAuthRepo.GetByPublicID(adminId)
 	if err != nil || admin == nil{
@@ -195,3 +196,4 @@ func (s *AdminAuthService) ChangePassword(req types.AdminChangePasswordRequest) 
 	}
 	return "password updated successfully", data, http.StatusOK, nil
 }
+

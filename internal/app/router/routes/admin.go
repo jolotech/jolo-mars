@@ -29,9 +29,9 @@ func AdminRoutes(
 				twoFa := auth.Group("/2fa")
 				auth.Use(middlewares.AdminAuthMiddleware())
 				{
-					auth.Use(middlewares.RequireAdminTokenPurpose("2FA"))
+					twoFa.Use(middlewares.RequireAdminTokenPurpose("2FA"))
 					twoFa.GET("/setup", authHandler.Setup2FA)
-				    auth.POST("/confirm", authHandler.Confirm2FA)
+				    twoFa.POST("/confirm", authHandler.Confirm2FA)
 				}
 			}
 
