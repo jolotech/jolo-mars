@@ -76,7 +76,7 @@ func AdminAuthMiddleware() gin.HandlerFunc {
 }
 
 
-func RequireAdminTokenPurpose(allowed ...string) gin.HandlerFunc {
+func RequireAdminToken(allowed ...string) gin.HandlerFunc {
 	allowedSet := map[string]bool{}
 	for _, a := range allowed {
 		allowedSet[a] = true
