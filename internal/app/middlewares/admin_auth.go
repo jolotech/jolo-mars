@@ -56,7 +56,6 @@ func AdminAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Extract payload safely
 		email, _ := claims["email"].(string)
 		purpose, _ := claims["purpose"].(string)
 
