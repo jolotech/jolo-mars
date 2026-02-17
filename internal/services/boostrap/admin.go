@@ -2,7 +2,7 @@ package bootstrap_service
 
 import (
 	// "log"
-	"os"
+	// "os"
 	"strings"
 
 	// "time"
@@ -98,7 +98,7 @@ type BootstrapResult struct {
 
 func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
 	cfg := config.LoadConfig()
-	gate := strings.ToLower(strings.TrimSpace(os.Getenv("BOOTSTRAP_SUPER_ADMIN")))
+	gate := strings.ToLower(strings.TrimSpace(cfg.BoostrapSuperAdmin))
 	if gate != "true" {
 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
 	}
@@ -111,9 +111,9 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 		return &BootstrapResult{Created: false, Reason: "super admin already exists"}, nil
 	}
 
-	name := strings.TrimSpace(os.Getenv("SUPER_ADMIN_NAME"))
-	emailAddr := strings.TrimSpace(strings.ToLower(os.Getenv("SUPER_ADMIN_EMAIL")))
-	pass := os.Getenv("SUPER_ADMIN_PASSWORD")
+	name := strings.TrimSpace(cfg.SuperAdminName)
+	emailAddr := strings.TrimSpace(strings.ToLower(cfg.SuperAdminEmail))
+	pass := cfg.SuperAdminPassword
 
 	if name == "" || emailAddr == "" {
 		return &BootstrapResult{Created: false, Reason: "missing SUPER_ADMIN_NAME or SUPER_ADMIN_EMAIL"}, nil
@@ -151,13 +151,13 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 		return nil, err
 	}
 
-	appName := strings.TrimSpace(os.Getenv("APP_NAME"))
+	appName := strings.TrimSpace(cfg.AppName)
 	if appName == "" {
 		appName = "Jolo Admin"
 	}
 
-	loginURL := strings.TrimSpace(os.Getenv("ADMIN_LOGIN_URL"))
-	supportEmail := strings.TrimSpace(os.Getenv("SUPPORT_EMAIL"))
+	loginURL := strings.TrimSpace(cfg.AdminLoginUrl)
+	supportEmail := strings.TrimSpace(cfg.SurpportEmail)
 
 	_ = email.SendEmail(nil, nil).AdminBootstrapCredentials(appName, "super-admin", temp, loginURL, supportEmail)
 
