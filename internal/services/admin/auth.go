@@ -117,35 +117,74 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 }
 
 
+// func (s *AdminAuthService) Setup2FA(adminId string) (string, any, int, error) {
+// 	admin, err := s.adminAuthRepo.GetByPublicID(adminId)
+// 	// if err != nil || admin == nil {
+// 	// 	return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
+// 	// }
+
+// 	admin, err := s.adminAuthRepo.GetByPublicID(adminId)
+// 	if err != nil {
+//         return "failed to fetch admin", nil, http.StatusInternalServerError, err
+//     }
+//     if admin == nil {
+//         return "admin not found", nil, http.StatusNotFound, nil
+//     }
+
+// 	key, err := utils.Generate2faTOTPKey("Jolo Admin", admin.Email)
+// 	if err != nil {
+// 		return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
+// 	}
+
+// 	encKeyB64 := os.Getenv("TWO_FA_ENC_KEY")
+// 	encKey, err := base64.StdEncoding.DecodeString(encKeyB64)
+// 	if err != nil || len(encKey) != 32 {
+// 		return "failed", nil, http.StatusInternalServerError, errors.New("invalid TWO_FA_ENC_KEY (must be base64 of 32 bytes)")
+// 	}
+
+// 	encSecret, err := utils.EncryptString(key.Secret(), encKey)
+// 	if err != nil {
+// 		return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
+// 	}
+
+// 	if err := s.adminAuthRepo.Save2FASecret(admin.ID, encSecret); err != nil {
+// 		return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
+// 	}
+
+// 	return "2fa setup successful", types.AdminTwoFASetupResponse{OtpAuthURL: key.URL()}, http.StatusOK, nil
+// }
+
 func (s *AdminAuthService) Setup2FA(adminId string) (string, any, int, error) {
 	admin, err := s.adminAuthRepo.GetByPublicID(adminId)
-	if err != nil || admin == nil {
-		return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
+	if err != nil {
+		return "failed to fetch admin", nil, http.StatusInternalServerError, err
+	}
+	if admin == nil {
+		return "admin not found", nil, http.StatusNotFound, nil
 	}
 
 	key, err := utils.Generate2faTOTPKey("Jolo Admin", admin.Email)
 	if err != nil {
-		return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
+		return "failed to generate 2FA key", nil, http.StatusInternalServerError, err
 	}
 
 	encKeyB64 := os.Getenv("TWO_FA_ENC_KEY")
 	encKey, err := base64.StdEncoding.DecodeString(encKeyB64)
 	if err != nil || len(encKey) != 32 {
-		return "failed", nil, http.StatusInternalServerError, errors.New("invalid TWO_FA_ENC_KEY (must be base64 of 32 bytes)")
+		return "invalid TWO_FA_ENC_KEY (must be base64 of 32 bytes)", nil, http.StatusInternalServerError, errors.New("invalid TWO_FA_ENC_KEY")
 	}
 
 	encSecret, err := utils.EncryptString(key.Secret(), encKey)
 	if err != nil {
-		return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
+		return "failed to encrypt 2FA secret", nil, http.StatusInternalServerError, err
 	}
 
 	if err := s.adminAuthRepo.Save2FASecret(admin.ID, encSecret); err != nil {
-		return "failed", types.AdminTwoFASetupResponse{}, http.StatusInternalServerError, err
+		return "failed to save 2FA secret", nil, http.StatusInternalServerError, err
 	}
 
-	return "2fa setup successful", types.AdminTwoFASetupResponse{OtpAuthURL: key.URL()}, http.StatusOK, nil
+	return "2fa setup successful", types.AdminTwoFASetupResponse{OtpAuthURL: key.URL(),}, http.StatusOK, nil
 }
-
 
 func (s *AdminAuthService) Confirm2FA(adminId, code string) (string, any, int, error) {
 	admin, err := s.adminAuthRepo.GetByPublicID(adminId)

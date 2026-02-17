@@ -42,6 +42,7 @@ func (h *AdminAuthHandler) Login(c *gin.Context) {
 
 func (h *AdminAuthHandler) Setup2FA(c *gin.Context) {
 	adminId := c.GetString("adminId")
+	log.Println("adminId from token:.......", adminId)
 
 	msg, data, statusCode, err := h.AdminAuthService.Setup2FA(adminId)
 	if err != nil {
