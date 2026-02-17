@@ -99,7 +99,7 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 		return "2FA required", data, http.StatusOK, nil
 	}
 
-	// 🔥 If 2FA NOT enabled → require setup
+	// If 2FA NOT enabled → require setup
 	setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2FA_SETUP", admin.PublicID)
 	if err != nil {
 		return "failed to create setup token", nil, http.StatusInternalServerError, err
