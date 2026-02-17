@@ -62,7 +62,21 @@ func GenerateAdminAuthToken(email, purpose, adminId string) (string, error) {
 				expiry = d
 			}
 		}
+	case "2FA_VERIFY":
+		expiry = 15 * time.Hour
+		if cfg.AuthPassExpIn != "" {
+			if d, err := time.ParseDuration(cfg.AuthPassExpIn); err == nil {
+				expiry = d
+			}
+		}
 
+	case "2FA_SETUP":
+		expiry = 15 * time.Hour
+		if cfg.AuthPassExpIn != "" {
+			if d, err := time.ParseDuration(cfg.AuthPassExpIn); err == nil {
+				expiry = d
+			}
+		}
 	default:
 		return "", fmt.Errorf("invalid token purpose: %s", purpose)
 	}

@@ -26,6 +26,47 @@ func NewAdminAuthService(adminAuthRepo *admin_repository.AdminAuthRepo) *AdminAu
 
 
 
+// func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int, error) {
+// 	email := strings.ToLower(strings.TrimSpace(req.Email))
+
+// 	admin, err := s.adminAuthRepo.GetByEmail(email)
+// 	if err != nil {
+// 		return "failed", nil, http.StatusInternalServerError, err
+// 	}
+// 	if admin == nil {
+// 		return "invalid credentials", nil, http.StatusUnauthorized, errors.New("invalid credentials")
+// 	}
+
+// 	if !utils.ComparePassword(admin.Password, req.Password) {
+// 		return "invalid credentials", nil, http.StatusUnauthorized, errors.New("invalid credentials")
+// 	}
+
+// 	setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2FA", admin.PublicID)
+
+// 	data := types.AdminLoginResponse{
+// 		    Requires2FA: true,
+// 	        Requires2FAMessage: "2FA is required for this account",
+// 		    TwoFAToken:  setupToken,
+// 			PasswordChangeRequired: admin.MustChangePassword,
+// 	    }
+
+// 	if admin.TwoFAEnabled {
+//         if err != nil {
+// 			return "failed to create token", nil, http.StatusInternalServerError, err
+// 		}
+// 	    return "2FA required", data, 200, nil
+// 	}
+
+// 	data.Requires2FAMessage = "2FA not setup for this account, please setup 2FA to secure your account"
+
+// 	if !admin.TwoFAEnabled{
+// 		return "2FA not setup Please use the setup 2fa endpoint", data, http.StatusFound, nil
+// 	}
+
+// 	// Normal access token
+// 	return "account malfunction", nil, http.StatusBadRequest, errors.New("bad or Admin account malfunction")
+// }
+
 func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int, error) {
 	email := strings.ToLower(strings.TrimSpace(req.Email))
 
@@ -41,30 +82,38 @@ func (s *AdminAuthService) Login(req types.AdminLoginRequest) (string, any, int,
 		return "invalid credentials", nil, http.StatusUnauthorized, errors.New("invalid credentials")
 	}
 
-	setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2FA", admin.PublicID)
+	//  If 2FA enabled → require token verification
+	if admin.TwoFAEnabled {
+
+		twoFAToken, err := utils.GenerateAdminAuthToken(admin.Email, "2FA_VERIFY", admin.PublicID)
+		if err != nil {
+			return "failed to create 2FA token", nil, http.StatusInternalServerError, err
+		}
+
+		data := types.AdminLoginResponse{
+			Requires2FA:        true,
+			Requires2FAMessage: "2FA is required for this account",
+			TwoFAToken:         twoFAToken,
+		}
+
+		return "2FA required", data, http.StatusOK, nil
+	}
+
+	// 🔥 If 2FA NOT enabled → require setup
+	setupToken, err := utils.GenerateAdminAuthToken(admin.Email, "2FA_SETUP", admin.PublicID)
+	if err != nil {
+		return "failed to create setup token", nil, http.StatusInternalServerError, err
+	}
 
 	data := types.AdminLoginResponse{
-		    Requires2FA: true,
-	        Requires2FAMessage: "2FA is required for this account",
-		    TwoFAToken:  setupToken,
-	    }
-
-	if admin.TwoFAEnabled {
-        if err != nil {
-			return "failed to create token", nil, http.StatusInternalServerError, err
-		}
-	    return "2FA required", data, 200, nil
+		Requires2FA:        true,
+		Requires2FAMessage: "2FA not setup for this account, please setup 2FA to secure your account",
+		SetupToken:         setupToken,
 	}
 
-	data.Requires2FAMessage = "2FA not setup for this account, please setup 2FA to secure your account"
-
-	if !admin.TwoFAEnabled{
-		return "2FA not setup Please use the setup 2fa endpoint", data, http.StatusFound, nil
-	}
-
-	// Normal access token
-	return "account malfunction", nil, http.StatusBadRequest, errors.New("bad or Admin account malfunction")
+	return "2FA not setup. Please use setup endpoint", data, http.StatusOK, nil
 }
+
 
 func (s *AdminAuthService) Setup2FA(adminId string) (string, any, int, error) {
 	admin, err := s.adminAuthRepo.GetByPublicID(adminId)
