@@ -37,64 +37,8 @@ type BootstrapResult struct {
 }
 
 
-// func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
-// 	gate := strings.ToLower(strings.TrimSpace(os.Getenv("BOOTSTRAP_SUPER_ADMIN")))
-// 	if gate != "true" {
-// 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
-// 	}
 
-// 	// Only block if SUPER ADMIN exists (not any admin)
-// 	superExists, err := s.adminBoostrapRepo.AnySuperAdminExists()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if superExists {
-// 		return &BootstrapResult{Created: false, Reason: "super admin already exists"}, nil
-// 	}
-
-// 	name := strings.TrimSpace(os.Getenv("SUPER_ADMIN_NAME"))
-// 	email := strings.TrimSpace(strings.ToLower(os.Getenv("SUPER_ADMIN_EMAIL")))
-// 	pass := os.Getenv("SUPER_ADMIN_PASSWORD")
-
-// 	if name == "" || email == "" {
-// 		return &BootstrapResult{Created: false, Reason: "missing SUPER_ADMIN_NAME or SUPER_ADMIN_EMAIL"}, nil
-// 	}
-
-// 	emailExists, err := s.adminAuthRepo.ExistsByEmail(email)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if emailExists {
-// 		return &BootstrapResult{Created: false, Reason: "email already exists (cannot bootstrap super admin)"}, nil
-// 	}
-
-// 	temp := ""
-// 	if strings.TrimSpace(pass) == "" {
-// 		temp = utils.GenerateStrongPassword(16)
-// 		pass = temp
-// 	}
-
-// 	hash, err := utils.HashPassword(pass)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	admin := &models.Admin{
-// 		Name:               name,
-// 		Email:              email,
-// 		Password:           hash,
-// 		Role:               "super-admin",
-// 		MustChangePassword: true,
-// 		TwoFAEnabled:       false,
-// 	}
-
-// 	if err := s.adminBoostrapRepo.CreateSuperAdmin(admin); err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &BootstrapResult{Created: true, Email: email, TempPassword: temp, Reason: "created"}, nil
-// }
-
+// ============== BOOSTRAP AND CREATE SUPER ADMIN =================
 
 func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, error) {
 	cfg := config.LoadConfig()
@@ -157,9 +101,9 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 	}
 
 	loginURL := strings.TrimSpace(cfg.AdminLoginUrl)
-	supportEmail := strings.TrimSpace(cfg.SurpportEmail)
+	supportEmail := strings.TrimSpace(cfg.SupportEmail)
 
-	_ = email.SendEmail(nil, nil).AdminBootstrapCredentials(appName, "super-admin", temp, loginURL, supportEmail)
+	_ = email.SendAdminEmail(emailAddr, name).AdminBootstrapCredentials(appName, "super-admin", temp, loginURL, supportEmail)
 
 	return &BootstrapResult{Created: true, Email: emailAddr, TempPassword: temp, Reason: "created"}, nil
 }

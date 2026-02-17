@@ -16,7 +16,7 @@ func NewBootstrapHandler(service *bootstrap_service.BootstrapService) *Bootstrap
 	return &BootstrapHandler{service: service}
 }
 
-// Run on app start
+// ============== BOOSTRAP AND CREATE SUPER ADMIN =================
 
 func (h *BootstrapHandler) Run() {
 	log.Println("[bootstrap] starting super admin bootstrap...")
@@ -38,9 +38,4 @@ func (h *BootstrapHandler) Run() {
 	}
 
 	log.Println("[bootstrap] ✅ super admin created successfully")
-	log.Printf("[bootstrap] EMAIL: %s\n", res.Email)
-
-	if res.TempPassword != "" {
-		log.Printf("[bootstrap] TEMP PASSWORD: %s\n", res.TempPassword)
-	}
 }

@@ -7,16 +7,15 @@ import (
 )
 
 func (s *EmailSender) AdminBootstrapCredentials(appName, role, tempPassword, loginURL, surpportEmail string) error {
-	// fallback if name empty
 	name := s.ToName
 	if name == "" {
 		name = "Admin"
 	}
 
-	body, err := renderTemplate("admin_bootstrap_credentials.html", map[string]any{
+	body, err := renderTemplate("create_super_admin_credentials.html", map[string]any{
 		"Name":         name,
 		"Email":        s.ToEmail,
-		"TempPassword": tempPassword, // can be ""
+		"TempPassword": tempPassword,
 		"Role":         role,
 		"AppName":      appName,
 		"LoginURL":     loginURL,

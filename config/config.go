@@ -53,7 +53,7 @@ type Config struct {
 	SuperAdminPassword   string // valid
 	SuperAdminEmail      string // valid
 	AdminLoginUrl        string // valid
-	SurpportEmail        string // valid
+	SupportEmail        string // valid
 
 }
 
@@ -112,9 +112,7 @@ func LoadConfig() *Config {
 		SuperAdminPassword: os.Getenv("SUPER_ADMIN_PASSWORD"),
 		SuperAdminEmail: os.Getenv("SUPER_ADMIN_EMAIL"),
 		AdminLoginUrl: os.Getenv("ADMIN_LOGIN_URL"),
-		SurpportEmail: os.Getenv("SUPPORT_EMAIL"),
-
-
+		SupportEmail: os.Getenv("SUPPORT_EMAIL"),
 	}
 
 	return cfg
