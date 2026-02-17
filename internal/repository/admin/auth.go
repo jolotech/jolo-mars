@@ -81,19 +81,6 @@ func (r *AdminAuthRepo) GetByID(id uint) (*models.Admin, error) {
 	return &a, nil
 }
 
-// func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
-// 	var a models.Admin
-
-// 	err := r.db.Where("email = ?", email).
-// 		Delete(&models.Admin{}).Error 
-		
-// 	if errors.Is(err, gorm.ErrRecordNotFound) {
-// 		return nil, nil
-// 	}
-
-// 	return &a, nil
-// }
-
 
 func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
 	var admin models.Admin
@@ -121,7 +108,7 @@ func (r *AdminAuthRepo) Save2FASecret(id uint, encSecret string) error {
 		Updates(map[string]any{
 			"two_fa_secret_enc":   encSecret,
 			"two_fa_enabled":      true,
-			"two_fa_confirmed_at": time.Now(),
+			"two_fa_confirmed_at": nil,
 		}).Error
 }
 

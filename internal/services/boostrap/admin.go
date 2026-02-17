@@ -41,7 +41,7 @@ func (s *BootstrapService) EnsureSuperAdminFromEnvSilently() (*BootstrapResult, 
 		return &BootstrapResult{Created: false, Reason: "BOOTSTRAP_SUPER_ADMIN is not true"}, nil
 	}
 
-	// ✅ Only block if SUPER ADMIN exists (not any admin)
+	// Only block if SUPER ADMIN exists (not any admin)
 	superExists, err := s.adminBoostrapRepo.AnySuperAdminExists()
 	if err != nil {
 		return nil, err
