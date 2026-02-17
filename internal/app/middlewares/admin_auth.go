@@ -36,7 +36,7 @@ func AdminAuthMiddleware() gin.HandlerFunc {
 		}
 
 		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-			// ✅ Ensure the token was signed with HMAC (HS256, HS384, HS512)
+			// Ensure the token was signed with HMAC (HS256, HS384, HS512)
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, jwt.ErrTokenSignatureInvalid
 			}
