@@ -71,7 +71,7 @@ func (r *AdminAuthRepo) DeleteByEmail(email string) (*models.Admin, error) {
 	var a models.Admin
 
 	err := r.db.Where("email = ?", email).
-		Delete(&models.OtpVerification{}).Error 
+		Delete(&models.Admin{}).Error 
 		
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
