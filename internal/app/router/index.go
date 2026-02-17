@@ -14,11 +14,14 @@ import (
 
 	// "github.com/jolotech/jolo-mars/internal/helpers"
 	"github.com/jolotech/jolo-mars/internal/app/dependencies"
+    // "github.com/jolotech/jolo-mars/internal/docsui"
+
 	// "github.com/jolotech/jolo-mars/internal/infrastructure/database"
 	"github.com/jolotech/jolo-mars/config"
 
 	"github.com/gin-gonic/gin"
 )
+
 
 func InitRoutes(container *dependencies.Container) *gin.Engine {
 	// logger.InitLogger()
@@ -43,6 +46,8 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*.html")
 
+
+	routes.RegisterDocsUI(router)
 
      router.GET("/health", healthHandler.UI)
 	 router.GET("/health/json", healthHandler.JSON)
