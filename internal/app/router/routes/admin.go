@@ -20,28 +20,51 @@ func AdminRoutes(
 	// StoreHandler *partners.StoreHandler,
 ) {
 
-		public := r.Group("/admin")
+
+	    public := r.Group("/admin")
 		{
-			auth := public.Group("/auth")
+            auth := public.Group("/auth")
 			{
-				auth.POST("/login", authHandler.Login)
-				auth.DELETE("/delete", authHandler.DeleteAdmin)
+                auth.POST("/login", authHandler.Login)
+                auth.DELETE("/delete", authHandler.DeleteAdmin)
 
-				twoFa := auth.Group("/2fa")
-				auth.Use(middlewares.AdminAuthMiddleware())
+                twoFa := auth.Group("/2fa")
+                twoFa.Use(middlewares.AdminAuthMiddleware())
 				{
-			        auth.Use(middlewares.RequireAdminToken("2FA_SETUP"))
-					twoFa.GET("/setup", authHandler.Setup2FA)
-					twoFa.Use(middlewares.RequireAdminToken("2FA_VERIFY"))
-				    twoFa.POST("/confirm", authHandler.Confirm2FA)
+                    twoFa.GET("/setup", middlewares.RequireAdminToken("2FA_SETUP"),authHandler.Setup2FA)
+                    twoFa.POST("/confirm", middlewares.RequireAdminToken("2FA_VERIFY"), authHandler.Confirm2FA)
 				}
-			}
+            }
 
-			dash := public.Group("/dash")
-			dash.Use(middlewares.AdminAuthMiddleware())
+            dash := public.Group("/dash")
+            dash.Use(middlewares.AdminAuthMiddleware())
 			{
-			    dash.Use(middlewares.RequireAdminToken("pwd_change"))
-			    dash.PUT("/change-password", authHandler.ChangePassword)
-		    }
+                dash.PUT("/change-password",middlewares.RequireAdminToken("pwd_change"),authHandler.ChangePassword)
+			}
 		}
+
+		// public := r.Group("/admin")
+		// {
+		// 	auth := public.Group("/auth")
+		// 	{
+		// 		auth.POST("/login", authHandler.Login)
+		// 		auth.DELETE("/delete", authHandler.DeleteAdmin)
+
+		// 		twoFa := auth.Group("/2fa")
+		// 		twoFa.Use(middlewares.AdminAuthMiddleware())
+		// 		{
+		// 	        auth.Use(middlewares.RequireAdminToken("2FA_SETUP"))
+		// 			twoFa.GET("/setup", authHandler.Setup2FA)
+		// 			twoFa.Use(middlewares.RequireAdminToken("2FA_VERIFY"))
+		// 		    twoFa.POST("/confirm", authHandler.Confirm2FA)
+		// 		}
+		// 	}
+
+		// 	dash := public.Group("/dash")
+		// 	dash.Use(middlewares.AdminAuthMiddleware())
+		// 	{
+		// 	    dash.Use(middlewares.RequireAdminToken("pwd_change"))
+		// 	    dash.PUT("/change-password", authHandler.ChangePassword)
+		//     }
+		// }
 }
