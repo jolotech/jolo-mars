@@ -14,9 +14,9 @@ type AdminChangePasswordRequest struct {
 
 type AdminLoginResponse struct {
 	AccessToken            string `json:"access_token,omitempty"`
-	Requires2FA bool   `json:"requires_2fa"`
-	Requires2FAMessage string `json:"requires_2fa_message,omitempty"`
-	TwoFAToken  string `json:"two_fa_token,omitempty"`
+	Requires2FA            bool   `json:"requires_2fa"`
+	Requires2FAMessage     string `json:"requires_2fa_message,omitempty"`
+	TwoFAToken             string `json:"two_fa_token,omitempty"`
 	PasswordChangeRequired bool   `json:"password_change_required"`
 	SetupToken             string `json:"setup_token,omitempty"`
 	Admin                  any    `json:"admin,omitempty"`
