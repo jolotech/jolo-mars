@@ -23,8 +23,8 @@ func RegisterDocsUI(r *gin.Engine) {
 	}
 	r.StaticFS("/docs/assets", http.FS(sub))
 
-	r.GET("/__debug/css", func(c *gin.Context) {
-		b, err := docsui.EmbeddedAssets.ReadFile("public/styles.css")
+	r.GET("/__debug/js", func(c *gin.Context) {
+		b, err := docsui.EmbeddedAssets.ReadFile("public/logo.svg")
 		if err != nil {
 			c.String(500, "read error: %v", err)
 			return
@@ -36,4 +36,9 @@ func RegisterDocsUI(r *gin.Engine) {
 		}
 		c.String(200, string(b[:n]))
 	})
+
+	r.GET("/__debug/spec", func(c *gin.Context) {
+        h := docsui.NewHandler(docsui.DefaultSpec())
+         h.ServeSpec(c)
+    })
 }

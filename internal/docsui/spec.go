@@ -29,12 +29,25 @@ type Group struct {
 	Sections    []Section `json:"sections"`
 }
 
+// type Section struct {
+// 	ID          string     `json:"id"`
+// 	Title       string     `json:"title"`
+// 	Description string     `json:"description,omitempty"`
+// 	Endpoints   []Endpoint `json:"endpoints"`
+// }
+
 type Section struct {
 	ID          string     `json:"id"`
 	Title       string     `json:"title"`
 	Description string     `json:"description,omitempty"`
-	Endpoints   []Endpoint `json:"endpoints"`
+
+	// endpoints directly under this section (optional)
+	Endpoints   []Endpoint `json:"endpoints,omitempty"`
+
+	// nested folders under this section (optional)
+	Children    []Section  `json:"children,omitempty"`
 }
+
 
 type Endpoint struct {
 	ID          string         `json:"id"`

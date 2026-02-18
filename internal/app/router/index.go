@@ -43,11 +43,12 @@ func InitRoutes(container *dependencies.Container) *gin.Engine {
 
 	router.Use(gin.Recovery())
 	// router.Use(gin.Logger())
+
+	routes.RegisterDocsUI(router)
+	
 	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*.html")
 
-
-	routes.RegisterDocsUI(router)
 
      router.GET("/health", healthHandler.UI)
 	 router.GET("/health/json", healthHandler.JSON)
