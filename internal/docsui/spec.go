@@ -74,12 +74,21 @@ type UsageSpec struct {
 }
 
 type RequestSpec struct {
-	ContentType string      `json:"contentType"`
-	Example     interface{} `json:"example"`
+  ContentType string      `json:"contentType"`
+  Example     interface{} `json:"example"`
+  
+  // optional file upload config
+  File *FileSpec `json:"file,omitempty"`
 }
 
 type ResponseSpec struct {
 	Status      int         `json:"status"`
 	Description string      `json:"description,omitempty"`
 	Example     interface{} `json:"example,omitempty"`
+}
+
+type FileSpec struct {
+  FieldName string   `json:"fieldName"`           // e.g. "file", "image"
+  Accept    []string `json:"accept,omitempty"`    // e.g. ["image/*","application/pdf"]
+  Multiple  bool     `json:"multiple,omitempty"`  // default false
 }

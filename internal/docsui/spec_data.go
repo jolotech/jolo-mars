@@ -63,10 +63,15 @@ func DefaultSpec() DocSpec {
                                     },
 								},
 								Request: &RequestSpec{
-									ContentType: "application/json",
+									ContentType: "multipart/form-data",
 									Example: map[string]any{
 										"email":    "dev@jolo.com",
 										"password": "password",
+									},
+									File: &FileSpec{
+										FieldName: "file",
+										Accept: []string{"image/*","video/*","application/pdf"},
+										Multiple: false,
 									},
 								},
 								Responses: []ResponseSpec{

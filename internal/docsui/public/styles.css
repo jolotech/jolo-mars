@@ -353,6 +353,42 @@ pre[data-autoselect="1"] {
   cursor: text;
 }
 
+/* ====== SELCT FILE BUTTON */
+.tryHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.tryHeadRight{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.iconBtn{
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background: rgba(96,165,250,0.12);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
+.iconBtn:hover{ border-color: rgba(96,165,250,0.65); }
+
+.iconBtn svg{
+  width:18px;
+  height:18px;
+  stroke: var(--text);
+  fill:none;
+  stroke-width:2;
+  opacity:0.92;
+}
+
+
 /* TOGGLE SWITCH */
 
 .sumRow{

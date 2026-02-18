@@ -10,6 +10,9 @@
     flatEndpoints: [], // for search
   };
 
+  const fileState = {}; // endpointId -> File
+
+
   // const STORAGE = {
   //   token: "docsui_bearer_token",
   //   baseUrl: "docsui_base_url",
@@ -598,35 +601,78 @@ function endpointHtml(e) {
 `).join("");
 
 
-  const tryItOut = `
-    <div class="card">
-      <div class="h2">Try it out</div>
-      <div class="muted">Uses Base URL + Path. Adds Authorization header if needed.</div>
+  // const tryItOut = `
+  //   <div class="card">
+  //     <div class="h2">Try it out</div>
+  //     <div class="muted">Uses Base URL + Path. Adds Authorization header if needed.</div>
 
-      <div class="tryRow">
-        <button class="btn" data-run="${escapeHtml(e.id)}" type="button">Run</button>
-        <span id="result-${escapeHtml(e.id)}" class="muted"></span>
+  //     <div class="tryRow">
+  //       <button class="btn" data-run="${escapeHtml(e.id)}" type="button">Run</button>
+  //       <span id="result-${escapeHtml(e.id)}" class="muted"></span>
+  //     </div>
+
+  //     <div style="height:10px"></div>
+  //     <div class="muted">Request body (JSON):</div>
+  //     <div style="height:6px"></div>
+  //     <textarea
+  //       id="body-${escapeHtml(e.id)}"
+  //       style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);background:rgba(2,6,23,0.6);color:var(--text);padding:10px;font-family:var(--mono);font-size:12px;outline:none"
+  //     >${escapeHtml(formatJson((e.request && e.request.example) ? e.request.example : {}))}</textarea>
+
+  //     <div style="height:10px"></div>
+  //     <div class="muted">Response:</div>
+  //     <div style="height:6px"></div>
+  //     <div class="codeWrap">
+  //       <button class="copyIconBtn" data-copy type="button" aria-label="Copy response output">
+  //         ${copyIconSvg()}
+  //       </button>
+  //       <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
+  //     </div>
+  //   </div>
+  // `;
+
+  const tryItOut = `
+  <div class="card tryCard">
+    <div class="tryHead">
+      <div>
+        <div class="h2">Try it out</div>
+        <div class="muted">Uses Base URL + Path. Adds Authorization header if needed.</div>
       </div>
 
-      <div style="height:10px"></div>
-      <div class="muted">Request body (JSON):</div>
-      <div style="height:6px"></div>
-      <textarea
-        id="body-${escapeHtml(e.id)}"
-        style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);background:rgba(2,6,23,0.6);color:var(--text);padding:10px;font-family:var(--mono);font-size:12px;outline:none"
-      >${escapeHtml(formatJson((e.request && e.request.example) ? e.request.example : {}))}</textarea>
-
-      <div style="height:10px"></div>
-      <div class="muted">Response:</div>
-      <div style="height:6px"></div>
-      <div class="codeWrap">
-        <button class="copyIconBtn" data-copy type="button" aria-label="Copy response output">
-          ${copyIconSvg()}
+      <div class="tryHeadRight">
+        <button class="iconBtn" data-pickfile="${escapeHtml(e.id)}" type="button" title="Attach file" aria-label="Attach file">
+          ${paperclipSvg()}
         </button>
-        <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
+        <input id="file-${escapeHtml(e.id)}" type="file" style="display:none"/>
       </div>
     </div>
-  `;
+
+    <div class="tryRow">
+      <button class="btn" data-run="${escapeHtml(e.id)}" type="button">Run</button>
+      <span id="result-${escapeHtml(e.id)}" class="muted"></span>
+    </div>
+
+    <div id="fileInfo-${escapeHtml(e.id)}" class="muted" style="margin-top:8px;display:none"></div>
+
+    <div style="height:10px"></div>
+    <div class="muted">Request body (JSON):</div>
+    <div style="height:6px"></div>
+    <textarea
+      id="body-${escapeHtml(e.id)}"
+      style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);background:rgba(2,6,23,0.6);color:var(--text);padding:10px;font-family:var(--mono);font-size:12px;outline:none"
+    >${escapeHtml(formatJson((e.request && e.request.example) ? e.request.example : {}))}</textarea>
+
+    <div style="height:10px"></div>
+    <div class="muted">Response:</div>
+    <div style="height:6px"></div>
+    <div class="codeWrap">
+      <button class="copyIconBtn" data-copy type="button" aria-label="Copy response output">
+        ${copyIconSvg()}
+      </button>
+      <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
+    </div>
+  </div>
+`;
 
   return `
     <div class="card" id="${escapeHtml(e.id)}">
@@ -725,6 +771,7 @@ function wireMiniToggles(root = document) {
     content.innerHTML = endpointHtml(e);
     wireCopyButtons(content);
     wireMiniToggles(content);
+    wireFilePickers(content)
 
     // attach run handler
     const runBtn = content.querySelector(`[data-run="${CSS.escape(e.id)}"]`);
@@ -734,6 +781,14 @@ function wireMiniToggles(root = document) {
     const el = document.getElementById(e.id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  function paperclipSvg(){
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M21 12.5l-8.5 8.5a6 6 0 0 1-8.5-8.5l10-10a4 4 0 0 1 5.5 5.5l-10 10a2.5 2.5 0 0 1-3.5-3.5l9-9"></path>
+    </svg>
+  `;
+}
 
   // async function runEndpoint(e) {
   //   const token = $("bearerToken").value.trim();
@@ -791,6 +846,68 @@ function wireMiniToggles(root = document) {
   //   }
   // }
   
+// async function runEndpoint(e) {
+//   const resultEl = document.getElementById(`result-${e.id}`);
+//   const outEl = document.getElementById(`out-${e.id}`);
+//   if (!resultEl || !outEl) return;
+
+//   resultEl.textContent = "Running...";
+//   outEl.textContent = "{}";
+
+//   try {
+//     const token = localStorage.getItem(STORAGE.token) || "";
+//     const baseUrl = (localStorage.getItem(STORAGE.baseUrl) || state.spec.baseUrl || "").replace(/\/+$/, "");
+//     const url = baseUrl + e.path;
+
+//     const headers = {};
+//     if (e.request?.contentType) headers["Content-Type"] = e.request.contentType;
+//     else headers["Content-Type"] = "application/json";
+
+//     if ((e.auth || "").toLowerCase() === "bearer" && token) {
+//       headers["Authorization"] = `Bearer ${token}`;
+//     }
+
+//     let body = undefined;
+//     const bodyBox = document.getElementById(`body-${e.id}`);
+//     if (bodyBox && ["POST", "PUT", "PATCH"].includes((e.method || "").toUpperCase())) {
+//       const raw = (bodyBox.value || "").trim();
+//       if (raw) body = raw;
+//     }
+
+//     const res = await fetch(url, {
+//       method: e.method,
+//       headers,
+//       body,
+//     });
+
+//     const ct = (res.headers.get("content-type") || "").toLowerCase();
+//     const text = await res.text();
+
+//     // Pretty print JSON if possible
+//     if (ct.includes("application/json")) {
+//       try {
+//         const obj = JSON.parse(text || "{}");
+//         outEl.textContent = JSON.stringify(obj, null, 2);
+//       } catch {
+//         outEl.textContent = text;
+//       }
+//     } else {
+//       // maybe JSON even if header isn't set
+//       try {
+//         const obj = JSON.parse(text);
+//         outEl.textContent = JSON.stringify(obj, null, 2);
+//       } catch {
+//         outEl.textContent = text;
+//       }
+//     }
+
+//     resultEl.textContent = res.ok ? `OK (${res.status})` : `Error (${res.status})`;
+//   } catch (err) {
+//     resultEl.textContent = "Error";
+//     outEl.textContent = String(err);
+//   }
+// }
+
 async function runEndpoint(e) {
   const resultEl = document.getElementById(`result-${e.id}`);
   const outEl = document.getElementById(`out-${e.id}`);
@@ -804,46 +921,60 @@ async function runEndpoint(e) {
     const baseUrl = (localStorage.getItem(STORAGE.baseUrl) || state.spec.baseUrl || "").replace(/\/+$/, "");
     const url = baseUrl + e.path;
 
-    const headers = {};
-    if (e.request?.contentType) headers["Content-Type"] = e.request.contentType;
-    else headers["Content-Type"] = "application/json";
+    const method = (e.method || "GET").toUpperCase();
 
-    if ((e.auth || "").toLowerCase() === "bearer" && token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    const attached = fileState[e.id] || null;
 
-    let body = undefined;
+    let headers = {};
+    let body;
+
+    // read textarea JSON
     const bodyBox = document.getElementById(`body-${e.id}`);
-    if (bodyBox && ["POST", "PUT", "PATCH"].includes((e.method || "").toUpperCase())) {
-      const raw = (bodyBox.value || "").trim();
-      if (raw) body = raw;
+    const raw = bodyBox ? (bodyBox.value || "").trim() : "";
+    let jsonObj = {};
+    if (raw) {
+      try { jsonObj = JSON.parse(raw); } catch { jsonObj = {}; }
     }
 
-    const res = await fetch(url, {
-      method: e.method,
-      headers,
-      body,
-    });
+    if (attached) {
+      // ✅ multipart upload
+      const fd = new FormData();
 
-    const ct = (res.headers.get("content-type") || "").toLowerCase();
-    const text = await res.text();
+      // put JSON fields into form data
+      Object.entries(jsonObj || {}).forEach(([k, v]) => {
+        if (v === undefined || v === null) return;
+        if (typeof v === "object") fd.append(k, JSON.stringify(v));
+        else fd.append(k, String(v));
+      });
 
-    // Pretty print JSON if possible
-    if (ct.includes("application/json")) {
-      try {
-        const obj = JSON.parse(text || "{}");
-        outEl.textContent = JSON.stringify(obj, null, 2);
-      } catch {
-        outEl.textContent = text;
+      const fieldName = e.request?.file?.fieldName || "file";
+      fd.append(fieldName, attached);
+
+      body = fd;
+      
+      if ((e.auth || "").toLowerCase() === "bearer" && token) {
+        headers["Authorization"] = `Bearer ${token}`;
       }
     } else {
-      // maybe JSON even if header isn't set
-      try {
-        const obj = JSON.parse(text);
-        outEl.textContent = JSON.stringify(obj, null, 2);
-      } catch {
-        outEl.textContent = text;
+      // normal JSON request
+      headers["Content-Type"] = "application/json";
+      if ((e.auth || "").toLowerCase() === "bearer" && token) {
+        headers["Authorization"] = `Bearer ${token}`;
       }
+      if (["POST","PUT","PATCH","DELETE"].includes(method)) {
+        body = raw ? raw : JSON.stringify(jsonObj || {});
+      }
+    }
+
+    const res = await fetch(url, { method, headers, body });
+
+    const text = await res.text();
+    // pretty print JSON if possible
+    try {
+      const obj = JSON.parse(text || "{}");
+      outEl.textContent = JSON.stringify(obj, null, 2);
+    } catch {
+      outEl.textContent = text;
     }
 
     resultEl.textContent = res.ok ? `OK (${res.status})` : `Error (${res.status})`;
@@ -851,6 +982,50 @@ async function runEndpoint(e) {
     resultEl.textContent = "Error";
     outEl.textContent = String(err);
   }
+}
+
+
+function wireFilePickers(root = document) {
+  root.querySelectorAll("[data-pickfile]").forEach(btn => {
+    if (btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-pickfile");
+      const input = document.getElementById(`file-${id}`);
+      if (!input) return;
+
+      // configure accept from spec if available
+      const e = state.flatEndpoints.find(x => x.id === id);
+      const accept = e?.request?.file?.accept?.join(",") || "image/*,video/*,application/pdf";
+      input.accept = accept;
+      input.multiple = !!e?.request?.file?.multiple;
+
+      input.click();
+    });
+  });
+
+  root.querySelectorAll(`input[type="file"][id^="file-"]`).forEach(inp => {
+    if (inp.dataset.bound === "1") return;
+    inp.dataset.bound = "1";
+
+    inp.addEventListener("change", () => {
+      const id = inp.id.replace("file-", "");
+      const f = inp.files && inp.files[0] ? inp.files[0] : null;
+      fileState[id] = f;
+
+      const info = document.getElementById(`fileInfo-${id}`);
+      if (info) {
+        if (!f) {
+          info.style.display = "none";
+          info.textContent = "";
+        } else {
+          info.style.display = "block";
+          info.textContent = `Attached: ${f.name} (${Math.round(f.size/1024)} KB)`;
+        }
+      }
+    });
+  });
 }
 
 
