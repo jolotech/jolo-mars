@@ -327,10 +327,10 @@ function renderSidebar(filtered = null) {
           </div>
           <span class="authTag">Auth: ${escapeHtml(e.auth || "none")}</span>
         </div>
-
         ${e.description ? `<div style="height:10px"></div><div class="muted">${escapeHtml(e.description)}</div>` : ""}
       </div>
 
+      ${usageBox}
       <div class="grid2">
         ${req}
         ${tryItOut}

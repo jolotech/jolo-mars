@@ -19,14 +19,14 @@ func DefaultSpec() DocSpec {
 					Title: "Example: Admin Login",
 					Lang:  "bash",
 					Code: `curl -X POST "$BASE_URL/admin/login" \
-					-H "Content-Type: application/json" \
-                    -d '{"email":"admin@jolo.com","password":"password"}'`,
+        -H "Content-Type: application/json" \
+        -d '{"email":"admin@jolo.com","password":"password"}'`,
 				},
 				{
 					Title: "Example: Call protected endpoint",
 					Lang:  "bash",
 					Code: `curl "$BASE_URL/v1/admin/2fa/setup" \
-					-H "Authorization: Bearer YOUR_TOKEN"`,
+        -H "Authorization: Bearer YOUR_TOKEN"`,
 				},
 			},
 			Overview: &OverviewSpec{
