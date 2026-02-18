@@ -544,35 +544,6 @@ function endpointHtml(e) {
       </ul>
     </div>` : "";
 
-  // const req = e.request ? `
-  //   <details open>
-  //     <div class="sumRow">
-  //       <span class="h2">Request</span>
-  //       <button class="sumToggle" type="button" data-toggle="#req-${escapeHtml(e.id)}" aria-label="Toggle request"></button>
-  //     </div>
-  //     <div class="detailsBody">
-  //       <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
-  //       <div style="height:10px"></div>
-  //       <div class="codeWrap">
-  //         <button class="copyIconBtn" data-copy type="button" aria-label="Copy request JSON">
-  //           ${copyIconSvg()}
-  //         </button>
-  //         <pre data-autoselect="1"><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
-  //       </div>
-  //     </div>
-  //   </details>
-  // ` : `
-  //   <details open>
-  //     <div class="sumRow" data-toggle-scope="details">
-  //       <span class="h2">Request</span>
-  //       <button class="sumToggle" type="button" aria-label="Toggle request"></button>
-  //     </div>
-  //     <div class="detailsBody">
-  //       <div class="muted">No request body documented.</div>
-  //     </div>
-  //   </details>
-  // `;
-
   const req = `
   <div class="card">
     <div class="sumRow">
@@ -599,27 +570,6 @@ function endpointHtml(e) {
     </div>
   </div>
 `;
-
-
-  // const responses = (e.responses || []).map(r => `
-  //   <details>
-  //     <div class="sumRow" data-toggle-scope="details">
-  //       <span class="h2">Response ${escapeHtml(r.status)}</span>
-  //       <button class="sumToggle" type="button" aria-label="Toggle response"></button>
-  //     </div>
-  //     <div class="detailsBody">
-  //       <div class="muted">${escapeHtml(r.description || "")}</div>
-  //       ${r.example ? `
-  //         <div style="height:10px"></div>
-  //         <div class="codeWrap">
-  //           <button class="copyIconBtn" data-copy type="button" aria-label="Copy response JSON">
-  //             ${copyIconSvg()}
-  //           </button>
-  //           <pre><code>${escapeHtml(formatJson(r.example))}</code></pre>
-  //         </div>` : ""}
-  //     </div>
-  //   </details>
-  // `).join("");
 
   const responses = (e.responses || []).map(r => `
   <div class="card">
@@ -684,7 +634,7 @@ function endpointHtml(e) {
         <div class="endpointTitle">
           <div class="endpointTitleRow">
             <span class="bigMethod">${escapeHtml(e.method)}</span>
-            <span class="bigPath">${escapeHtml(e.path)}</span>
+            <code class="bigPath">${escapeHtml(e.path)}</code>
 
             <button
               class="copyIconBtn copyEndpointBtn"
