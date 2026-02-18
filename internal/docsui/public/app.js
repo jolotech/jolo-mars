@@ -31,6 +31,51 @@
   };
 
 
+function isLikelyJwt(s) {
+  if (!s || typeof s !== "string") return false;
+  // basic JWT shape: xxx.yyy.zzz
+  const parts = s.split(".");
+  return parts.length === 3 && parts.every(p => p.length >= 10);
+}
+
+function findTokenDeep(obj) {
+  if (!obj || typeof obj !== "object") return null;
+
+  const tokenKeys = new Set(["access_token", "token", "setup_token", "two_fa_token"]);
+
+  const stack = [obj];
+
+  while (stack.length) {
+    const cur = stack.pop();
+    if (!cur || typeof cur !== "object") continue;
+
+    for (const [k, v] of Object.entries(cur)) {
+      const key = String(k).toLowerCase();
+
+      if (typeof v === "string") {
+        // direct key match
+        if (tokenKeys.has(key) && v.trim().length) return v.trim();
+
+        // sometimes token is stored under weird keys but still JWT-like
+        if (isLikelyJwt(v.trim())) return v.trim();
+      } else if (v && typeof v === "object") {
+        stack.push(v);
+      }
+    }
+  }
+
+  return null;
+}
+
+function setBearerToken(token) {
+  if (!token) return;
+  localStorage.setItem(STORAGE.token, token);
+
+  const input = document.getElementById("bearerToken");
+  if (input) input.value = token;
+}
+
+  
   function setHash(hash) {
     if (!hash.startsWith("#")) hash = "#" + hash;
     window.location.hash = hash;
@@ -726,12 +771,13 @@ const tryItOut = `
     <div class="muted">Response:</div>
     <div style="height:6px"></div>
 
-    <div class="codeWrap">
-      <button class="copyIconBtn" data-copy type="button"
-        aria-label="Copy response output">
-        ${copyIconSvg()}
-      </button>
-      <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
+    <div id="resbox-${escapeHtml(e.id)}" class="resBox">
+      <div class="codeWrap">
+        <button class="copyIconBtn" data-copy type="button" aria-label="Copy response output">
+          ${copyIconSvg()}
+        </button>
+        <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
+      </div>
     </div>
   </div>
 `;
@@ -851,62 +897,6 @@ function wireMiniToggles(root = document) {
     </svg>
   `;
 }
-
-  // async function runEndpoint(e) {
-  //   const token = $("bearerToken").value.trim();
-  //   const baseUrl = $("baseUrl").value.trim() || "";
-  //   const resultEl = document.getElementById(`result-${e.id}`);
-  //   const outEl = document.getElementById(`out-${e.id}`);
-  //   const bodyEl = document.getElementById(`body-${e.id}`);
-
-  //   resultEl.textContent = "Running...";
-  //   resultEl.className = "muted";
-  //   outEl.textContent = "{}";
-
-  //   const url = (baseUrl.replace(/\/+$/,"")) + e.path;
-
-  //   const headers = {};
-  //   if (e.request && e.request.contentType) headers["Content-Type"] = e.request.contentType;
-  //   if ((e.auth || "").toLowerCase() === "bearer" && token) headers["Authorization"] = `Bearer ${token}`;
-
-  //   let body = undefined;
-  //   if (e.method !== "GET" && e.method !== "DELETE") {
-  //     try {
-  //       const parsed = JSON.parse(bodyEl.value || "{}");
-  //       body = JSON.stringify(parsed);
-  //     } catch {
-  //       resultEl.textContent = "Invalid JSON body";
-  //       resultEl.className = "resultErr";
-  //       return;
-  //     }
-  //   }
-
-  //   try {
-  //     const res = await fetch(url, {
-  //       method: e.method,
-  //       headers,
-  //       body,
-  //     });
-
-  //     const text = await res.text();
-  //     let data = text;
-  //     try { data = JSON.parse(text); } catch {}
-
-  //     outEl.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
-
-  //     if (res.ok) {
-  //       resultEl.textContent = `OK (${res.status})`;
-  //       resultEl.className = "resultOk";
-  //     } else {
-  //       resultEl.textContent = `ERROR (${res.status})`;
-  //       resultEl.className = "resultErr";
-  //     }
-  //   } catch (err) {
-  //     resultEl.textContent = "Network error";
-  //     resultEl.className = "resultErr";
-  //     outEl.textContent = String(err);
-  //   }
-  // }
   
 // async function runEndpoint(e) {
 //   const resultEl = document.getElementById(`result-${e.id}`);
@@ -970,16 +960,95 @@ function wireMiniToggles(root = document) {
 //   }
 // }
 
+// async function runEndpoint(e) {
+//   const resultEl = document.getElementById(`result-${e.id}`);
+//   const outEl = document.getElementById(`out-${e.id}`);
+//   if (!resultEl || !outEl) return;
+//   if (!e.request?.file) {
+//     delete fileState[e.id];
+//   }
+
+//   resultEl.textContent = "Running...";
+//   outEl.textContent = "{}";
+
+//   try {
+//     const token = localStorage.getItem(STORAGE.token) || "";
+//     const baseUrl = (localStorage.getItem(STORAGE.baseUrl) || state.spec.baseUrl || "").replace(/\/+$/, "");
+//     const url = baseUrl + e.path;
+
+//     const method = (e.method || "GET").toUpperCase();
+
+//     const attached = fileState[e.id] || null;
+
+//     let headers = {};
+//     let body;
+
+//     // read textarea JSON
+//     const bodyBox = document.getElementById(`body-${e.id}`);
+//     const raw = bodyBox ? (bodyBox.value || "").trim() : "";
+//     let jsonObj = {};
+//     if (raw) {
+//       try { jsonObj = JSON.parse(raw); } catch { jsonObj = {}; }
+//     }
+
+//     if (attached) {
+//       // ✅ multipart upload
+//       const fd = new FormData();
+
+//       // put JSON fields into form data
+//       Object.entries(jsonObj || {}).forEach(([k, v]) => {
+//         if (v === undefined || v === null) return;
+//         if (typeof v === "object") fd.append(k, JSON.stringify(v));
+//         else fd.append(k, String(v));
+//       });
+
+//       const fieldName = e.request?.file?.fieldName || "file";
+//       fd.append(fieldName, attached);
+
+//       body = fd;
+
+//       if ((e.auth || "").toLowerCase() === "bearer" && token) {
+//         headers["Authorization"] = `Bearer ${token}`;
+//       }
+//     } else {
+//       // normal JSON request
+//       headers["Content-Type"] = "application/json";
+//       if ((e.auth || "").toLowerCase() === "bearer" && token) {
+//         headers["Authorization"] = `Bearer ${token}`;
+//       }
+//       if (["POST","PUT","PATCH","DELETE"].includes(method)) {
+//         body = raw ? raw : JSON.stringify(jsonObj || {});
+//       }
+//     }
+
+//     const res = await fetch(url, { method, headers, body });
+
+//     const text = await res.text();
+//     // pretty print JSON if possible
+//     try {
+//       const obj = JSON.parse(text || "{}");
+//       outEl.textContent = JSON.stringify(obj, null, 2);
+//     } catch {
+//       outEl.textContent = text;
+//     }
+
+//     resultEl.textContent = res.ok ? `OK (${res.status})` : `Error (${res.status})`;
+//   } catch (err) {
+//     resultEl.textContent = "Error";
+//     outEl.textContent = String(err);
+//   }
+// }
+
 async function runEndpoint(e) {
   const resultEl = document.getElementById(`result-${e.id}`);
   const outEl = document.getElementById(`out-${e.id}`);
+  const resBox = document.getElementById(`resbox-${e.id}`);
+
   if (!resultEl || !outEl) return;
-  if (!e.request?.file) {
-    delete fileState[e.id];
-  }
 
   resultEl.textContent = "Running...";
   outEl.textContent = "{}";
+  if (resBox) resBox.classList.remove("ok", "err");
 
   try {
     const token = localStorage.getItem(STORAGE.token) || "";
@@ -987,25 +1056,22 @@ async function runEndpoint(e) {
     const url = baseUrl + e.path;
 
     const method = (e.method || "GET").toUpperCase();
+    const needsBearer = (e.auth || "").toLowerCase() === "bearer";
 
-    const attached = fileState[e.id] || null;
+    // textarea json
+    const bodyBox = document.getElementById(`body-${e.id}`);
+    const raw = bodyBox ? (bodyBox.value || "").trim() : "";
+    let jsonObj = {};
+    if (raw) { try { jsonObj = JSON.parse(raw); } catch { jsonObj = {}; } }
+
+    // file upload support (only if endpoint supports it)
+    const attached = (e.request?.file && fileState[e.id]) ? fileState[e.id] : null;
 
     let headers = {};
     let body;
 
-    // read textarea JSON
-    const bodyBox = document.getElementById(`body-${e.id}`);
-    const raw = bodyBox ? (bodyBox.value || "").trim() : "";
-    let jsonObj = {};
-    if (raw) {
-      try { jsonObj = JSON.parse(raw); } catch { jsonObj = {}; }
-    }
-
     if (attached) {
-      // ✅ multipart upload
       const fd = new FormData();
-
-      // put JSON fields into form data
       Object.entries(jsonObj || {}).forEach(([k, v]) => {
         if (v === undefined || v === null) return;
         if (typeof v === "object") fd.append(k, JSON.stringify(v));
@@ -1014,40 +1080,48 @@ async function runEndpoint(e) {
 
       const fieldName = e.request?.file?.fieldName || "file";
       fd.append(fieldName, attached);
-
       body = fd;
 
-      if ((e.auth || "").toLowerCase() === "bearer" && token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
+      if (needsBearer && token) headers["Authorization"] = `Bearer ${token}`;
     } else {
-      // normal JSON request
       headers["Content-Type"] = "application/json";
-      if ((e.auth || "").toLowerCase() === "bearer" && token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
+      if (needsBearer && token) headers["Authorization"] = `Bearer ${token}`;
       if (["POST","PUT","PATCH","DELETE"].includes(method)) {
         body = raw ? raw : JSON.stringify(jsonObj || {});
       }
     }
 
     const res = await fetch(url, { method, headers, body });
-
     const text = await res.text();
-    // pretty print JSON if possible
-    try {
-      const obj = JSON.parse(text || "{}");
-      outEl.textContent = JSON.stringify(obj, null, 2);
-    } catch {
-      outEl.textContent = text;
+
+    // decide success/error for color (status code + your `status` field)
+    let parsed = null;
+    try { parsed = JSON.parse(text); } catch {}
+
+    const apiStatus = (parsed && typeof parsed.status === "string") ? parsed.status.toLowerCase() : "";
+    const okByApiField = apiStatus === "success";
+    const ok = res.ok || okByApiField;
+
+    if (resBox) resBox.classList.add(ok ? "ok" : "err");
+    resultEl.textContent = ok ? `OK (${res.status})` : `Error (${res.status})`;
+
+    // output formatting
+    if (parsed) outEl.textContent = JSON.stringify(parsed, null, 2);
+    else outEl.textContent = text;
+
+    // auto-store token if present
+    if (parsed) {
+      const found = findTokenDeep(parsed);
+      if (found) setBearerToken(found);
     }
 
-    resultEl.textContent = res.ok ? `OK (${res.status})` : `Error (${res.status})`;
   } catch (err) {
+    if (resBox) resBox.classList.add("err");
     resultEl.textContent = "Error";
     outEl.textContent = String(err);
   }
 }
+
 
 
 function wireFilePickers(root = document) {
@@ -1286,6 +1360,18 @@ function wireCopyButtons(root = document) {
 
     renderSidebar(null);
     wireSearch();
+
+    const saved = localStorage.getItem(STORAGE.token);
+    if (saved) {
+      const input = document.getElementById("bearerToken");
+      if (input) input.value = saved;
+    }
+
+    const savedBase = localStorage.getItem(STORAGE.baseUrl);
+    if (savedBase) {
+      const baseInput = document.getElementById("baseUrl");
+      if (baseInput) baseInput.value = savedBase;
+    }
 
     if (!window.location.hash) setHash("quickstart");
     renderPage();
