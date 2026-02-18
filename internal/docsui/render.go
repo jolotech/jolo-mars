@@ -120,6 +120,7 @@ var pageTmpl = template.Must(template.New("docs").Parse(`<!doctype html>
     </main>
   </div>
 
+  <div id="toastRoot" class="toastRoot" aria-live="polite" aria-atomic="true"></div>
   <script defer src="/docs/assets/app.js"></script>
 </body>
 </html>`))

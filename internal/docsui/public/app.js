@@ -23,7 +23,7 @@
   const STORAGE = {
     token: "docsui_bearer_token",
     baseUrl: "docsui_base_url",
-    theme: "docsui_theme",
+    // theme: "docsui_theme",
     env: "docsui_env",
   };
 
@@ -572,23 +572,23 @@ function renderSidebar(filtered = null) {
   });
 }
 
-  function wireThemeToggle() {
-  const btn = $("themeToggle");
-  if (!btn) return;
+//   function wireThemeToggle() {
+//   const btn = $("themeToggle");
+//   if (!btn) return;
 
-  const saved = localStorage.getItem(STORAGE.theme);
-  if (saved) document.documentElement.setAttribute("data-theme", saved);
+//   const saved = localStorage.getItem(STORAGE.theme);
+//   if (saved) document.documentElement.setAttribute("data-theme", saved);
 
-  btn.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme") || "dark";
-    const next = current === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem(STORAGE.theme, next);
-  });
-}
+//   btn.addEventListener("click", () => {
+//     const current = document.documentElement.getAttribute("data-theme") || "dark";
+//     const next = current === "dark" ? "light" : "dark";
+//     document.documentElement.setAttribute("data-theme", next);
+//     localStorage.setItem(STORAGE.theme, next);
+//   });
+// }
   async function boot() {
     wireTopControls();
-    wireThemeToggle();
+    // wireThemeToggle();
 
 
     const res = await fetch("/docs/spec.json", { cache: "no-store" });
