@@ -5,7 +5,7 @@ func DefaultSpec() DocSpec {
 		ProductName: "Jolo API",
 		CompanyName: "Jolo",
 		Description: "Jolo powers logistics, commerce, and admin operations through secure APIs.",
-		BaseURL:     "/api/v1",
+		BaseURL:     "staging.jolojolo.com/v1",
 		Version:     "1.0.0",
 		QuickStart: QuickStart{
 			Title: "Quick Start",
@@ -18,19 +18,20 @@ func DefaultSpec() DocSpec {
 				{
 					Title: "Example: Admin Login",
 					Lang:  "bash",
-					Code: `curl -X POST "$BASE_URL/api/v1/admin/login" \
+					Code: `curl -X POST "$BASE_URL/admin/login" \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@jolo.com","password":"password"}'`,
 				},
 				{
 					Title: "Example: Call protected endpoint",
 					Lang:  "bash",
-					Code: `curl "$BASE_URL/api/v1/admin/2fa/setup" \
+					Code: `curl "$BASE_URL/v1/admin/2fa/setup" \
   -H "Authorization: Bearer YOUR_TOKEN"`,
 				},
 			},
 		},
 		Groups: []Group{
+// ======== ADMIN GROUP WITH NESTED SECTIONS (AUTH + MANAGEMENT etc..) ========
 			{
 				ID:    "admin",
 				Title: "Admin",
@@ -83,6 +84,7 @@ func DefaultSpec() DocSpec {
 							},
 						},
 					},
+		// ======== MANAGEMENT SECTION NESTED UNDER ADMIN ========
 					{
 						ID:    "admin-management",
 						Title: "Management",
@@ -93,36 +95,62 @@ func DefaultSpec() DocSpec {
 					},
 				},
 			},
+
+	// ======== USERS GROUP WITH NESTED SECTIONS (AUTH + CART etc..) ========
 			{
-				ID:    "users",
-				Title: "Users",
-				Sections: []Section{
+                ID: "users",
+                Title: "Users",
+                Sections: []Section{
 					{
-						ID:    "users-auth",
-						Title: "Auth",
-						Endpoints: []Endpoint{
-							{ID: "user-signup", Method: "POST", Path: "/api/v1/users/signup", Summary: "Signup", Auth: "none"},
-							{ID: "user-login", Method: "POST", Path: "/api/v1/users/login", Summary: "Login", Auth: "none"},
-							{ID: "user-forgot-password", Method: "POST", Path: "/api/v1/users/forgot-password", Summary: "Forgot Password", Auth: "none"},
-						},
-					},
-				},
-			},
-			{
-				ID:    "carts",
-				Title: "Carts",
-				Sections: []Section{
-					{
-						ID:    "carts-main",
-						Title: "Cart",
-						Endpoints: []Endpoint{
-							{ID: "cart-get", Method: "GET", Path: "/api/v1/cart", Summary: "Get cart", Auth: "bearer"},
-							{ID: "cart-add", Method: "POST", Path: "/api/v1/cart/items", Summary: "Add item", Auth: "bearer"},
-							{ID: "cart-remove", Method: "DELETE", Path: "/api/v1/cart/items/:itemId", Summary: "Remove item", Auth: "bearer"},
-						},
-					},
-				},
-			},
+						ID: "users-auth",
+                        Title: "Auth",
+                        Endpoints: []Endpoint{
+							{ ID:"user-login", Method:"POST", Path:"/users/auth/login", Summary:"Login", Auth:"none" },
+                           { ID:"user-forgot-password", Method:"POST", Path:"/users/auth/forgot-password", Summary:"Forgot Password", Auth:"none" },
+                        },
+                    },
+          // ======== CART SECTION NESTED UNDER USERS ========
+	                {
+						ID: "users-cart",
+                        Title: "Cart",
+                         Endpoints: []Endpoint{
+                            { ID:"cart-get", Method:"GET", Path:"/users/cart", Summary:"Get Cart", Auth:"bearer" },
+                            { ID:"cart-add", Method:"POST", Path:"/users/cart/items", Summary:"Add Item", Auth:"bearer" },
+                        },
+                    },
+                },
+             },
+
+			// {
+			// 	ID:    "users",
+			// 	Title: "Users",
+			// 	Sections: []Section{
+			// 		{
+			// 			ID:    "users-auth",
+			// 			Title: "Auth",
+			// 			Endpoints: []Endpoint{
+			// 				{ID: "user-signup", Method: "POST", Path: "/api/v1/users/signup", Summary: "Signup", Auth: "none"},
+			// 				{ID: "user-login", Method: "POST", Path: "/api/v1/users/login", Summary: "Login", Auth: "none"},
+			// 				{ID: "user-forgot-password", Method: "POST", Path: "/api/v1/users/forgot-password", Summary: "Forgot Password", Auth: "none"},
+			// 			},
+			// 		},
+			// 	},
+			// },
+			// {
+			// 	ID:    "carts",
+			// 	Title: "Carts",
+			// 	Sections: []Section{
+			// 		{
+			// 			ID:    "carts-main",
+			// 			Title: "Cart",
+			// 			Endpoints: []Endpoint{
+			// 				{ID: "cart-get", Method: "GET", Path: "/api/v1/cart", Summary: "Get cart", Auth: "bearer"},
+			// 				{ID: "cart-add", Method: "POST", Path: "/api/v1/cart/items", Summary: "Add item", Auth: "bearer"},
+			// 				{ID: "cart-remove", Method: "DELETE", Path: "/api/v1/cart/items/:itemId", Summary: "Remove item", Auth: "bearer"},
+			// 			},
+			// 		},
+			// 	},
+			// },
 		},
 	}
 }
