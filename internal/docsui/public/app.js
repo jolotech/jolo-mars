@@ -214,7 +214,8 @@ function renderSidebar(filtered = null) {
     head.innerHTML = `<strong>${escapeHtml(g.title)}</strong><span class="pill">folders</span>`;
 
     const body = document.createElement("div");
-    body.className = "treeGroupBody open";
+    body.className = "treeGroupBody";
+    if (filtered) body.classList.add("open");
 
     head.addEventListener("click", () => body.classList.toggle("open"));
 
@@ -261,6 +262,15 @@ function renderSidebar(filtered = null) {
   }
 
   function endpointHtml(e) {
+
+    const usageBox = (e.usage && (e.usage.notes || []).length) ? `
+      <div class="card">
+        <div class="h2">${escapeHtml(e.usage.title || "Usage")}</div>
+        <ul class="muted" style="margin:0;padding-left:18px">
+          ${(e.usage.notes || []).map(n => `<li>${escapeHtml(n)}</li>`).join("")}
+        </ul>
+      </div>` : "";
+
     const req = e.request ? `
       <div class="card">
         <div class="h2">Request</div>

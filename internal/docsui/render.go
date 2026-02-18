@@ -13,7 +13,7 @@ var pageTmpl = template.Must(template.New("docs").Parse(`<!doctype html>
 <body>
   <header class="topbar">
     <div class="brand">
-      <img class="logo" src="/docs/assets/logo.svg" alt="logo"/>
+      <img class="logo" src="/docs/assets/joloImg.png" alt="logo"/>
       <div class="brandText">
         <div class="titleRow">
           <h1>{{.ProductName}}</h1>
