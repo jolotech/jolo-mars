@@ -5,28 +5,36 @@ func DefaultSpec() DocSpec {
 		ProductName: "Jolo API",
 		CompanyName: "Jolo",
 		Description: "Jolo powers logistics, commerce, and admin operations through secure APIs.",
-		BaseURL:     "staging.jolojolo.com/v1",
+		BaseURL:     "https://staging.jolojolo.com/v1",
 		Version:     "1.0.0",
 		QuickStart: QuickStart{
 			Title: "Quick Start",
 			Steps: []string{
-				"1) Pick an endpoint from the left sidebar.",
-				"2) If it needs auth, paste your Bearer token at the top of the page.",
-				"3) Click an endpoint to view details and optional “Try it out”.",
+				"Pick an endpoint from the left sidebar.",
+				"If it needs auth, paste your Bearer token at the top of the page.",
+				"Click an endpoint to view details and optional “Try it out”.",
 			},
 			Examples: []CodeBlock{
 				{
 					Title: "Example: Admin Login",
 					Lang:  "bash",
 					Code: `curl -X POST "$BASE_URL/admin/login" \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@jolo.com","password":"password"}'`,
+					-H "Content-Type: application/json" \
+                    -d '{"email":"admin@jolo.com","password":"password"}'`,
 				},
 				{
 					Title: "Example: Call protected endpoint",
 					Lang:  "bash",
 					Code: `curl "$BASE_URL/v1/admin/2fa/setup" \
-  -H "Authorization: Bearer YOUR_TOKEN"`,
+					-H "Authorization: Bearer YOUR_TOKEN"`,
+				},
+			},
+			Overview: &OverviewSpec{
+				Title: "About Jolo & This API",
+				Body: []string{
+					"Jolo is a logistics and commerce platform that helps businesses manage deliveries, orders, and operations.",
+                    "This API powers admin operations, user authentication, and commerce flows like carts and checkout.",
+                    "Use the sidebar to explore endpoints. Protected endpoints require a Bearer token after login.",
 				},
 			},
 		},
@@ -46,6 +54,14 @@ func DefaultSpec() DocSpec {
 								Path:    "/api/v1/admin/login",
 								Summary: "Admin Login",
 								Auth:    "none",
+								Usage: &UsageSpec{
+								    Title: "Usage",
+                                    Notes: []string{
+										"Use this endpoint to authenticate an admin and get an access token.",
+                                        "Send email + password in JSON.",
+                                        "On success, store the token and use it in Authorization: Bearer <token> for protected endpoints.",
+                                    },
+								},
 								Request: &RequestSpec{
 									ContentType: "application/json",
 									Example: map[string]any{

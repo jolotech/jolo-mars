@@ -13,7 +13,13 @@ type DocSpec struct {
 type QuickStart struct {
 	Title    string      `json:"title"`
 	Steps    []string    `json:"steps"`
+	Overview  *OverviewSpec `json:"overview,omitempty"`
 	Examples []CodeBlock `json:"examples"`
+}
+
+type OverviewSpec struct {
+	Title string   `json:"title,omitempty"`
+	Body  []string `json:"body,omitempty"` // paragraphs
 }
 
 type CodeBlock struct {
@@ -54,10 +60,17 @@ type Endpoint struct {
 	Method      string         `json:"method"`
 	Path        string         `json:"path"`
 	Summary     string         `json:"summary"`
+	Usage       *UsageSpec     `json:"usage,omitempty"`
 	Description string         `json:"description,omitempty"`
 	Auth        string         `json:"auth"` // none | bearer
 	Request     *RequestSpec   `json:"request,omitempty"`
 	Responses   []ResponseSpec `json:"responses,omitempty"`
+}
+
+
+type UsageSpec struct {
+	Title string   `json:"title,omitempty"` // e.g. "How to use"
+	Notes []string `json:"notes,omitempty"` // bullet points / steps
 }
 
 type RequestSpec struct {

@@ -33,84 +33,210 @@
     try { return JSON.stringify(obj, null, 2); } catch { return String(obj); }
   }
 
+  // function normalize() {
+  //   const list = [];
+  //   for (const g of state.spec.groups) {
+  //     for (const s of g.sections) {
+  //       for (const e of s.endpoints) {
+  //         list.push({
+  //           ...e,
+  //           groupId: g.id,
+  //           groupTitle: g.title,
+  //           sectionId: s.id,
+  //           sectionTitle: s.title,
+  //           searchText: `${g.title} ${s.title} ${e.method} ${e.path} ${e.summary} ${e.description || ""}`.toLowerCase(),
+  //         });
+  //       }
+  //     }
+  //   }
+  //   state.flatEndpoints = list;
+  // }
+
   function normalize() {
     const list = [];
-    for (const g of state.spec.groups) {
-      for (const s of g.sections) {
-        for (const e of s.endpoints) {
-          list.push({
-            ...e,
-            groupId: g.id,
-            groupTitle: g.title,
-            sectionId: s.id,
-            sectionTitle: s.title,
-            searchText: `${g.title} ${s.title} ${e.method} ${e.path} ${e.summary} ${e.description || ""}`.toLowerCase(),
-          });
-        }
+    function walkSection(group, section) {
+      // endpoints in this section
+      for (const e of (section.endpoints || [])) {
+        list.push({
+           ...e,
+           groupId: group.id,
+           groupTitle: group.title,
+           sectionId: section.id,
+           sectionTitle: section.title,
+           searchText: `${group.title} ${section.title} ${e.method} ${e.path} ${e.summary} ${e.description || ""}`.toLowerCase(),
+        });
+      }
+
+       // children folders
+      for (const child of (section.children || [])) {
+        walkSection(group, child);
       }
     }
+
+    for (const g of state.spec.groups || []) {
+      for (const s of g.sections || []) {
+        walkSection(g, s);
+      }
+    }
+
     state.flatEndpoints = list;
   }
 
-  function renderSidebar(filtered = null) {
-    const tree = $("sidebarTree");
-    tree.innerHTML = "";
+  // function renderSidebar(filtered = null) {
+  //   const tree = $("sidebarTree");
+  //   tree.innerHTML = "";
 
-    const groups = state.spec.groups;
+  //   const groups = state.spec.groups;
 
-    for (const g of groups) {
-      const wrap = document.createElement("div");
-      wrap.className = "treeGroup";
+  //   for (const g of groups) {
+  //     const wrap = document.createElement("div");
+  //     wrap.className = "treeGroup";
 
-      const head = document.createElement("div");
-      head.className = "treeGroupHeader";
-      head.innerHTML = `<strong>${escapeHtml(g.title)}</strong><span class="pill">${g.sections.length} sections</span>`;
+  //     const head = document.createElement("div");
+  //     head.className = "treeGroupHeader";
+  //     head.innerHTML = `<strong>${escapeHtml(g.title)}</strong><span class="pill">${g.sections.length} sections</span>`;
 
-      const body = document.createElement("div");
-      body.className = "treeGroupBody open";
+  //     const body = document.createElement("div");
+  //     body.className = "treeGroupBody open";
 
-      head.addEventListener("click", () => body.classList.toggle("open"));
+  //     head.addEventListener("click", () => body.classList.toggle("open"));
 
-      for (const s of g.sections) {
-        const sec = document.createElement("div");
-        sec.className = "treeSection";
-        sec.innerHTML = `<div class="treeSectionTitle">${escapeHtml(s.title)}</div>`;
+  //     for (const s of g.sections) {
+  //       const sec = document.createElement("div");
+  //       sec.className = "treeSection";
+  //       sec.innerHTML = `<div class="treeSectionTitle">${escapeHtml(s.title)}</div>`;
 
-        const endpoints = filtered
-          ? filtered.filter(x => x.groupId === g.id && x.sectionId === s.id)
-          : s.endpoints.map(e => ({...e, groupId: g.id, sectionId: s.id}));
+  //       const endpoints = filtered
+  //         ? filtered.filter(x => x.groupId === g.id && x.sectionId === s.id)
+  //         : s.endpoints.map(e => ({...e, groupId: g.id, sectionId: s.id}));
 
-        for (const e of endpoints) {
-          const item = document.createElement("div");
-          item.className = "treeItem";
-          item.innerHTML = `
-            <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
-              <div style="display:flex;gap:8px;align-items:center">
-                <span class="method">${escapeHtml(e.method)}</span>
-                <span style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(e.summary || e.id)}</span>
-              </div>
-              <div class="path" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(e.path)}</div>
-            </div>
-          `;
-          item.addEventListener("click", () => {
-            setHash(e.id);
-            renderPage();
-          });
-          sec.appendChild(item);
-        }
+  //       for (const e of endpoints) {
+  //         const item = document.createElement("div");
+  //         item.className = "treeItem";
+  //         item.innerHTML = `
+  //           <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+  //             <div style="display:flex;gap:8px;align-items:center">
+  //               <span class="method">${escapeHtml(e.method)}</span>
+  //               <span style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(e.summary || e.id)}</span>
+  //             </div>
+  //             <div class="path" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(e.path)}</div>
+  //           </div>
+  //         `;
+  //         item.addEventListener("click", () => {
+  //           setHash(e.id);
+  //           renderPage();
+  //         });
+  //         sec.appendChild(item);
+  //       }
 
-        body.appendChild(sec);
-      }
+  //       body.appendChild(sec);
+  //     }
 
-      wrap.appendChild(head);
-      wrap.appendChild(body);
-      tree.appendChild(wrap);
-    }
+  //     wrap.appendChild(head);
+  //     wrap.appendChild(body);
+  //     tree.appendChild(wrap);
+  //   }
+  // }
+
+function renderSidebar(filtered = null) {
+  const tree = $("sidebarTree");
+  tree.innerHTML = "";
+
+  function createEndpointItem(e) {
+    const item = document.createElement("div");
+    item.className = "treeItem";
+
+    // Sidebar label = just "Login", "Forgot Password", etc.
+    item.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+        <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          ${escapeHtml(e.summary || e.id)}
+        </div>
+      </div>
+    `;
+
+    item.addEventListener("click", () => {
+      setHash(e.id);
+      renderPage();
+    });
+
+    return item;
   }
 
+  function renderSectionFolder(group, section, parentEl) {
+    // collect endpoints for this folder
+    const endpoints = filtered
+      ? filtered.filter(x => x.groupId === group.id && x.sectionId === section.id)
+      : (section.endpoints || []).map(e => ({ ...e, groupId: group.id, sectionId: section.id }));
+
+    const children = section.children || [];
+
+    // In search mode: hide folders with nothing inside
+    if (filtered && endpoints.length === 0 && children.length === 0) return;
+
+    const folder = document.createElement("div");
+    folder.className = "treeGroup";
+    folder.style.marginTop = "8px";
+
+    const head = document.createElement("div");
+    head.className = "treeGroupHeader";
+    head.innerHTML = `<strong>${escapeHtml(section.title)}</strong><span class="pill">${endpoints.length}</span>`;
+
+    const body = document.createElement("div");
+    body.className = "treeGroupBody"; // collapsed by default
+
+    // If searching, auto-open matching folders
+    if (filtered) body.classList.add("open");
+
+    head.addEventListener("click", () => body.classList.toggle("open"));
+
+    // endpoints inside folder
+    for (const e of endpoints) {
+      body.appendChild(createEndpointItem(e));
+    }
+
+    // nested folders
+    for (const child of children) {
+      renderSectionFolder(group, child, body);
+    }
+
+    folder.appendChild(head);
+    folder.appendChild(body);
+    parentEl.appendChild(folder);
+  }
+
+  for (const g of (state.spec.groups || [])) {
+    const wrap = document.createElement("div");
+    wrap.className = "treeGroup";
+
+    const head = document.createElement("div");
+    head.className = "treeGroupHeader";
+    head.innerHTML = `<strong>${escapeHtml(g.title)}</strong><span class="pill">folders</span>`;
+
+    const body = document.createElement("div");
+    body.className = "treeGroupBody open";
+
+    head.addEventListener("click", () => body.classList.toggle("open"));
+
+    for (const s of (g.sections || [])) {
+      renderSectionFolder(g, s, body);
+    }
+
+    wrap.appendChild(head);
+    wrap.appendChild(body);
+    tree.appendChild(wrap);
+  }
+}
+
+  
   function quickStartHtml() {
     const q = state.spec.quickStart;
     const steps = (q.steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+    const overview = (q.overview && (q.overview.body || []).length) ? `
+      <div class="card">
+        <h2 class="h2">${escapeHtml(q.overview.title || "Overview")}</h2>
+          ${(q.overview.body || []).map(p => `<p class="muted" style="margin:0 0 10px">${escapeHtml(p)}</p>`).join("")}
+      </div>` : "";
     const examples = (q.examples || []).map(ex => `
       <div class="card">
         <div class="h2">${escapeHtml(ex.title)}</div>
@@ -119,6 +245,7 @@
     `).join("");
 
     return `
+      ${overview}
       <div class="card">
         <h2 class="h2">${escapeHtml(q.title || "Quick Start")}</h2>
         <div class="muted">Base URL: <span class="path">${escapeHtml(state.spec.baseUrl)}</span></div>
