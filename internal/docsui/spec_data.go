@@ -51,7 +51,7 @@ func DefaultSpec() DocSpec {
 							{
 								ID:      "admin-login",
 								Method:  "POST",
-								Path:    "/api/v1/admin/login",
+								Path:    "/admin/login",
 								Summary: "Admin Login",
 								Auth:    "none",
 								Usage: &UsageSpec{
@@ -141,37 +141,6 @@ func DefaultSpec() DocSpec {
                     },
                 },
              },
-
-			// {
-			// 	ID:    "users",
-			// 	Title: "Users",
-			// 	Sections: []Section{
-			// 		{
-			// 			ID:    "users-auth",
-			// 			Title: "Auth",
-			// 			Endpoints: []Endpoint{
-			// 				{ID: "user-signup", Method: "POST", Path: "/api/v1/users/signup", Summary: "Signup", Auth: "none"},
-			// 				{ID: "user-login", Method: "POST", Path: "/api/v1/users/login", Summary: "Login", Auth: "none"},
-			// 				{ID: "user-forgot-password", Method: "POST", Path: "/api/v1/users/forgot-password", Summary: "Forgot Password", Auth: "none"},
-			// 			},
-			// 		},
-			// 	},
-			// },
-			// {
-			// 	ID:    "carts",
-			// 	Title: "Carts",
-			// 	Sections: []Section{
-			// 		{
-			// 			ID:    "carts-main",
-			// 			Title: "Cart",
-			// 			Endpoints: []Endpoint{
-			// 				{ID: "cart-get", Method: "GET", Path: "/api/v1/cart", Summary: "Get cart", Auth: "bearer"},
-			// 				{ID: "cart-add", Method: "POST", Path: "/api/v1/cart/items", Summary: "Add item", Auth: "bearer"},
-			// 				{ID: "cart-remove", Method: "DELETE", Path: "/api/v1/cart/items/:itemId", Summary: "Remove item", Auth: "bearer"},
-			// 			},
-			// 		},
-			// 	},
-			// },
 		},
 	}
 }

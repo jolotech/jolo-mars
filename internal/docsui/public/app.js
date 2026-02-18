@@ -631,7 +631,52 @@ function endpointHtml(e) {
   //   </div>
   // `;
 
-  const tryItOut = `
+//   const tryItOut = `
+//   <div class="card tryCard">
+//     <div class="tryHead">
+//       <div>
+//         <div class="h2">Try it out</div>
+//         <div class="muted">Uses Base URL + Path. Adds Authorization header if needed.</div>
+//       </div>
+
+//       <div class="tryHeadRight">
+//         <button class="iconBtn" data-pickfile="${escapeHtml(e.id)}" type="button" title="Attach file" aria-label="Attach file">
+//           ${paperclipSvg()}
+//         </button>
+//         <input id="file-${escapeHtml(e.id)}" type="file" style="display:none"/>
+//       </div>
+//     </div>
+
+//     <div class="tryRow">
+//       <button class="btn" data-run="${escapeHtml(e.id)}" type="button">Run</button>
+//       <span id="result-${escapeHtml(e.id)}" class="muted"></span>
+//     </div>
+
+//     <div id="fileInfo-${escapeHtml(e.id)}" class="muted" style="margin-top:8px;display:none"></div>
+
+//     <div style="height:10px"></div>
+//     <div class="muted">Request body (JSON):</div>
+//     <div style="height:6px"></div>
+//     <textarea
+//       id="body-${escapeHtml(e.id)}"
+//       style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);background:rgba(2,6,23,0.6);color:var(--text);padding:10px;font-family:var(--mono);font-size:12px;outline:none"
+//     >${escapeHtml(formatJson((e.request && e.request.example) ? e.request.example : {}))}</textarea>
+
+//     <div style="height:10px"></div>
+//     <div class="muted">Response:</div>
+//     <div style="height:6px"></div>
+//     <div class="codeWrap">
+//       <button class="copyIconBtn" data-copy type="button" aria-label="Copy response output">
+//         ${copyIconSvg()}
+//       </button>
+//       <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
+//     </div>
+//   </div>
+// `;
+
+const hasFileUpload = !!e.request?.file;
+
+const tryItOut = `
   <div class="card tryCard">
     <div class="tryHead">
       <div>
@@ -639,12 +684,17 @@ function endpointHtml(e) {
         <div class="muted">Uses Base URL + Path. Adds Authorization header if needed.</div>
       </div>
 
-      <div class="tryHeadRight">
-        <button class="iconBtn" data-pickfile="${escapeHtml(e.id)}" type="button" title="Attach file" aria-label="Attach file">
-          ${paperclipSvg()}
-        </button>
-        <input id="file-${escapeHtml(e.id)}" type="file" style="display:none"/>
-      </div>
+      ${
+        hasFileUpload ? `
+        <div class="tryHeadRight">
+          <button class="iconBtn" data-pickfile="${escapeHtml(e.id)}"
+            type="button" title="Attach file" aria-label="Attach file">
+            ${paperclipSvg()}
+          </button>
+          <input id="file-${escapeHtml(e.id)}" type="file" style="display:none"/>
+        </div>
+        ` : ``
+      }
     </div>
 
     <div class="tryRow">
@@ -652,21 +702,33 @@ function endpointHtml(e) {
       <span id="result-${escapeHtml(e.id)}" class="muted"></span>
     </div>
 
-    <div id="fileInfo-${escapeHtml(e.id)}" class="muted" style="margin-top:8px;display:none"></div>
+    ${
+      hasFileUpload ? `
+      <div id="fileInfo-${escapeHtml(e.id)}"
+        class="muted"
+        style="margin-top:8px;display:none">
+      </div>
+      ` : ``
+    }
 
     <div style="height:10px"></div>
     <div class="muted">Request body (JSON):</div>
     <div style="height:6px"></div>
+
     <textarea
       id="body-${escapeHtml(e.id)}"
-      style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);background:rgba(2,6,23,0.6);color:var(--text);padding:10px;font-family:var(--mono);font-size:12px;outline:none"
+      style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);
+      background:rgba(2,6,23,0.6);color:var(--text);padding:10px;
+      font-family:var(--mono);font-size:12px;outline:none"
     >${escapeHtml(formatJson((e.request && e.request.example) ? e.request.example : {}))}</textarea>
 
     <div style="height:10px"></div>
     <div class="muted">Response:</div>
     <div style="height:6px"></div>
+
     <div class="codeWrap">
-      <button class="copyIconBtn" data-copy type="button" aria-label="Copy response output">
+      <button class="copyIconBtn" data-copy type="button"
+        aria-label="Copy response output">
         ${copyIconSvg()}
       </button>
       <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
@@ -912,6 +974,9 @@ async function runEndpoint(e) {
   const resultEl = document.getElementById(`result-${e.id}`);
   const outEl = document.getElementById(`out-${e.id}`);
   if (!resultEl || !outEl) return;
+  if (!e.request?.file) {
+    delete fileState[e.id];
+  }
 
   resultEl.textContent = "Running...";
   outEl.textContent = "{}";
@@ -951,7 +1016,7 @@ async function runEndpoint(e) {
       fd.append(fieldName, attached);
 
       body = fd;
-      
+
       if ((e.auth || "").toLowerCase() === "bearer" && token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
