@@ -33,6 +33,82 @@
     window.location.hash = hash;
   }
 
+  function toastSuccess(title, msg) {
+  const root = document.getElementById("toastRoot");
+  if (!root) return;
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <div class="checkWrap" aria-hidden="true">
+      <svg class="checkIcon" viewBox="0 0 24 24">
+        <path d="M20 6L9 17l-5-5"></path>
+      </svg>
+    </div>
+    <div style="display:flex;flex-direction:column">
+      <div class="toastTitle">${escapeHtml(title || "Copied")}</div>
+      <div class="toastMsg">${escapeHtml(msg || "")}</div>
+    </div>
+  `;
+
+  root.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("hide");
+    setTimeout(() => toast.remove(), 200);
+  }, 1400);
+}
+
+// function selectCodeInPre(preEl) {
+//   try {
+//     const range = document.createRange();
+//     range.selectNodeContents(preEl);
+//     const sel = window.getSelection();
+//     sel.removeAllRanges();
+//     sel.addRange(range);
+//   } catch {}
+// }
+
+// Clipboard API with fallback for older/blocked contexts
+async function copyTextReliable(text) {
+  // Try modern clipboard API first
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+
+  // Fallback: hidden textarea + execCommand
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "fixed";
+  ta.style.top = "-1000px";
+  ta.style.left = "-1000px";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+
+  try {
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    document.body.removeChild(ta);
+    return false;
+  }
+}
+
+function copyIconSvg() {
+  // simple “copy” icon (two rectangles)
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="9" y="9" width="10" height="10" rx="2"></rect>
+      <path d="M7 15H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  `;
+}
+
+
   function escapeHtml(str) {
     return String(str)
       .replaceAll("&", "&amp;")
@@ -243,169 +319,427 @@ function renderSidebar(filtered = null) {
 }
 
   
-  function quickStartHtml() {
-    const q = state.spec.quickStart;
-    const steps = (q.steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
-    const overview = (q.overview && (q.overview.body || []).length) ? `
-      <div class="card">
-        <h2 class="h2">${escapeHtml(q.overview.title || "Overview")}</h2>
-          ${(q.overview.body || []).map(p => `<p class="muted" style="margin:0 0 10px">${escapeHtml(p)}</p>`).join("")}
-      </div>` : "";
-    // const examples = (q.examples || []).map(ex => `
-    //   <div class="card">
-    //     <div class="h2">${escapeHtml(ex.title)}</div>
-    //     <pre><code>${escapeHtml(ex.code)}</code></pre>
-    //   </div>
-    // `).join("");
+  // function quickStartHtml() {
+  //   const q = state.spec.quickStart;
+  //   const steps = (q.steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+  //   const overview = (q.overview && (q.overview.body || []).length) ? `
+  //     <div class="card">
+  //       <h2 class="h2">${escapeHtml(q.overview.title || "Overview")}</h2>
+  //         ${(q.overview.body || []).map(p => `<p class="muted" style="margin:0 0 10px">${escapeHtml(p)}</p>`).join("")}
+  //     </div>` : "";
+  //   // const examples = (q.examples || []).map(ex => `
+  //   //   <div class="card">
+  //   //     <div class="h2">${escapeHtml(ex.title)}</div>
+  //   //     <pre><code>${escapeHtml(ex.code)}</code></pre>
+  //   //   </div>
+  //   // `).join("");
 
-    const examples = (q.examples || []).map(ex => `
-      <div class="card">
-        <div class="h2">${escapeHtml(ex.title)}</div>
-        <div class="codeWrap">
-          <button class="copyBtn" data-copy>Copy</button>
-          <pre><code>${escapeHtml(ex.code)}</code></pre>
-        </div>
-      </div>
-    `).join("");
+  //   const examples = (q.examples || []).map(ex => `
+  //     <div class="card">
+  //       <div class="h2">${escapeHtml(ex.title)}</div>
+  //       <div class="codeWrap">
+  //         <button class="copyBtn" data-copy>Copy</button>
+  //         <pre><code>${escapeHtml(ex.code)}</code></pre>
+  //       </div>
+  //     </div>
+  //   `).join("");
 
 
-    return `
-      ${overview}
-      <div class="card">
-        <h2 class="h2">${escapeHtml(q.title || "Quick Start")}</h2>
-        <div class="muted">Base URL: <span class="path">${escapeHtml(state.spec.baseUrl)}</span></div>
-        <div style="height:10px"></div>
-        <ol class="muted" style="margin:0;padding-left:18px">${steps}</ol>
-      </div>
-      ${examples}
-      <div class="card">
-        <div class="h2">Browse</div>
-        <div class="muted">Use the sidebar to pick a group, then an endpoint. The sidebar stays open.</div>
-      </div>
-    `;
-  }
+  //   return `
+  //     ${overview}
+  //     <div class="card">
+  //       <h2 class="h2">${escapeHtml(q.title || "Quick Start")}</h2>
+  //       <div class="muted">Base URL: <span class="path">${escapeHtml(state.spec.baseUrl)}</span></div>
+  //       <div style="height:10px"></div>
+  //       <ol class="muted" style="margin:0;padding-left:18px">${steps}</ol>
+  //     </div>
+  //     ${examples}
+  //     <div class="card">
+  //       <div class="h2">Browse</div>
+  //       <div class="muted">Use the sidebar to pick a group, then an endpoint. The sidebar stays open.</div>
+  //     </div>
+  //   `;
+  // }
+  
+function quickStartHtml() {
+  const q = state.spec.quickStart;
 
-  function endpointHtml(e) {
+  const steps = (q.steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
 
-    const usageBox = (e.usage && (e.usage.notes || []).length) ? `
-      <div class="card">
-        <div class="h2">${escapeHtml(e.usage.title || "Usage")}</div>
-        <ul class="muted" style="margin:0;padding-left:18px">
-          ${(e.usage.notes || []).map(n => `<li>${escapeHtml(n)}</li>`).join("")}
-        </ul>
-      </div>` : "";
+  const overview = (q.overview && (q.overview.body || []).length) ? `
+    <div class="card">
+      <h2 class="h2">${escapeHtml(q.overview.title || "Overview")}</h2>
+      ${(q.overview.body || []).map(p => `<p class="muted" style="margin:0 0 10px">${escapeHtml(p)}</p>`).join("")}
+    </div>` : "";
 
-    // const req = e.request ? `
-    //   <div class="card">
-    //     <div class="h2">Request</div>
-    //     <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
-    //     <div style="height:10px"></div>
-    //     <pre><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
-    //   </div>
-    // ` : `
-    //   <div class="card">
-    //     <div class="h2">Request</div>
-    //     <div class="muted">No request body documented.</div>
-    //   </div>
-    // `;
+  // const examples = (q.examples || []).map(ex => `
+  //   <div class="card">
+  //     <div class="h2">${escapeHtml(ex.title)}</div>
+  //     <div class="codeWrap">
+  //       <button class="copyIconBtn" data-copy type="button" aria-label="Copy code">
+  //         ${copyIconSvg()}
+  //       </button>
+  //     </div>
+  //   </div>
+  // `).join("");
 
-  const req = e.request ? `
-  <details open>
-    <summary><span class="h2">Request</span><span class="chev">toggle</span></summary>
-    <div class="detailsBody">
-      <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
-      <div style="height:10px"></div>
+  const examples = (q.examples || []).map(ex => `
+    <div class="card">
+      <div class="h2">${escapeHtml(ex.title)}</div>
       <div class="codeWrap">
-        <button class="copyBtn" data-copy>Copy</button>
-        <pre><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
+        <button class="copyIconBtn" data-copy type="button" aria-label="Copy code">
+          ${copyIconSvg()}
+        </button>
+        <pre><code>${escapeHtml(ex.code)}</code></pre>
       </div>
     </div>
-  </details>
-` : `
-  <details open>
-    <summary><span class="h2">Request</span><span class="chev">toggle</span></summary>
-    <div class="detailsBody">
-      <div class="muted">No request body documented.</div>
+  `).join("");
+
+
+  return `
+    ${overview}
+    <div class="card">
+      <h2 class="h2">${escapeHtml(q.title || "Quick Start")}</h2>
+      <div class="muted">Base URL: <span class="path">${escapeHtml(state.spec.baseUrl)}</span></div>
+      <div style="height:10px"></div>
+      <ol class="muted" style="margin:0;padding-left:18px">${steps}</ol>
     </div>
-  </details>
+    ${examples}
+    <div class="card">
+      <div class="h2">Browse</div>
+      <div class="muted">Use the sidebar to pick a group, then a folder, then an endpoint.</div>
+    </div>
+  `;
+}
+
+
+//   function endpointHtml(e) {
+
+//     const usageBox = (e.usage && (e.usage.notes || []).length) ? `
+//       <div class="card">
+//         <div class="h2">${escapeHtml(e.usage.title || "Usage")}</div>
+//         <ul class="muted" style="margin:0;padding-left:18px">
+//           ${(e.usage.notes || []).map(n => `<li>${escapeHtml(n)}</li>`).join("")}
+//         </ul>
+//       </div>` : "";
+
+//     // const req = e.request ? `
+//     //   <div class="card">
+//     //     <div class="h2">Request</div>
+//     //     <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
+//     //     <div style="height:10px"></div>
+//     //     <pre><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
+//     //   </div>
+//     // ` : `
+//     //   <div class="card">
+//     //     <div class="h2">Request</div>
+//     //     <div class="muted">No request body documented.</div>
+//     //   </div>
+//     // `;
+
+//   const req = e.request ? `
+//   <details open>
+//     <summary><span class="h2">Request</span><span class="chev">toggle</span></summary>
+//     <div class="detailsBody">
+//       <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
+//       <div style="height:10px"></div>
+//       <div class="codeWrap">
+//         <button class="copyBtn" data-copy>Copy</button>
+//         <pre><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
+//       </div>
+//     </div>
+//   </details>
+// ` : `
+//   <details open>
+//     <summary><span class="h2">Request</span><span class="chev">toggle</span></summary>
+//     <div class="detailsBody">
+//       <div class="muted">No request body documented.</div>
+//     </div>
+//   </details>
+// `;
+
+
+//     // const responses = (e.responses || []).map(r => `
+//     //   <div class="card">
+//     //     <div class="h2">Response ${escapeHtml(r.status)}</div>
+//     //     <div class="muted">${escapeHtml(r.description || "")}</div>
+//     //     ${r.example ? `<div style="height:10px"></div><pre><code>${escapeHtml(formatJson(r.example))}</code></pre>` : ""}
+//     //   </div>
+//     // `).join("");
+
+//   const responses = (e.responses || []).map(r => `
+//   <details>
+//     <summary><span class="h2">Response ${escapeHtml(r.status)}</span><span class="chev">toggle</span></summary>
+//     <div class="detailsBody">
+//       <div class="muted">${escapeHtml(r.description || "")}</div>
+//       ${r.example ? `
+//         <div style="height:10px"></div>
+//         <div class="codeWrap">
+//           <button class="copyBtn" data-copy>Copy</button>
+//           <pre><code>${escapeHtml(formatJson(r.example))}</code></pre>
+//         </div>` : ""}
+//     </div>
+//   </details>
+// `).join("");
+
+
+//     const tryItOut = `
+//       <div class="card">
+//         <div class="h2">Try it out</div>
+//         <div class="muted">Uses Base URL + Path. Adds Authorization header if needed.</div>
+
+//         <div class="tryRow">
+//           <button class="btn" data-run="${escapeHtml(e.id)}">Run</button>
+//           <span id="result-${escapeHtml(e.id)}" class="muted"></span>
+//         </div>
+
+//         <div style="height:10px"></div>
+//         <div class="muted">Request body (JSON):</div>
+//         <div style="height:6px"></div>
+//         <textarea id="body-${escapeHtml(e.id)}" style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);background:rgba(2,6,23,0.6);color:var(--text);padding:10px;font-family:var(--mono);font-size:12px;outline:none">${escapeHtml(formatJson((e.request && e.request.example) ? e.request.example : {}))}</textarea>
+
+//         <div style="height:10px"></div>
+//         <div class="muted">Response:</div>
+//         <div style="height:6px"></div>
+//         <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
+//       </div>
+//     `;
+
+//     return `
+//       <div class="card" id="${escapeHtml(e.id)}">
+//         <div class="endpointHeader">
+//           <div class="endpointTitle">
+//             <div class="endpointTitleRow">
+//               <span class="bigMethod">${escapeHtml(e.method)}</span>
+//               <span class="bigPath">${escapeHtml(e.path)}</span>
+//             </div>
+//             <div class="muted">${escapeHtml(e.summary || "")}</div>
+//           </div>
+//           <span class="authTag">Auth: ${escapeHtml(e.auth || "none")}</span>
+//         </div>
+//         ${e.description ? `<div style="height:10px"></div><div class="muted">${escapeHtml(e.description)}</div>` : ""}
+//       </div>
+
+//       ${usageBox}
+//       <div class="grid2">
+//         ${req}
+//         ${tryItOut}
+//       </div>
+
+//       ${responses || `
+//         <div class="card">
+//           <div class="h2">Responses</div>
+//           <div class="muted">No responses documented.</div>
+//         </div>
+//       `}
+//     `;
+//   }
+
+function endpointHtml(e) {
+  const usageBox = (e.usage && (e.usage.notes || []).length) ? `
+    <div class="card">
+      <div class="h2">${escapeHtml(e.usage.title || "Usage")}</div>
+      <ul class="muted" style="margin:0;padding-left:18px">
+        ${(e.usage.notes || []).map(n => `<li>${escapeHtml(n)}</li>`).join("")}
+      </ul>
+    </div>` : "";
+
+  // const req = e.request ? `
+  //   <details open>
+  //     <div class="sumRow">
+  //       <span class="h2">Request</span>
+  //       <button class="sumToggle" type="button" data-toggle="#req-${escapeHtml(e.id)}" aria-label="Toggle request"></button>
+  //     </div>
+  //     <div class="detailsBody">
+  //       <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
+  //       <div style="height:10px"></div>
+  //       <div class="codeWrap">
+  //         <button class="copyIconBtn" data-copy type="button" aria-label="Copy request JSON">
+  //           ${copyIconSvg()}
+  //         </button>
+  //         <pre data-autoselect="1"><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
+  //       </div>
+  //     </div>
+  //   </details>
+  // ` : `
+  //   <details open>
+  //     <div class="sumRow" data-toggle-scope="details">
+  //       <span class="h2">Request</span>
+  //       <button class="sumToggle" type="button" aria-label="Toggle request"></button>
+  //     </div>
+  //     <div class="detailsBody">
+  //       <div class="muted">No request body documented.</div>
+  //     </div>
+  //   </details>
+  // `;
+
+  const req = `
+  <div class="card">
+    <div class="sumRow">
+      <span class="h2">Request</span>
+      <button class="sumToggle" type="button" data-toggle="#req-${escapeHtml(e.id)}" aria-label="Toggle request"></button>
+    </div>
+
+    <div class="detailsBody">
+      ${e.request ? `
+        <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
+        <div style="height:10px"></div>
+
+        <div id="req-${escapeHtml(e.id)}" class="collapsibleBody open">
+          <div class="codeWrap">
+            <button class="copyIconBtn" data-copy type="button" aria-label="Copy request JSON">
+              ${copyIconSvg()}
+            </button>
+            <pre><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
+          </div>
+        </div>
+      ` : `
+        <div class="muted">No request body documented.</div>
+      `}
+    </div>
+  </div>
 `;
 
 
-    // const responses = (e.responses || []).map(r => `
-    //   <div class="card">
-    //     <div class="h2">Response ${escapeHtml(r.status)}</div>
-    //     <div class="muted">${escapeHtml(r.description || "")}</div>
-    //     ${r.example ? `<div style="height:10px"></div><pre><code>${escapeHtml(formatJson(r.example))}</code></pre>` : ""}
-    //   </div>
-    // `).join("");
+  // const responses = (e.responses || []).map(r => `
+  //   <details>
+  //     <div class="sumRow" data-toggle-scope="details">
+  //       <span class="h2">Response ${escapeHtml(r.status)}</span>
+  //       <button class="sumToggle" type="button" aria-label="Toggle response"></button>
+  //     </div>
+  //     <div class="detailsBody">
+  //       <div class="muted">${escapeHtml(r.description || "")}</div>
+  //       ${r.example ? `
+  //         <div style="height:10px"></div>
+  //         <div class="codeWrap">
+  //           <button class="copyIconBtn" data-copy type="button" aria-label="Copy response JSON">
+  //             ${copyIconSvg()}
+  //           </button>
+  //           <pre><code>${escapeHtml(formatJson(r.example))}</code></pre>
+  //         </div>` : ""}
+  //     </div>
+  //   </details>
+  // `).join("");
 
   const responses = (e.responses || []).map(r => `
-  <details>
-    <summary><span class="h2">Response ${escapeHtml(r.status)}</span><span class="chev">toggle</span></summary>
+  <div class="card">
+    <div class="sumRow">
+      <span class="h2">Response ${escapeHtml(r.status)}</span>
+      <button class="sumToggle" type="button" data-toggle="#res-${escapeHtml(e.id)}-${escapeHtml(String(r.status))}" aria-label="Toggle response"></button>
+    </div>
+
     <div class="detailsBody">
       <div class="muted">${escapeHtml(r.description || "")}</div>
+
       ${r.example ? `
         <div style="height:10px"></div>
-        <div class="codeWrap">
-          <button class="copyBtn" data-copy>Copy</button>
-          <pre><code>${escapeHtml(formatJson(r.example))}</code></pre>
-        </div>` : ""}
+
+        <div id="res-${escapeHtml(e.id)}-${escapeHtml(String(r.status))}" class="collapsibleBody open">
+          <div class="codeWrap">
+            <button class="copyIconBtn" data-copy type="button" aria-label="Copy response JSON">
+              ${copyIconSvg()}
+            </button>
+            <pre><code>${escapeHtml(formatJson(r.example))}</code></pre>
+          </div>
+        </div>
+      ` : ""}
     </div>
-  </details>
+  </div>
 `).join("");
 
 
-    const tryItOut = `
-      <div class="card">
-        <div class="h2">Try it out</div>
-        <div class="muted">Uses Base URL + Path. Adds Authorization header if needed.</div>
+  const tryItOut = `
+    <div class="card">
+      <div class="h2">Try it out</div>
+      <div class="muted">Uses Base URL + Path. Adds Authorization header if needed.</div>
 
-        <div class="tryRow">
-          <button class="btn" data-run="${escapeHtml(e.id)}">Run</button>
-          <span id="result-${escapeHtml(e.id)}" class="muted"></span>
-        </div>
+      <div class="tryRow">
+        <button class="btn" data-run="${escapeHtml(e.id)}" type="button">Run</button>
+        <span id="result-${escapeHtml(e.id)}" class="muted"></span>
+      </div>
 
-        <div style="height:10px"></div>
-        <div class="muted">Request body (JSON):</div>
-        <div style="height:6px"></div>
-        <textarea id="body-${escapeHtml(e.id)}" style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);background:rgba(2,6,23,0.6);color:var(--text);padding:10px;font-family:var(--mono);font-size:12px;outline:none">${escapeHtml(formatJson((e.request && e.request.example) ? e.request.example : {}))}</textarea>
+      <div style="height:10px"></div>
+      <div class="muted">Request body (JSON):</div>
+      <div style="height:6px"></div>
+      <textarea
+        id="body-${escapeHtml(e.id)}"
+        style="width:100%;min-height:140px;border-radius:12px;border:1px solid var(--border);background:rgba(2,6,23,0.6);color:var(--text);padding:10px;font-family:var(--mono);font-size:12px;outline:none"
+      >${escapeHtml(formatJson((e.request && e.request.example) ? e.request.example : {}))}</textarea>
 
-        <div style="height:10px"></div>
-        <div class="muted">Response:</div>
-        <div style="height:6px"></div>
+      <div style="height:10px"></div>
+      <div class="muted">Response:</div>
+      <div style="height:6px"></div>
+      <div class="codeWrap">
+        <button class="copyIconBtn" data-copy type="button" aria-label="Copy response output">
+          ${copyIconSvg()}
+        </button>
         <pre><code id="out-${escapeHtml(e.id)}">{}</code></pre>
       </div>
-    `;
+    </div>
+  `;
 
-    return `
-      <div class="card" id="${escapeHtml(e.id)}">
-        <div class="endpointHeader">
-          <div class="endpointTitle">
-            <div class="endpointTitleRow">
-              <span class="bigMethod">${escapeHtml(e.method)}</span>
-              <span class="bigPath">${escapeHtml(e.path)}</span>
-            </div>
-            <div class="muted">${escapeHtml(e.summary || "")}</div>
+  return `
+    <div class="card" id="${escapeHtml(e.id)}">
+      <div class="endpointHeader">
+        <div class="endpointTitle">
+          <div class="endpointTitleRow">
+            <span class="bigMethod">${escapeHtml(e.method)}</span>
+            <span class="bigPath">${escapeHtml(e.path)}</span>
+
+            <button
+              class="copyIconBtn copyEndpointBtn"
+              data-copy-endpoint="${escapeHtml(e.id)}"
+              type="button"
+              aria-label="Copy endpoint"
+              title="Copy endpoint"
+            >
+              ${copyIconSvg()}
+            </button>
           </div>
-          <span class="authTag">Auth: ${escapeHtml(e.auth || "none")}</span>
+          <div class="muted">${escapeHtml(e.summary || "")}</div>
         </div>
-        ${e.description ? `<div style="height:10px"></div><div class="muted">${escapeHtml(e.description)}</div>` : ""}
-      </div>
 
-      ${usageBox}
-      <div class="grid2">
-        ${req}
-        ${tryItOut}
+        <span class="authTag">Auth: ${escapeHtml(e.auth || "none")}</span>
       </div>
+      ${e.description ? `<div style="height:10px"></div><div class="muted">${escapeHtml(e.description)}</div>` : ""}
+    </div>
 
-      ${responses || `
-        <div class="card">
-          <div class="h2">Responses</div>
-          <div class="muted">No responses documented.</div>
-        </div>
-      `}
-    `;
-  }
+    ${usageBox}
+    <div class="grid2">
+      ${req}
+      ${tryItOut}
+    </div>
+
+    ${responses || `
+      <div class="card">
+        <div class="h2">Responses</div>
+        <div class="muted">No responses documented.</div>
+      </div>
+    `}
+  `;
+}
+
+function wireMiniToggles(root = document) {
+  root.querySelectorAll(".sumToggle[data-toggle]").forEach(btn => {
+    if (btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const sel = btn.getAttribute("data-toggle");
+      if (!sel) return;
+
+      const target = root.querySelector(sel) || document.querySelector(sel);
+      if (!target) return;
+
+      target.classList.toggle("open");
+      btn.classList.toggle("isOn");
+    });
+  });
+}
+
 
   function getSelectedEndpointId() {
     const hash = (window.location.hash || "").trim();
@@ -422,7 +756,7 @@ function renderSidebar(filtered = null) {
       wireCopyButtons(content);
       return;
     }
-
+  
     const e = state.flatEndpoints.find(x => x.id === id);
     if (!e) {
       content.innerHTML = `
@@ -439,6 +773,8 @@ function renderSidebar(filtered = null) {
     }
 
     content.innerHTML = endpointHtml(e);
+    wireCopyButtons(content);
+    wireMiniToggles(content);
 
     // attach run handler
     const runBtn = content.querySelector(`[data-run="${CSS.escape(e.id)}"]`);
@@ -449,61 +785,124 @@ function renderSidebar(filtered = null) {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  async function runEndpoint(e) {
-    const token = $("bearerToken").value.trim();
-    const baseUrl = $("baseUrl").value.trim() || "";
-    const resultEl = document.getElementById(`result-${e.id}`);
-    const outEl = document.getElementById(`out-${e.id}`);
-    const bodyEl = document.getElementById(`body-${e.id}`);
+  // async function runEndpoint(e) {
+  //   const token = $("bearerToken").value.trim();
+  //   const baseUrl = $("baseUrl").value.trim() || "";
+  //   const resultEl = document.getElementById(`result-${e.id}`);
+  //   const outEl = document.getElementById(`out-${e.id}`);
+  //   const bodyEl = document.getElementById(`body-${e.id}`);
 
-    resultEl.textContent = "Running...";
-    resultEl.className = "muted";
-    outEl.textContent = "{}";
+  //   resultEl.textContent = "Running...";
+  //   resultEl.className = "muted";
+  //   outEl.textContent = "{}";
 
-    const url = (baseUrl.replace(/\/+$/,"")) + e.path;
+  //   const url = (baseUrl.replace(/\/+$/,"")) + e.path;
+
+  //   const headers = {};
+  //   if (e.request && e.request.contentType) headers["Content-Type"] = e.request.contentType;
+  //   if ((e.auth || "").toLowerCase() === "bearer" && token) headers["Authorization"] = `Bearer ${token}`;
+
+  //   let body = undefined;
+  //   if (e.method !== "GET" && e.method !== "DELETE") {
+  //     try {
+  //       const parsed = JSON.parse(bodyEl.value || "{}");
+  //       body = JSON.stringify(parsed);
+  //     } catch {
+  //       resultEl.textContent = "Invalid JSON body";
+  //       resultEl.className = "resultErr";
+  //       return;
+  //     }
+  //   }
+
+  //   try {
+  //     const res = await fetch(url, {
+  //       method: e.method,
+  //       headers,
+  //       body,
+  //     });
+
+  //     const text = await res.text();
+  //     let data = text;
+  //     try { data = JSON.parse(text); } catch {}
+
+  //     outEl.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+
+  //     if (res.ok) {
+  //       resultEl.textContent = `OK (${res.status})`;
+  //       resultEl.className = "resultOk";
+  //     } else {
+  //       resultEl.textContent = `ERROR (${res.status})`;
+  //       resultEl.className = "resultErr";
+  //     }
+  //   } catch (err) {
+  //     resultEl.textContent = "Network error";
+  //     resultEl.className = "resultErr";
+  //     outEl.textContent = String(err);
+  //   }
+  // }
+  
+async function runEndpoint(e) {
+  const resultEl = document.getElementById(`result-${e.id}`);
+  const outEl = document.getElementById(`out-${e.id}`);
+  if (!resultEl || !outEl) return;
+
+  resultEl.textContent = "Running...";
+  outEl.textContent = "{}";
+
+  try {
+    const token = localStorage.getItem(STORAGE.token) || "";
+    const baseUrl = (localStorage.getItem(STORAGE.baseUrl) || state.spec.baseUrl || "").replace(/\/+$/, "");
+    const url = baseUrl + e.path;
 
     const headers = {};
-    if (e.request && e.request.contentType) headers["Content-Type"] = e.request.contentType;
-    if ((e.auth || "").toLowerCase() === "bearer" && token) headers["Authorization"] = `Bearer ${token}`;
+    if (e.request?.contentType) headers["Content-Type"] = e.request.contentType;
+    else headers["Content-Type"] = "application/json";
+
+    if ((e.auth || "").toLowerCase() === "bearer" && token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
 
     let body = undefined;
-    if (e.method !== "GET" && e.method !== "DELETE") {
+    const bodyBox = document.getElementById(`body-${e.id}`);
+    if (bodyBox && ["POST", "PUT", "PATCH"].includes((e.method || "").toUpperCase())) {
+      const raw = (bodyBox.value || "").trim();
+      if (raw) body = raw;
+    }
+
+    const res = await fetch(url, {
+      method: e.method,
+      headers,
+      body,
+    });
+
+    const ct = (res.headers.get("content-type") || "").toLowerCase();
+    const text = await res.text();
+
+    // Pretty print JSON if possible
+    if (ct.includes("application/json")) {
       try {
-        const parsed = JSON.parse(bodyEl.value || "{}");
-        body = JSON.stringify(parsed);
+        const obj = JSON.parse(text || "{}");
+        outEl.textContent = JSON.stringify(obj, null, 2);
       } catch {
-        resultEl.textContent = "Invalid JSON body";
-        resultEl.className = "resultErr";
-        return;
+        outEl.textContent = text;
+      }
+    } else {
+      // maybe JSON even if header isn't set
+      try {
+        const obj = JSON.parse(text);
+        outEl.textContent = JSON.stringify(obj, null, 2);
+      } catch {
+        outEl.textContent = text;
       }
     }
 
-    try {
-      const res = await fetch(url, {
-        method: e.method,
-        headers,
-        body,
-      });
-
-      const text = await res.text();
-      let data = text;
-      try { data = JSON.parse(text); } catch {}
-
-      outEl.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
-
-      if (res.ok) {
-        resultEl.textContent = `OK (${res.status})`;
-        resultEl.className = "resultOk";
-      } else {
-        resultEl.textContent = `ERROR (${res.status})`;
-        resultEl.className = "resultErr";
-      }
-    } catch (err) {
-      resultEl.textContent = "Network error";
-      resultEl.className = "resultErr";
-      outEl.textContent = String(err);
-    }
+    resultEl.textContent = res.ok ? `OK (${res.status})` : `Error (${res.status})`;
+  } catch (err) {
+    resultEl.textContent = "Error";
+    outEl.textContent = String(err);
   }
+}
+
 
   function wireTopControls() {
     const tokenInput = $("bearerToken");
@@ -542,6 +941,24 @@ function renderSidebar(filtered = null) {
     });
   }
 
+//   function wireDetailsToggles(root = document) {
+//   root.querySelectorAll(".sumToggle").forEach(btn => {
+//     if (btn.dataset.bound === "1") return;
+//     btn.dataset.bound = "1";
+
+//     btn.addEventListener("click", (ev) => {
+//       ev.preventDefault();
+//       ev.stopPropagation();
+
+//       const details = btn.closest("details");
+//       if (!details) return;
+
+//       details.open = !details.open;
+//     });
+//   });
+// }
+
+
   function wireSearch() {
     const input = $("search");
     input.addEventListener("input", () => {
@@ -555,22 +972,22 @@ function renderSidebar(filtered = null) {
     });
   }
 
-  function wireCopyButtons(root = document) {
-  root.querySelectorAll("[data-copy]").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const pre = btn.parentElement?.querySelector("pre");
-      const text = pre ? pre.innerText : "";
-      try {
-        await navigator.clipboard.writeText(text);
-        btn.textContent = "Copied";
-        setTimeout(() => (btn.textContent = "Copy"), 900);
-      } catch {
-        btn.textContent = "Failed";
-        setTimeout(() => (btn.textContent = "Copy"), 900);
-      }
-    });
-  });
-}
+//   function wireCopyButtons(root = document) {
+//   root.querySelectorAll("[data-copy]").forEach(btn => {
+//     btn.addEventListener("click", async () => {
+//       const pre = btn.parentElement?.querySelector("pre");
+//       const text = pre ? pre.innerText : "";
+//       try {
+//         await navigator.clipboard.writeText(text);
+//         btn.textContent = "Copied";
+//         setTimeout(() => (btn.textContent = "Copy"), 900);
+//       } catch {
+//         btn.textContent = "Failed";
+//         setTimeout(() => (btn.textContent = "Copy"), 900);
+//       }
+//     });
+//   });
+// }
 
 //   function wireThemeToggle() {
 //   const btn = $("themeToggle");
@@ -586,6 +1003,88 @@ function renderSidebar(filtered = null) {
 //     localStorage.setItem(STORAGE.theme, next);
 //   });
 // }
+
+// function wireCopyButtons(root = document) {
+//   // Auto-select on hover for code blocks
+//   root.querySelectorAll("pre[data-autoselect='1']").forEach(pre => {
+//     pre.addEventListener("mouseenter", () => selectCodeInPre(pre));
+//   });
+
+//   root.querySelectorAll("[data-copy]").forEach(btn => {
+//     btn.addEventListener("click", async () => {
+//       const pre = btn.parentElement?.querySelector("pre");
+//       if (!pre) return;
+
+//       const text = pre.innerText || "";
+//       const ok = await copyTextReliable(text);
+
+//       if (ok) {
+//         toastSuccess("Copied", "Code copied to clipboard");
+//       } else {
+//         toastSuccess("Copy failed", "Your browser blocked clipboard access");
+//       }
+//     });
+//   });
+// }
+
+// function wireCopyButtons(root = document) {
+//   // Auto-select on hover for code blocks
+//   root.querySelectorAll("pre[data-autoselect='1']").forEach(pre => {
+//     if (pre.dataset.bound === "1") return;
+//     pre.dataset.bound = "1";
+//     pre.addEventListener("mouseenter", () => selectCodeInPre(pre));
+//   });
+
+//   root.querySelectorAll("[data-copy]").forEach(btn => {
+//     if (btn.dataset.bound === "1") return;
+//     btn.dataset.bound = "1";
+
+//     btn.addEventListener("click", async () => {
+//       // We copy the nearest code block inside the same codeWrap
+//       const wrap = btn.closest(".codeWrap") || btn.parentElement;
+//       const code = wrap ? wrap.querySelector("pre code") : null;
+//       const pre = wrap ? wrap.querySelector("pre") : null;
+
+//       const text = (code?.innerText || pre?.innerText || "").trim();
+//       if (!text) {
+//         toastSuccess("Copy failed", "Nothing to copy");
+//         return;
+//       }
+
+//       const ok = await copyTextReliable(text);
+//       if (ok) {
+//         toastSuccess("Copied", "Code copied to clipboard");
+//       } else {
+//         toastSuccess("Copy failed", "Your browser blocked clipboard access");
+//       }
+//     });
+//   });
+// }
+
+function wireCopyButtons(root = document) {
+  root.querySelectorAll("[data-copy]").forEach(btn => {
+    if (btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+
+    btn.addEventListener("click", async () => {
+      const wrap = btn.closest(".codeWrap") || btn.parentElement;
+      const code = wrap ? wrap.querySelector("pre code") : null;
+      const pre = wrap ? wrap.querySelector("pre") : null;
+
+      const text = (code?.innerText || pre?.innerText || "").trim();
+      if (!text) {
+        toastSuccess("Copy failed", "Nothing to copy");
+        return;
+      }
+
+      const ok = await copyTextReliable(text);
+      if (ok) toastSuccess("Capied", "Code copied to clipboard");
+      else toastSuccess("Copy failed", "Your browser blocked clipboard access");
+    });
+  });
+}
+
+
   async function boot() {
     wireTopControls();
     // wireThemeToggle();

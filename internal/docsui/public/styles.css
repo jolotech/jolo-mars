@@ -227,6 +227,20 @@ html[data-theme="light"] select {
 }
 select:focus { border-color: rgba(96,165,250,0.6); }
 
+/* ====== COPY ENDPOINT ======= */
+.copyEndpointBtn {
+  position: static;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  margin-left: 10px;
+}
+.endpointTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 
 /* ===== Toast ===== */
 .toastRoot {
@@ -344,6 +358,90 @@ select:focus { border-color: rgba(96,165,250,0.6); }
 pre[data-autoselect="1"] {
   cursor: text;
 }
+
+/* TOGGLE SWITCH */
+
+.sumRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+/* summary .sumToggle{
+  pointer-events:none;
+} */
+
+
+.collapsibleBody {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 220ms ease;
+}
+.collapsibleBody.open {
+  max-height: 1200px;
+}
+
+/* toggle switch button (same look you liked) */
+
+.sumToggle{
+  width:44px;
+  height:24px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: rgba(96,165,250,0.12);
+  position:relative;
+  cursor:pointer;
+  flex:0 0 auto;
+}
+
+.sumToggle::after{
+  content:"";
+  position:absolute;
+  top:3px;
+  left:3px;
+  width:16px;
+  height:16px;
+  border-radius:999px;
+  background: var(--text);
+  opacity:0.85;
+  transition: transform 160ms ease;
+}
+
+.sumToggle.isOn::after{
+  transform: translateX(20px);
+}
+
+
+.sumToggle{
+  width:44px;
+  height:24px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: rgba(96,165,250,0.12);
+  position:relative;
+  cursor:pointer;
+  flex:0 0 auto;
+}
+
+.sumToggle::after{
+  content:"";
+  position:absolute;
+  top:3px;
+  left:3px;
+  width:16px;
+  height:16px;
+  border-radius:999px;
+  background: var(--text);
+  opacity:0.85;
+  transition: transform 160ms ease;
+}
+
+/* when details is open, move knob */
+/* details[open] .sumToggle::after{
+  transform: translateX(20px);
+} */
+
 
 /* .codeWrap { position: relative; } */
 .copyBtn {
