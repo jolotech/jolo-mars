@@ -10,10 +10,23 @@
     flatEndpoints: [], // for search
   };
 
+  // const STORAGE = {
+  //   token: "docsui_bearer_token",
+  //   baseUrl: "docsui_base_url",
+  // };
+  const ENV = {
+    dev: "http://localhost:8023",
+    staging: "https://staging.jolojolo.com",
+    prod: "https://api.jolojolo.com",
+  };
+
   const STORAGE = {
     token: "docsui_bearer_token",
     baseUrl: "docsui_base_url",
+    theme: "docsui_theme",
+    env: "docsui_env",
   };
+
 
   function setHash(hash) {
     if (!hash.startsWith("#")) hash = "#" + hash;
@@ -238,12 +251,23 @@ function renderSidebar(filtered = null) {
         <h2 class="h2">${escapeHtml(q.overview.title || "Overview")}</h2>
           ${(q.overview.body || []).map(p => `<p class="muted" style="margin:0 0 10px">${escapeHtml(p)}</p>`).join("")}
       </div>` : "";
+    // const examples = (q.examples || []).map(ex => `
+    //   <div class="card">
+    //     <div class="h2">${escapeHtml(ex.title)}</div>
+    //     <pre><code>${escapeHtml(ex.code)}</code></pre>
+    //   </div>
+    // `).join("");
+
     const examples = (q.examples || []).map(ex => `
       <div class="card">
         <div class="h2">${escapeHtml(ex.title)}</div>
-        <pre><code>${escapeHtml(ex.code)}</code></pre>
+        <div class="codeWrap">
+          <button class="copyBtn" data-copy>Copy</button>
+          <pre><code>${escapeHtml(ex.code)}</code></pre>
+        </div>
       </div>
     `).join("");
+
 
     return `
       ${overview}
@@ -271,27 +295,65 @@ function renderSidebar(filtered = null) {
         </ul>
       </div>` : "";
 
-    const req = e.request ? `
-      <div class="card">
-        <div class="h2">Request</div>
-        <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
-        <div style="height:10px"></div>
+    // const req = e.request ? `
+    //   <div class="card">
+    //     <div class="h2">Request</div>
+    //     <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
+    //     <div style="height:10px"></div>
+    //     <pre><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
+    //   </div>
+    // ` : `
+    //   <div class="card">
+    //     <div class="h2">Request</div>
+    //     <div class="muted">No request body documented.</div>
+    //   </div>
+    // `;
+
+  const req = e.request ? `
+  <details open>
+    <summary><span class="h2">Request</span><span class="chev">toggle</span></summary>
+    <div class="detailsBody">
+      <div class="muted">Content-Type: <span class="path">${escapeHtml(e.request.contentType || "application/json")}</span></div>
+      <div style="height:10px"></div>
+      <div class="codeWrap">
+        <button class="copyBtn" data-copy>Copy</button>
         <pre><code>${escapeHtml(formatJson(e.request.example || {}))}</code></pre>
       </div>
-    ` : `
-      <div class="card">
-        <div class="h2">Request</div>
-        <div class="muted">No request body documented.</div>
-      </div>
-    `;
+    </div>
+  </details>
+` : `
+  <details open>
+    <summary><span class="h2">Request</span><span class="chev">toggle</span></summary>
+    <div class="detailsBody">
+      <div class="muted">No request body documented.</div>
+    </div>
+  </details>
+`;
 
-    const responses = (e.responses || []).map(r => `
-      <div class="card">
-        <div class="h2">Response ${escapeHtml(r.status)}</div>
-        <div class="muted">${escapeHtml(r.description || "")}</div>
-        ${r.example ? `<div style="height:10px"></div><pre><code>${escapeHtml(formatJson(r.example))}</code></pre>` : ""}
-      </div>
-    `).join("");
+
+    // const responses = (e.responses || []).map(r => `
+    //   <div class="card">
+    //     <div class="h2">Response ${escapeHtml(r.status)}</div>
+    //     <div class="muted">${escapeHtml(r.description || "")}</div>
+    //     ${r.example ? `<div style="height:10px"></div><pre><code>${escapeHtml(formatJson(r.example))}</code></pre>` : ""}
+    //   </div>
+    // `).join("");
+
+  const responses = (e.responses || []).map(r => `
+  <details>
+    <summary><span class="h2">Response ${escapeHtml(r.status)}</span><span class="chev">toggle</span></summary>
+    <div class="detailsBody">
+      <div class="muted">${escapeHtml(r.description || "")}</div>
+      ${r.example ? `
+        <div style="height:10px"></div>
+        <div class="codeWrap">
+          <button class="copyBtn" data-copy>Copy</button>
+          <pre><code>${escapeHtml(formatJson(r.example))}</code></pre>
+        </div>` : ""}
+    </div>
+  </details>
+`).join("");
+
 
     const tryItOut = `
       <div class="card">
@@ -357,6 +419,7 @@ function renderSidebar(filtered = null) {
 
     if (id === "quickstart") {
       content.innerHTML = quickStartHtml();
+      wireCopyButtons(content);
       return;
     }
 
@@ -446,6 +509,24 @@ function renderSidebar(filtered = null) {
     const tokenInput = $("bearerToken");
     const baseUrlInput = $("baseUrl");
 
+    const envSelect = $("envSelect");
+    if (envSelect) {
+      const savedEnv = localStorage.getItem(STORAGE.env);
+        if (savedEnv && ENV[savedEnv]) envSelect.value = savedEnv;
+          // If user never set baseUrl before, set it from env
+          if (!localStorage.getItem(STORAGE.baseUrl) && ENV[envSelect.value]) {
+              baseUrlInput.value = ENV[envSelect.value];
+          }
+          envSelect.addEventListener("change", () => {
+          const v = envSelect.value;
+          localStorage.setItem(STORAGE.env, v);
+          if (ENV[v]) {
+            baseUrlInput.value = ENV[v];
+            localStorage.setItem(STORAGE.baseUrl, baseUrlInput.value);
+          }
+       });
+    }
+
     // load saved values
     const savedToken = localStorage.getItem(STORAGE.token);
     const savedBase = localStorage.getItem(STORAGE.baseUrl);
@@ -474,8 +555,41 @@ function renderSidebar(filtered = null) {
     });
   }
 
+  function wireCopyButtons(root = document) {
+  root.querySelectorAll("[data-copy]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const pre = btn.parentElement?.querySelector("pre");
+      const text = pre ? pre.innerText : "";
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "Copied";
+        setTimeout(() => (btn.textContent = "Copy"), 900);
+      } catch {
+        btn.textContent = "Failed";
+        setTimeout(() => (btn.textContent = "Copy"), 900);
+      }
+    });
+  });
+}
+
+  function wireThemeToggle() {
+  const btn = $("themeToggle");
+  if (!btn) return;
+
+  const saved = localStorage.getItem(STORAGE.theme);
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+
+  btn.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    const next = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem(STORAGE.theme, next);
+  });
+}
   async function boot() {
     wireTopControls();
+    wireThemeToggle();
+
 
     const res = await fetch("/docs/spec.json", { cache: "no-store" });
     state.spec = await res.json();
