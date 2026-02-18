@@ -226,7 +226,126 @@ html[data-theme="light"] select {
   background: rgba(241,245,249,0.85);
 }
 select:focus { border-color: rgba(96,165,250,0.6); }
+
+
+/* ===== Toast ===== */
+.toastRoot {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+  max-width: 360px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(17,24,39,0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+  transform: translateY(10px);
+  opacity: 0;
+  animation: toastIn 180ms ease forwards;
+}
+
+@keyframes toastIn {
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.toast.hide {
+  animation: toastOut 160ms ease forwards;
+}
+
+@keyframes toastOut {
+  to { transform: translateY(10px); opacity: 0; }
+}
+
+.toastTitle {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0;
+}
+.toastMsg {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 2px 0 0;
+}
+
+/* Animated success checkmark */
+.checkWrap {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(52,211,153,0.45);
+  background: rgba(52,211,153,0.16);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.checkIcon {
+  width: 14px;
+  height: 14px;
+  stroke: rgba(52,211,153,0.95);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: drawCheck 360ms ease forwards;
+}
+
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ===== Copy button as icon ===== */
 .codeWrap { position: relative; }
+
+.copyIconBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(96,165,250,0.12);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease;
+}
+
+.copyIconBtn:hover {
+  border-color: rgba(96,165,250,0.65);
+  transform: translateY(-1px);
+}
+
+.copyIconBtn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.8;
+  opacity: 0.92;
+}
+
+/* Auto-select affordance */
+pre[data-autoselect="1"] {
+  cursor: text;
+}
+
+/* .codeWrap { position: relative; } */
 .copyBtn {
   position: absolute;
   top: 10px;
@@ -246,6 +365,8 @@ details {
   background: rgba(17,24,39,0.55);
   margin-bottom: 12px;
 }
+
+
 html[data-theme="light"] details { background: rgba(241,245,249,0.85); }
 
 summary {
