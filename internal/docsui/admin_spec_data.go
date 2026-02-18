@@ -12,7 +12,7 @@ func AdminGroup() Group {
 					{
 						ID:      "admin-login",
 						Method:  "POST",
-						Path:    "/admin/login",
+						Path:    "/admin/auth/login",
 						Summary: "Admin Login",
 						Auth:    "none",
 						Usage: &UsageSpec{
@@ -29,8 +29,6 @@ func AdminGroup() Group {
 								"email":    "dev@jolo.com",
 								"password": "password",
 							},
-							// Only include File if this endpoint truly uploads a file.
-							// File: &FileSpec{ FieldName: "file", Accept: []string{"image/*"}, Multiple: false },
 						},
 						Responses: []ResponseSpec{
 							{Status: 200, Description: "Success", Example: map[string]any{"token": "jwt_here"}},
