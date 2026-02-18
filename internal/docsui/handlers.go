@@ -17,13 +17,26 @@ func NewHandler(spec DocSpec) *Handler {
 	return &Handler{spec: spec}
 }
 
-// GET /
+// // GET /
+// func (h *Handler) ServeHome(c *gin.Context) {
+// 	c.Header("Content-Type", "text/html; charset=utf-8")
+// 	_ = pageTmpl.Execute(c.Writer, h.spec)
+// }
+
+// // GET /docs/spec.json
+// func (h *Handler) ServeSpec(c *gin.Context) {
+// 	c.Header("Content-Type", "application/json; charset=utf-8")
+// 	enc := json.NewEncoder(c.Writer)
+// 	enc.SetEscapeHTML(false)
+// 	_ = enc.Encode(h.spec)
+// }
+
+
 func (h *Handler) ServeHome(c *gin.Context) {
 	c.Header("Content-Type", "text/html; charset=utf-8")
 	_ = pageTmpl.Execute(c.Writer, h.spec)
 }
 
-// GET /docs/spec.json
 func (h *Handler) ServeSpec(c *gin.Context) {
 	c.Header("Content-Type", "application/json; charset=utf-8")
 	enc := json.NewEncoder(c.Writer)
@@ -45,7 +58,7 @@ func (h *Handler) ServeAsset(c *gin.Context) {
 	// assets are under public/
 	full := "public/" + file
 
-	data, err := embeddedAssets.ReadFile(full)
+	data, err := EmbeddedAssets.ReadFile(full)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
