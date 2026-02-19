@@ -651,6 +651,7 @@ pre {
     overflow: auto;
     padding-top: 64px;               /* push under topbar */
     border-right: 1px solid var(--border);
+    background: rgba(2,6,23,0.55);
   }
 
   .sidebar.open{
