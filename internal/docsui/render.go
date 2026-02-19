@@ -70,7 +70,9 @@ var pageTmpl = template.Must(template.New("docs").Parse(`<!doctype html>
   <link rel="stylesheet" href="/docs/assets/styles.css"/>
 </head>
 <body>
+  <div id="backdrop" class="backdrop" hidden></div>
   <header class="topbar">
+
     <div class="brand">
       <img class="logo" src="/docs/assets/joloImg.png" alt="logo"/>
       <div class="brandText">
@@ -84,6 +86,8 @@ var pageTmpl = template.Must(template.New("docs").Parse(`<!doctype html>
 
     <!-- Updated controls: token + env selector + base url + theme toggle -->
     <div class="topControls">
+    <button id="mobileMenuBtn" class="btn small mobileOnly" type="button">Menu</button>
+
       <div class="tokenWrap">
         <label for="bearerToken">Bearer Token</label>
         <input id="bearerToken" placeholder="paste token here (optional)"/>

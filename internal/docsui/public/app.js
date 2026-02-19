@@ -75,6 +75,12 @@ function setBearerToken(token) {
   if (input) input.value = token;
 }
 
+function scrollToWithOffset(el, offset = 80) {
+  const y = el.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top: y, behavior: "smooth" });
+}
+
+
   
   function setHash(hash) {
     if (!hash.startsWith("#")) hash = "#" + hash;
@@ -131,6 +137,45 @@ function enableDragScroll(el) {
     el.scrollTop  = st - (e.pageY - startY);
   });
 }
+
+function wireMobileMenu(){
+  const btn = document.getElementById("mobileMenuBtn");
+  const sidebar = document.querySelector(".sidebar");
+  const backdrop = document.getElementById("backdrop");
+  if (!btn || !sidebar || !backdrop) return;
+
+  function open(){
+    sidebar.classList.add("open");
+    backdrop.hidden = false;
+    document.body.classList.add("lockScroll");
+  }
+
+  function close(){
+    sidebar.classList.remove("open");
+    backdrop.hidden = true;
+    document.body.classList.remove("lockScroll");
+  }
+
+  btn.addEventListener("click", () => {
+    if (sidebar.classList.contains("open")) close();
+    else open();
+  });
+
+  backdrop.addEventListener("click", close);
+
+  // close sidebar after selecting an endpoint (mobile only)
+  document.addEventListener("click", (e) => {
+    const item = e.target.closest(".treeItem");
+    if (!item) return;
+    if (window.matchMedia("(max-width: 900px)").matches) close();
+  });
+
+  window.addEventListener("resize", () => {
+    // if user resizes to desktop, clean up
+    if (!window.matchMedia("(max-width: 900px)").matches) close();
+  });
+}
+
 
 function wireDragScroll(root = document) {
   root.querySelectorAll(".resBox pre").forEach(pre => {
@@ -612,7 +657,8 @@ function wireMiniToggles(root = document) {
 
     // scroll into view
     const el = document.getElementById(e.id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    // if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (el) scrollToWithOffset(el, 90);
   }
 
   function paperclipSvg(){
@@ -829,6 +875,7 @@ function wireCopyButtons(root = document) {
 
   async function boot() {
     wireTopControls();
+    wireMobileMenu()
     // wireThemeToggle();
 
 
