@@ -75,7 +75,19 @@ function setBearerToken(token) {
   if (input) input.value = token;
 }
 
-function scrollToWithOffset(el, offset = 80) {
+// function scrollToWithOffset(el, offset = 80) {
+//   const y = el.getBoundingClientRect().top + window.scrollY - offset;
+//   window.scrollTo({ top: y, behavior: "smooth" });
+// }
+
+function topbarOffsetPx() {
+  const tb = document.querySelector(".topbar");
+  if (!tb) return 0;
+  return tb.getBoundingClientRect().height || 0;
+}
+
+function scrollToWithOffset(el) {
+  const offset = topbarOffsetPx() + 10; // extra spacing
   const y = el.getBoundingClientRect().top + window.scrollY - offset;
   window.scrollTo({ top: y, behavior: "smooth" });
 }
@@ -658,7 +670,7 @@ function wireMiniToggles(root = document) {
     // scroll into view
     const el = document.getElementById(e.id);
     // if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (el) scrollToWithOffset(el, 90);
+    if (el) scrollToWithOffset(el);
   }
 
   function paperclipSvg(){

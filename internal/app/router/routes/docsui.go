@@ -23,8 +23,8 @@ func RegisterDocsUI(r *gin.Engine) {
 	}
 	r.StaticFS("/docs/assets", http.FS(sub))
 
-	r.GET("/__debug/js", func(c *gin.Context) {
-		b, err := docsui.EmbeddedAssets.ReadFile("public/logo.svg")
+	r.GET("/__debug/fav", func(c *gin.Context) {
+		b, err := docsui.EmbeddedAssets.ReadFile("public/joloFav.png")
 		if err != nil {
 			c.String(500, "read error: %v", err)
 			return
