@@ -107,6 +107,40 @@ function setBearerToken(token) {
   }, 1400);
 }
 
+function enableDragScroll(el) {
+  let down = false, startX = 0, startY = 0, sl = 0, st = 0;
+
+  el.addEventListener("mousedown", (e) => {
+    down = true;
+    el.classList.add("dragging");
+    startX = e.pageX;
+    startY = e.pageY;
+    sl = el.scrollLeft;
+    st = el.scrollTop;
+  });
+
+  window.addEventListener("mouseup", () => {
+    down = false;
+    el.classList.remove("dragging");
+  });
+
+  el.addEventListener("mousemove", (e) => {
+    if (!down) return;
+    e.preventDefault();
+    el.scrollLeft = sl - (e.pageX - startX);
+    el.scrollTop  = st - (e.pageY - startY);
+  });
+}
+
+function wireDragScroll(root = document) {
+  root.querySelectorAll(".resBox pre").forEach(pre => {
+    if (pre.dataset.drag === "1") return;
+    pre.dataset.drag = "1";
+    enableDragScroll(pre);
+  });
+}
+
+
 // function selectCodeInPre(preEl) {
 //   try {
 //     const range = document.createRange();
@@ -569,7 +603,8 @@ function wireMiniToggles(root = document) {
     content.innerHTML = endpointHtml(e);
     wireCopyButtons(content);
     wireMiniToggles(content);
-    wireFilePickers(content)
+    wireFilePickers(content);
+    wireDragScroll(content);
 
     // attach run handler
     const runBtn = content.querySelector(`[data-run="${CSS.escape(e.id)}"]`);
