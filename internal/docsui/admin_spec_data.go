@@ -75,6 +75,7 @@ func AdminGroup() Group {
 								    "code": 200,
 							    },
 							},
+							{Status: 401, Description: "Invalide auth token", Example: map[string]any{"status": "error", "message": "Invalid token purpose", "code": 401}},
 							{Status: 401, Description: "Authorization failed", Example: map[string]any{"status": "error", "message": "Missing Authorization header", "code": 401}},
 					    },
 					},
