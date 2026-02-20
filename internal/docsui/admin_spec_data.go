@@ -29,19 +29,29 @@ func AdminGroup() Group {
 						Request: &RequestSpec{
 							ContentType: "application/json",
 							Example: map[string]any{
-								"email":    "dev@jolo.com",
-								"password": "password",
+								"email": "isihaqabdullahi01+1@gmail.com",
+								"password": "med#*Jm@sPa@sRxE",
 							},
 						},
 						Responses: []ResponseSpec{
-							{Status: 200, Description: "Success", Example: map[string]any{"token": "jwt_here"}},
-							{Status: 401, Description: "Invalid credentials", Example: map[string]any{"message": "Unauthorized"}},
+							{Status: 200, Description: "Success", Example: map[string]any{
+								"status": "success",
+								"message": "2FA not setup. Please use setup endpoint",
+								"data": map[string]any{
+									"requires_2fa": true,
+									"requires_2fa_message": "2FA not setup for this account, please setup 2FA to secure your account",
+									"password_change_required": true,
+									"setup_token": "JWT token e.g -- eyJhbGciOiJIUzI1NiIsIn",
+								},
+								"code": 200,
+							}},
+							{Status: 401, Description: "Invalid credentials", Example: map[string]any{"status": "error","message": "invalid credentials", "code": 401,}},
 						},
 					},
 					{
 						ID:      "admin-setup-2fa",
 						Method:  "POST",
-						Path:    "/admin/2fa/setup",
+						Path:    "/admin/auth/2fa/setup",
 						Summary: "Setup 2FA",
 						Auth:    "bearer",
 						Responses: []ResponseSpec{
