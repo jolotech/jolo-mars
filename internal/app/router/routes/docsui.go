@@ -30,24 +30,4 @@ func RegisterDocsUI(r *gin.Engine) {
         }
         c.Data(200, "image/png", b)
     })
-
-
-	r.GET("/__debug/fav", func(c *gin.Context) {
-		b, err := docsui.EmbeddedAssets.ReadFile("public/joloFav.png")
-		if err != nil {
-			c.String(500, "read error: %v", err)
-			return
-		}
-		c.Header("Content-Type", "text/plain; charset=utf-8")
-		n := 300
-		if len(b) < n {
-			n = len(b)
-		}
-		c.String(200, string(b[:n]))
-	})
-
-	r.GET("/__debug/spec", func(c *gin.Context) {
-        h := docsui.NewHandler(docsui.DefaultSpec())
-         h.ServeSpec(c)
-    })
 }
