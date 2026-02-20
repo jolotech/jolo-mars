@@ -89,14 +89,13 @@ func AdminGroup() Group {
 							Notes: []string{
 								"Use this endpoint to verify the 2FA code and enable 2FA for the admin account.",
 								"Call this endpoint after getting the setup token from login and setting up 2FA with the otpauth url.",
-								"Send the 6-digit code from your 2FA app in JSON.",
 								"Requires Authorization header with Bearer setup_token or two_fa_token from login response.",
 								"On success, 2FA will be enabled for the account and you can use the same code to login next time.",
 								"After enabling 2FA, you need to use the 2FA token from login response to verify the code.",
 								"If password change is required, you need to change the password first before you can use the access_token for protected endpoints.",
 								"On failure, 2FA will not be enabled and you can retry with the correct code.",
-
-								"NOTE: that the setup_token and two_fa_token from login response can both be used to call this endpoint for verification, but the two_fa_token is meant to last for 15 minutes and can only be used for verification, while the setup_token is meant to be used for setup and verification and may last longer (e.g. 30 minutes) to allow for setup and verification process.",
+								"",
+								"NOTE:   The setup_token and two_fa_token from login response can both be used to call this endpoint for verification, but the two_fa_token is meant to last for 15 minutes and can only be used for verification, while the setup_token is meant to be used for setup and verification and may last longer (e.g. 30 minutes) to allow for setup and verification process.",
 							},
 						},
 						Request: &RequestSpec{
