@@ -83,7 +83,6 @@ function scrollToWithOffset(el) {
   window.scrollTo({ top: y, behavior: "smooth" });
 }
 
-
   
   function setHash(hash) {
     if (!hash.startsWith("#")) hash = "#" + hash;
@@ -370,6 +369,8 @@ function quickStartHtml() {
   const q = state.spec.quickStart;
 
   const steps = (q.steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+  const savedBase = localStorage.getItem(STORAGE.baseUrl);
+
 
   const overview = (q.overview && (q.overview.body || []).length) ? `
     <div class="card">
@@ -377,16 +378,11 @@ function quickStartHtml() {
       ${(q.overview.body || []).map(p => `<p class="muted" style="margin:0 0 10px">${escapeHtml(p)}</p>`).join("")}
     </div>` : "";
 
-  // const examples = (q.examples || []).map(ex => `
-  //   <div class="card">
-  //     <div class="h2">${escapeHtml(ex.title)}</div>
-  //     <div class="codeWrap">
-  //       <button class="copyIconBtn" data-copy type="button" aria-label="Copy code">
-  //         ${copyIconSvg()}
-  //       </button>
-  //     </div>
-  //   </div>
-  // `).join("");
+  const onboarding = (q.onboarding && (q.onboarding.title || []).length) ? `
+    <div class="card">
+      <h2 class="h2">${escapeHtml(q.onboarding.title || "Onboarding")}</h2>
+      ${(q.onboarding.notes || []).map(p => `<p class="muted" style="margin:0 0 7px">${escapeHtml(p)}</p>`).join("")}
+    </div>` : "";
 
   const examples = (q.examples || []).map(ex => `
     <div class="card">
@@ -405,11 +401,12 @@ function quickStartHtml() {
     ${overview}
     <div class="card">
       <h2 class="h2">${escapeHtml(q.title || "Quick Start")}</h2>
-      <div class="muted">Base URL: <span class="path">${escapeHtml(state.spec.baseUrl)}</span></div>
+      <div class="muted">Base URL: <span class="path">${escapeHtml(savedBase ||state.spec.baseUrl)}</span></div>
       <div style="height:10px"></div>
       <ol class="muted" style="margin:0;padding-left:18px">${steps}</ol>
     </div>
     ${examples}
+    ${onboarding}
     <div class="card">
       <div class="h2">Browse</div>
       <div class="muted">Use the sidebar to pick a group, then a folder, then an endpoint.</div>
@@ -552,15 +549,6 @@ const tryItOut = `
             <span class="bigMethod">${escapeHtml(e.method)}</span>
             <code class="bigPath">${escapeHtml(e.path)}</code>
 
-            <button
-              class="copyIconBtn copyEndpointBtn"
-              data-copy-endpoint="${escapeHtml(e.id)}"
-              type="button"
-              aria-label="Copy endpoint"
-              title="Copy endpoint"
-            >
-              ${copyIconSvg()}
-            </button>
           </div>
           <div class="muted">${escapeHtml(e.summary || "")}</div>
         </div>

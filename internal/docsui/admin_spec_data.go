@@ -1,5 +1,6 @@
 package docsui
 
+// AdminGroup returns a Group with admin-related endpoints for the documentation spec.
 func AdminGroup() Group {
 	return Group{
 		ID:    "admin",
@@ -18,7 +19,9 @@ func AdminGroup() Group {
 						Usage: &UsageSpec{
 							Title: "Usage",
 							Notes: []string{
-								"Use this endpoint to authenticate an admin and get an access token.",
+								"Use this endpoint to authenticate an admin and get a JWT temporaty token based on the admin's account.",
+								"e.g. if 2FA is not enabled, you can login with email and password but requires to set up your 2fa.", 
+								"If 2FA is enabled, you need to first login with email and password to get a temporary token, then call the 2FA verify endpoint with the code and temporary token to get the access token.",
 								"Send email + password in JSON.",
 								"On success, store the token and use it in Authorization: Bearer <token> for protected endpoints.",
 							},

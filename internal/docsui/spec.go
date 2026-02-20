@@ -11,15 +11,16 @@ type DocSpec struct {
 }
 
 type QuickStart struct {
-	Title    string      `json:"title"`
-	Steps    []string    `json:"steps"`
-	Overview  *OverviewSpec `json:"overview,omitempty"`
-	Examples []CodeBlock `json:"examples"`
+	Title        string      `json:"title"`
+	Steps        []string    `json:"steps"`
+	Overview     *OverviewSpec `json:"overview,omitempty"`
+	Onboarding   *UsageSpec   `json:"onboarding,omitempty"`
+	Examples     []CodeBlock `json:"examples"`
 }
 
 type OverviewSpec struct {
 	Title string   `json:"title,omitempty"`
-	Body  []string `json:"body,omitempty"` // paragraphs
+	Body  []string `json:"body,omitempty"`
 }
 
 type CodeBlock struct {
@@ -69,7 +70,7 @@ type Endpoint struct {
 
 
 type UsageSpec struct {
-	Title string   `json:"title,omitempty"` // e.g. "How to use"
+	Title string   `json:"title,omitempty"` 
 	Notes []string `json:"notes,omitempty"` // bullet points / steps
 }
 
