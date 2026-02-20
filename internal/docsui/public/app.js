@@ -13,10 +13,6 @@
   const fileState = {}; // endpointId -> File
 
 
-  // const STORAGE = {
-  //   token: "docsui_bearer_token",
-  //   baseUrl: "docsui_base_url",
-  // };
   const ENV = {
     dev: "http://localhost:8023",
     staging: "https://staging.jolojolo.com",
@@ -74,11 +70,6 @@ function setBearerToken(token) {
   const input = document.getElementById("bearerToken");
   if (input) input.value = token;
 }
-
-// function scrollToWithOffset(el, offset = 80) {
-//   const y = el.getBoundingClientRect().top + window.scrollY - offset;
-//   window.scrollTo({ top: y, behavior: "smooth" });
-// }
 
 function topbarOffsetPx() {
   const tb = document.querySelector(".topbar");
@@ -198,17 +189,7 @@ function wireDragScroll(root = document) {
 }
 
 
-// function selectCodeInPre(preEl) {
-//   try {
-//     const range = document.createRange();
-//     range.selectNodeContents(preEl);
-//     const sel = window.getSelection();
-//     sel.removeAllRanges();
-//     sel.addRange(range);
-//   } catch {}
-// }
 
-// Clipboard API with fallback for older/blocked contexts
 async function copyTextReliable(text) {
   // Try modern clipboard API first
   if (navigator.clipboard && window.isSecureContext) {
