@@ -50,7 +50,7 @@ func AdminGroup() Group {
 					},
 					{
 						ID:      "admin-setup-2fa",
-						Method:  "POST",
+						Method:  "GET",
 						Path:    "/admin/auth/2fa/setup",
 						Summary: "Setup 2FA",
 						Auth:    "bearer",
