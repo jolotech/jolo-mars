@@ -1,5 +1,6 @@
 package docsui
 
+// DefaultSpec returns a default DocSpec with example data for the Jolo API documentation.
 func DefaultSpec() DocSpec {
 	return DocSpec{
 		ProductName: "Jolo API",
