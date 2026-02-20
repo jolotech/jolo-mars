@@ -86,12 +86,6 @@ input {
   min-width: 260px;
 }
 input:focus { border-color: rgba(96,165,250,0.6); }
-/* 
-.layout {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  min-height: calc(100vh - 64px);
-} */
 
 .layout{
   display: grid;
@@ -100,12 +94,6 @@ input:focus { border-color: rgba(96,165,250,0.6); }
   min-height: calc(100vh - 64px);
   align-items: start;
 }
-
-/* .sidebar {
-  border-right: 1px solid var(--border);
-  background: rgba(15,23,42,0.55);
-  padding: 12px;
-} */
 
 .sideTop {
   display: flex;
@@ -119,12 +107,12 @@ input:focus { border-color: rgba(96,165,250,0.6); }
   background: rgba(15,23,42,0.55);
   padding: 12px;
 
-  scrollbar-width: thin;                           /* Firefox */
+  scrollbar-width: thin;                         
   scrollbar-color: rgba(148,163,184,.35) transparent;
   position: sticky;
-  top: 64px;                         /* below your topbar */
-  height: calc(100vh - 64px);        /* full height minus topbar */
-  overflow: auto;                    /* sidebar scrolls */
+  top: 64px;                      
+  height: calc(100vh - 64px);       
+  overflow: auto;                    
   min-width: 0;
 }
 
@@ -173,8 +161,6 @@ input:focus { border-color: rgba(96,165,250,0.6); }
   cursor: pointer;
 }
 .treeGroupHeader strong { font-size: 13px; }
-/* .treeGroupBody { padding: 8px 8px 10px; display: none; }
-.treeGroupBody.open { display: block; } */
 
 .treeGroupBody {
   max-height: 0;
@@ -209,7 +195,6 @@ input:focus { border-color: rgba(96,165,250,0.6); }
 }
 .path { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
-/* .content { padding: 18px; } */
 .content{
   padding: 18px;
   min-width: 0;
@@ -240,7 +225,6 @@ input:focus { border-color: rgba(96,165,250,0.6); }
   border-radius: 999px;
   border: 1px solid var(--border);
 }
-/* .bigPath { font-family: var(--mono); color: var(--text); font-size: 13px; } */
 .bigPath { font-family: var(--mono); font-size: 13px; color: var(--muted); }
 
 .authTag {
@@ -385,11 +369,6 @@ select:focus { border-color: rgba(96,165,250,0.6); }
   opacity: 0.92;
 }
 
-/* Auto-select affordance */
-/* pre[data-autoselect="1"] {
-  cursor: text;
-} */
-
 /* ====== SELCT FILE BUTTON */
 .tryHead{
   display:flex;
@@ -425,18 +404,6 @@ select:focus { border-color: rgba(96,165,250,0.6); }
   opacity:0.92;
 }
 
-
-/* Try-it-out response coloring */
-/* .resBox {
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 10px;
-  background: rgba(2,6,23,0.55);
-} */
-
 .resBox{
   border-radius: 14px;
   border: 1px solid var(--border);
@@ -445,8 +412,8 @@ select:focus { border-color: rgba(96,165,250,0.6); }
 
   width: 100%;
   max-width: 100%;
-  overflow: hidden;     /* important */
-  min-width: 0;         /* ✅ critical in grid/flex */
+  overflow: hidden;     
+  min-width: 0;
 }
 
 .resBox.ok {
@@ -462,10 +429,10 @@ select:focus { border-color: rgba(96,165,250,0.6); }
 .resBox pre{
   margin: 0;
   max-height: 320px;
-  overflow: auto;       /* ✅ both directions */
+  overflow: auto;      
   max-width: 100%;
-  min-width: 0;         /* ✅ critical in grid/flex */
-  white-space: pre;     /* keep formatting */
+  min-width: 0;         
+  white-space: pre;     
   word-break: normal;
 
   -webkit-overflow-scrolling: touch;
@@ -503,10 +470,6 @@ pre {
   gap:12px;
 }
 
-/* summary .sumToggle{
-  pointer-events:none;
-} */
-
 
 .collapsibleBody {
   max-height: 0;
@@ -524,62 +487,11 @@ pre {
 /* Default: desktop */
 .mobileOnly { display: none; }
 
-/* Backdrop */
-/* .backdrop{
-  position: fixed;
-  inset: 0;
-  background: rgba(2,6,23,0.55);
-  z-index: 55; 
-} */
+
 
 
 /* Mobile layout */
-/* @media (max-width: 900px) {
-  .mobileOnly { display: inline-flex; }
-
-.sidebar{
-  position: fixed;
-  top: 64px;
-  height: calc(100vh - 64px); 
-  left: 0;
-  width: 86vw;
-  max-width: 340px;
-  transform: translateX(-110%);
-  transition: transform 220ms ease;
-  z-index: 60;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  overflow: auto;
-}
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(17,24,39,0.85), rgba(17,24,39,0.65));
-  position: sticky;
-  top: 0;
-  z-index: 50; 
-  backdrop-filter: blur(8px);
-}
-
-  @media (max-width: 900px) {
-  .layout { display:block; }
-}
-
-  .content{
-    width: 100%;
-    min-width: 0;
-  }
-} */
  
-
 .backdrop{
   position: fixed;
   inset: 0;
@@ -599,44 +511,44 @@ pre {
   }
   
   #pageContent {
-    scroll-margin-top: 90px; /* fallback for anchor-like jumps */
+    scroll-margin-top: 90px; 
   }
   .mobileOnly{ display: inline-flex !important; }
 
   .topbar{
-    flex-wrap: wrap;        /* ✅ allows wrapping */
+    flex-wrap: wrap;        
     align-items: flex-start;
     gap: 10px;
   }
 
   .brand{
     min-width: 0;
-    flex: 1 1 100%;         /* ✅ brand goes full width */
+    flex: 1 1 100%;     
   }
 
   .topControls{
     min-width: 0;
     width: 100%;
     display: flex;
-    flex-wrap: wrap;        /* ✅ controls wrap */
+    flex-wrap: wrap;        
     gap: 10px;
   }
 
   /* inputs/selects should shrink */
   .tokenWrap, .envWrap{
-    flex: 1 1 180px;        /* ✅ responsive boxes */
+    flex: 1 1 180px;       
     min-width: 0;
   }
 
   #mobileMenuBtn{
     flex: 0 0 auto;
-    order: -1;              /* ✅ keeps menu button visible first */
+    order: -1;            
   }
 
   input, select{
     width: 100%;
     min-width: 0;
-    box-sizing: border-box; /* ✅ prevents right cut */
+    box-sizing: border-box;
   }
 
   /* IMPORTANT: stop sticky on mobile */
@@ -649,9 +561,9 @@ pre {
     max-width: 340px;
     transform: translateX(-110%);
     transition: transform 220ms ease;
-    z-index: 100;                    /* above topbar */
+    z-index: 100;                   
     overflow: auto;
-    padding-top: 64px;               /* push under topbar */
+    padding-top: 64px;               
     border-right: 1px solid var(--border);
     background: rgba(2,6,23,0.55);
   }
@@ -660,10 +572,8 @@ pre {
     transform: translateX(0);
   }
 
-  /* mobile input shrink fix */
   input { min-width: 0; width: 100%; }
 
-  /* keep your 1-col cards */
   .grid2 {grid-template-columns: 1fr; gap: 0;}
 }
 
@@ -674,7 +584,7 @@ body.lockScroll{
 }
 
 
-/* toggle switch button (same look you liked) */
+/* toggle switch button */
 
 .sumToggle{
   width:44px;
@@ -729,13 +639,6 @@ body.lockScroll{
   transition: transform 160ms ease;
 }
 
-/* when details is open, move knob */
-/* details[open] .sumToggle::after{
-  transform: translateX(20px);
-} */
-
-
-/* .codeWrap { position: relative; } */
 .copyBtn {
   position: absolute;
   top: 10px;
@@ -772,29 +675,25 @@ summary::-webkit-details-marker { display: none; }
 .detailsBody { padding: 0 14px 14px; }
 .chev { opacity: 0.7; font-family: var(--mono); font-size: 12px; }
 
-/* 1) Critical: allow grid children to shrink */
 .grid2 {
   min-width: 0;
 }
 
 .grid2 > * {
-  min-width: 0; /* ✅ THIS is the usual missing piece */
+  min-width: 0;
 }
 
-/* 2) Cards must be allowed to shrink too */
 .card, .tryCard {
   min-width: 0;
   max-width: 100%;
 }
 
-/* 3) codeWrap can also force width if not shrinkable */
 .codeWrap {
   min-width: 0;
   max-width: 100%;
-  overflow: hidden; /* stops inner overflow from affecting outer */
+  overflow: hidden; 
 }
 
-/* 4) Hard stop for pre/code width */
 .resBox, .resBox * {
   max-width: 100%;
   min-width: 0;
@@ -807,22 +706,11 @@ summary::-webkit-details-marker { display: none; }
   white-space: pre;
 }
 
-/* 5) Prevent code from forcing width */
 .resBox code {
   display: block;
   white-space: pre;
   max-width: 100%;
 }
-
-
-/* @media (max-width: 980px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar { position: sticky; top: 64px; z-index: 2; }
-  input { min-width: 0; width: 100%; }
-  .grid2 { grid-template-columns: 1fr; }
-} */
-
-
 
 .tryRow { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
 .smallInput { min-width: 0; width: 220px; }
