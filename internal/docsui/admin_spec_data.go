@@ -55,7 +55,7 @@ func AdminGroup() Group {
 						Summary: "Setup 2FA",
 						Auth:    "bearer",
 						Responses: []ResponseSpec{
-							{Status: 200, Description: "Returns otpauth url", Example: map[string]any{"otpauth_url": "otpauth://totp/..."}},
+							{Status: 200, Description: "Returns otpauth url to generate QR code", Example: map[string]any{"otpauth_url": "otpauth://totp/..."}},
 						},
 					},
 					{
