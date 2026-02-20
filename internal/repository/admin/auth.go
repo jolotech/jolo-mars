@@ -107,7 +107,7 @@ func (r *AdminAuthRepo) Save2FASecret(id uint, encSecret string) error {
 		Where("id = ?", id).
 		Updates(map[string]any{
 			"two_fa_secret_enc":   encSecret,
-			"two_fa_enabled":      true,
+			"two_fa_enabled":      false,
 			"two_fa_confirmed_at": nil,
 		}).Error
 }

@@ -172,7 +172,7 @@ func (s *AdminAuthService) Confirm2FA(adminId, code string) (string, any, int, e
 	}
 
 	if !utils.Verify2faTOTP(code, secret) {
-		return "invalid 2fa code", nil, http.StatusUnauthorized, errors.New("invalid 2fa code")
+		return "invalid 2fa code", nil, http.StatusBadRequest, errors.New("invalid 2fa code")
 	}
 
 	if err := s.adminAuthRepo.Enable2FA(admin.ID); err != nil {
