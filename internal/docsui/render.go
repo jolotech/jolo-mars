@@ -2,6 +2,12 @@ package docsui
 
 import "html/template"
 
+
+// pageTmpl is the HTML template for the documentation page. 
+// It includes placeholders for product name, version, company name, description, and base URL. 
+// The template also references static assets like styles.css and app.js, 
+// which are served from the embedded filesystem.
+
 var pageTmpl = template.Must(template.New("docs").Parse(`<!doctype html>
 <html lang="en">
 <head>

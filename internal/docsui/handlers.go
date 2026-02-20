@@ -16,7 +16,8 @@ func NewHandler(spec DocSpec) *Handler {
 	return &Handler{spec: spec}
 }
 
-// ========== GET /docs/ ===========
+// ========== HOME PAGE ===========
+// ServeHome serves the documentation HTML page at /
 func (h *Handler) ServeHome(c *gin.Context) {
 	// serve the HTML page with the embedded spec
 	c.Header("Content-Type", "text/html; charset=utf-8")
@@ -25,7 +26,8 @@ func (h *Handler) ServeHome(c *gin.Context) {
 }
 
 
-// ========== GET /docs/spec.json ===========
+// ========== SPEC DATA ===========
+// ServeSpec serves the OpenAPI spec as JSON at /docs/spec.json
 func (h *Handler) ServeSpec(c *gin.Context) {
 	// serve the OpenAPI spec as JSON
 	c.Header("Content-Type", "application/json; charset=utf-8")
@@ -37,8 +39,8 @@ func (h *Handler) ServeSpec(c *gin.Context) {
 	_ = enc.Encode(h.spec)
 }
 
-
-// ========== GET /docs/assesets/:file ===========
+// ========== ASSETS ===========
+// ServeAsset serves embedded static assets (CSS, JS, images) at /docs/assets/:file
 func (h *Handler) ServeAsset(c *gin.Context) {
 	// get the requested file from the URL parameter
 	file := c.Param("file")
