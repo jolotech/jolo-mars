@@ -34,7 +34,7 @@ func AdminGroup() Group {
 							},
 						},
 						Responses: []ResponseSpec{
-							{Status: 200, Description: "Success", Example: map[string]any{
+							{Status: 200, Description: "2fa Success", Example: map[string]any{
 								"status": "success",
 								"message": "2FA not setup. Please use setup endpoint",
 								"data": map[string]any{
