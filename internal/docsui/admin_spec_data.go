@@ -122,6 +122,27 @@ func AdminGroup() Group {
 				},
 			},
 			{
+				ID:    "admin-dashboard",
+				Title: "Dashboard",
+				Endpoints: []Endpoint{
+					{
+						ID: "admin-change-password", 
+						Method: "PUT", 
+						Path: "/admin/dash/change-password", 
+						Summary: "Change password", 
+						Auth: "bearer",
+						Usage: &UsageSpec{
+							Title: "Usage",
+							Notes: []string{
+								"Use this endpoint to change the password of the admin account.",
+								"Requires Authorization header with Bearer token from 2fa verification response.",
+								"If password change is required after login, you need to change the password before you can use the access token for protected endpoints.",
+							},
+						},
+					},
+				},
+			},
+			{
 				ID:    "admin-management",
 				Title: "Management",
 				Endpoints: []Endpoint{
