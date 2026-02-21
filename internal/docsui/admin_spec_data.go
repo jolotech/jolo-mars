@@ -76,7 +76,6 @@ func AdminGroup() Group {
 							    },
 							},
 							{Status: 401, Description: "Invalide auth token", Example: map[string]any{"status": "error", "message": "Invalid token purpose", "code": 401}},
-							{Status: 401, Description: "Authorization failed", Example: map[string]any{"status": "error", "message": "Missing Authorization header", "code": 401}},
 					    },
 					},
 					{
@@ -117,18 +116,6 @@ func AdminGroup() Group {
 								    "code": 200,
 								},
 							},
-							{
-								Status: 200, 
-								Description: "Successful login response", 
-								Example: map[string]any{
-									"status": "success",
-								    "message": "login successful",
-								    "data": map[string]any{
-									   "password_change_required": false,
-									   "access_token": "JWT token e.g eyJhbGciOiJIUzI1....",
-								    },
-								"code": 200,
-							}},
 							{Status: 400, Description: "Invalid code", Example: map[string]any{"status": "error", "message": "invalid 2FA code", "code": 400}},
 						},
 					},
