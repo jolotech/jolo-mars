@@ -118,7 +118,67 @@ func UserGroup() Group {
 							},
 						},
 					},
+					{
+						ID: "user-verify-otp", 
+						Method: "POST", Path: "/users/auth/verify-otp", 
+						Summary: "Verify OTP",
+						Auth: "bearer",
+						Usage: &UsageSpec{
+							Title: "Usage",
+							Notes: []string{
+								"This endpoint verifies the OTP sent to the user's email or phone during registration or password reset. The user must provide the OTP code and the associated email or phone number for verification.",
+						    },
+						},
+						Request: &RequestSpec{
+								ContentType: "application/json",
+								Example: map[string]any{
+									"otp": "123456",
+									"email": "jolo@example.com",
+									"verification_method": "email",
+								},
+						},
+						
+						Responses: []ResponseSpec{
+							{
+								Status: 200,
+								Description: "Verification Success",
+								Example: map[string]any{
+									"status": "success",
+									"message": "Verification successful",
+									"data": map[string]any{
+										"token": "JWT token e.g eyJhbGciOiJIUzI1NiI.......",
+										"user": map[string]any{
+											"public_id": "AMbm48jjMPaTz0Q",
+											"f_name": "jolo",
+											"l_name": "delivery",
+											"email": "jolodelivery@gmail.com",
+											"phone": "+2348120618617",
+											"ref_by": nil,
+											"ref_code": "RPC-WM5A-FDK8-G3",
+											"status": true,
+											"is_phone_verified": false,
+											"is_email_verified": true,
+											"cm_firebase_token": nil,
+											"created_at": "2026-01-27T06:16:23.952+01:00",
+											"updated_at": "2026-01-27T06:16:43.377+01:00",
+										},
+									},
+									"code": 200,
+								},
+							},
+							{
+								Status: 400,
+								Description: "Invalid OTP",
+								Example: map[string]any{
+									"status": "error",
+									"message": "Invalid OTP code",
+									"code": 400,
+								},
+							},
+						},
+					},
 					{ID: "user-forgot-password", Method: "POST", Path: "/users/auth/forgot-password", Summary: "Forgot Password", Auth: "none"},
+
 				},
 			},
 			{
