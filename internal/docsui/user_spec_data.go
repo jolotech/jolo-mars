@@ -186,10 +186,9 @@ func UserGroup() Group {
 						Usage: &UsageSpec{
 							Title: "Usage",
 							Notes: []string{
-								"Use this endpont to resend users expired or none received otp",
-								"Required fields are verification_method and email or phone",
+								"This endpoint triggers the regeneration and delivery of a new One-Time Password (OTP) for verification purposes when the previous OTP has expired or was not delivered. Required parameters include verification_method and either email or phone, based on the specified delivery channel.",
 							},
-							},
+						},
 						Request: &RequestSpec{
 							ContentType: "application/json",
 							Example: map[string]any{
@@ -219,8 +218,43 @@ func UserGroup() Group {
 							},
 						},
 					},
-					{ID: "user-forgot-password", Method: "POST", Path: "/users/auth/forgot-password", Summary: "Forgot Password", Auth: "none"},
+					{
+						ID: "user-forgot-password", 
+						Method: "POST", 
+						Path: "/v1/auth/forget-password", 
+						Summary: "Forgot Password",
+						Auth: "none",
+						Usage: &UsageSpec{
+							Title: "Usage",
+							Notes: []string{
+								"This endpoint triggers the password recovery workflow. It generates a time-bound OTP and delivers it through the specified verification_method (e.g., email or phone). Required parameters include email and verification_method. After receiving the OTP, the user must call the reset endpoint to validate the OTP and complete the password update process.",
+							},
+						},
+						Request: &RequestSpec{
+							ContentType: "application/json",
+							Example: map[string]any{
+								"email": "jolodelivry@gmail.com",
+							    "verification_method": "email",
 
+								"reset_token": "123456",
+							    // "email": "jolodelivry@gmail.com",
+							    // "verification_method": "email",
+							    "password": "1234567890",
+							    "confirm_password": "1234567890",
+						    },
+					    },
+						Responses: []ResponseSpec{
+							{
+								Status: 200,
+								Description: "OTP Sent",
+								Example: map[string]any{
+									"status": "success",
+									"message": "OTP sent successfully",
+									"code": 200,
+								},
+							},
+						},
+					},
 				},
 			},
 			{
