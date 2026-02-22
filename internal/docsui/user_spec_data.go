@@ -120,7 +120,7 @@ func UserGroup() Group {
 					},
 					{
 						ID: "user-verify-otp", 
-						Method: "POST", Path: "/users/auth/verify-otp", 
+						Method: "POST", Path: "/v1/auth/verify-otp", 
 						Summary: "Verify OTP",
 						Auth: "bearer",
 						Usage: &UsageSpec{
