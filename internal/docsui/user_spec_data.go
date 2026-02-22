@@ -177,6 +177,48 @@ func UserGroup() Group {
 							},
 						},
 					},
+					{
+						ID: "user-resend-otp",
+						Method: "POST",
+						Path: "/v1/auth/resend-otp",
+						Summary: "Resend OTP",
+						Auth: "none",
+						Usage: &UsageSpec{
+							Title: "Usage",
+							Notes: []string{
+								"Use this endpont to resend users expired or none received otp",
+								"Required fields are verification_method and email or phone",
+							},
+							},
+						Request: &RequestSpec{
+							ContentType: "application/json",
+							Example: map[string]any{
+								"verification_method": "email",
+								"email or phone":      "jolo@gmail.com",
+							},
+						},
+						Responses: []ResponseSpec{
+							{
+								Status: 200,
+								Description: "OTP Sent",
+								Example: map[string]any{
+									"status": "success",
+									"message": "OTP sent successfully",
+									"code": 200,
+								},
+							},
+							{
+								Status: 400,
+								Description: "Deactivated TOP",
+								Example: map[string]any{
+									"status": "error",
+									"message": "OTP deactivated",
+									"error": "Invalid OTP",
+									"code": 400,
+								},
+							},
+						},
+					},
 					{ID: "user-forgot-password", Method: "POST", Path: "/users/auth/forgot-password", Summary: "Forgot Password", Auth: "none"},
 
 				},
