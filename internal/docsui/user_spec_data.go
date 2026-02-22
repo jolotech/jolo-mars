@@ -13,7 +13,7 @@ func UserGroup() Group {
 						ID: "user-login", 
 						Method: "POST", 
 						Path: "/v1/auth/login", 
-						Summary: "Login", 
+						Summary: "User Login", 
 						Auth: "none",
 						Usage: &UsageSpec{
 							Title: "Usage",
