@@ -185,7 +185,7 @@ func AdminGroup() Group {
 			},
 			{
 				ID:    "admin-management",
-				Title: "Management (PENDING)",
+				Title: "Management (pending)",
 				Endpoints: []Endpoint{
 					{ID: "admin-list", Method: "GET", Path: "/admins", Summary: "List admins", Auth: "bearer"},
 					{ID: "admin-delete-all", Method: "DELETE", Path: "/admins", Summary: "Delete all admins", Auth: "bearer"},
