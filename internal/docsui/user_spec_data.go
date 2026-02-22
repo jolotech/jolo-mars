@@ -123,7 +123,7 @@ func UserGroup() Group {
 			},
 			{
 				ID:    "users-cart",
-				Title: "Cart",
+				Title: "Cart (PENDING)",
 				Endpoints: []Endpoint{
 					{ID: "cart-get", Method: "GET", Path: "/users/cart", Summary: "Get Cart", Auth: "bearer"},
 					{ID: "cart-add", Method: "POST", Path: "/users/cart/items", Summary: "Add Item", Auth: "bearer"},
