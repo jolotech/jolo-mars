@@ -281,6 +281,16 @@ func UserGroup() Group {
 									"code": 200,
 								},
 							},
+							{
+								Status: 400,
+								Description: "Password Error",
+								Example: map[string]any{
+									"status": "error",
+									"message": "cant use previous password",
+									"error": "cant use old password update to a new password",
+									"code": 400,
+								},
+							},
 						},
 					},
 				},
