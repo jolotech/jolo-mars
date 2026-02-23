@@ -193,7 +193,7 @@ func UserGroup() Group {
 							ContentType: "application/json",
 							Example: map[string]any{
 								"verification_method": "email",
-								"email or phone":      "jolo@gmail.com",
+								"email":      "jolo@gmail.com",
 							},
 						},
 						Responses: []ResponseSpec{
@@ -235,10 +235,38 @@ func UserGroup() Group {
 							Example: map[string]any{
 								"email": "jolodelivry@gmail.com",
 							    "verification_method": "email",
-
+						    },
+					    },
+						Responses: []ResponseSpec{
+							{
+								Status: 200,
+								Description: "OTP Sent",
+								Example: map[string]any{
+									"status": "success",
+									"message": "OTP sent successfully",
+									"code": 200,
+								},
+							},
+						},
+					},
+					{
+						ID: "user-reset-password", 
+						Method: "POST", 
+						Path: "/v1/auth/reset-password", 
+						Summary: "Reset Password",
+						Auth: "none",
+						Usage: &UsageSpec{
+							Title: "Usage",
+							Notes: []string{
+								"This endpoint verifies the provided reset_token against the active OTP issued for the specified email and verification_method. If the token is valid and not expired, and password matches confirm_password, the system updates the user’s password and invalidates the used OTP to prevent reuse.",
+							},
+						},
+						Request: &RequestSpec{
+							ContentType: "application/json",
+							Example: map[string]any{
 								"reset_token": "123456",
-							    // "email": "jolodelivry@gmail.com",
-							    // "verification_method": "email",
+							    "email": "jolodelivry@gmail.com",
+							    "verification_method": "email",
 							    "password": "1234567890",
 							    "confirm_password": "1234567890",
 						    },
