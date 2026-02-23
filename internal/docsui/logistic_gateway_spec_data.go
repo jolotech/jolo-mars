@@ -3,7 +3,7 @@ package docsui
 func LogisticGatewayGroup() Group {
 	return Group{
 		ID:    "logistics",
-		Title: "Logistics Gateway -- (pending)",
+		Title: "Logistics Gateway - (pending)",
 		Sections: []Section{
 			{
 				ID:    "logistics-health",
