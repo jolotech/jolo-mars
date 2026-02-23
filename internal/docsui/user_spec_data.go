@@ -251,7 +251,7 @@ func UserGroup() Group {
 					},
 					{
 						ID: "user-reset-password", 
-						Method: "POST", 
+						Method: "PUT", 
 						Path: "/v1/auth/reset-password", 
 						Summary: "Reset Password",
 						Auth: "none",
@@ -289,6 +289,36 @@ func UserGroup() Group {
 									"message": "cant use previous password",
 									"error": "cant use old password update to a new password",
 									"code": 400,
+								},
+							},
+						},
+					},
+					{
+						ID: "guest-creation", 
+						Method: "POST", 
+						Path: "/v1/auth/guest-request", 
+						Summary: "Create Guest",
+						Auth: "none",
+						Usage: &UsageSpec{
+							Title: "Usage",
+							Notes: []string{
+								"This endpoint initializes a guest user entity within the system. It requires fcm_token for device-level identification and push notification support. Upon successful creation, a unique guest_id is issued, which can be used to persist guest-related data and optionally linked to a registered user during authentication or registration.",
+							},
+						},
+						Request: &RequestSpec{
+							ContentType: "application/json",
+							Example: map[string]any{
+								"fcm_token": "6998knbiib8",
+						    },
+					    },
+						Responses: []ResponseSpec{
+							{
+								Status: 200,
+								Description: "OTP Sent",
+								Example: map[string]any{
+									"status": "success",
+									"message": "OTP sent successfully",
+									"code": 200,
 								},
 							},
 						},
