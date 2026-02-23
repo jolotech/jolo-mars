@@ -311,17 +311,6 @@ func UserGroup() Group {
 								"fcm_token": "6998knbiib8",
 						    },
 					    },
-						Responses: []ResponseSpec{
-							{
-								Status: 200,
-								Description: "OTP Sent",
-								Example: map[string]any{
-									"status": "success",
-									"message": "OTP sent successfully",
-									"code": 200,
-								},
-							},
-						},
 					},
 				},
 			},
