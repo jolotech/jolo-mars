@@ -16,18 +16,18 @@ func RegisterDocsUI(r *gin.Engine) {
 	// serve the JSON spec
 	r.GET("/docs/spec.json", h.ServeSpec)
 
-	// serve embedded assets (css/js/svg) correctly
+	// serve embedded assets (css/js/png) correctly
 	sub, err := fs.Sub(docsui.EmbeddedAssets, "public")
 	if err != nil {
 		panic(err)
 	}
 	r.StaticFS("/docs/assets", http.FS(sub))
-	r.GET("/favicon.ico", func(c *gin.Context) {
-       b, err := docsui.EmbeddedAssets.ReadFile("public/joloIcon.png")
-        if err != nil {
-           c.Status(404)
-           return
-        }
-        c.Data(200, "image/png", b)
-    })
+	// r.GET("/favicon.ico", func(c *gin.Context) {
+    //    b, err := docsui.EmbeddedAssets.ReadFile("public/joloIcon.png")
+    //     if err != nil {
+    //        c.Status(404)
+    //        return
+    //     }
+    //     c.Data(200, "image/png", b)
+    // })
 }
