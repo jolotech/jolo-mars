@@ -15,7 +15,7 @@ var pageTmpl = template.Must(template.New("docs").Parse(`<!doctype html>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>{{.ProductName}} Docs</title>
 
-  <link rel="icon" href="/docs/assets/joloFav.png" type="image/png"/>
+  <link rel="icon" href="/docs/assets/joloIcon.png" type="image/png"/>
   <link rel="stylesheet" href="/docs/assets/styles.css"/>
 </head>
 <body>

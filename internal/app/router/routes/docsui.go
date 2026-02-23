@@ -23,7 +23,7 @@ func RegisterDocsUI(r *gin.Engine) {
 	}
 	r.StaticFS("/docs/assets", http.FS(sub))
 	r.GET("/favicon.ico", func(c *gin.Context) {
-       b, err := docsui.EmbeddedAssets.ReadFile("public/joloFav.png")
+       b, err := docsui.EmbeddedAssets.ReadFile("public/joloIcon.png")
         if err != nil {
            c.Status(404)
            return
